@@ -48,7 +48,7 @@ class Site(models.Model):
     shortname = models.CharField(max_length=30)
     configdirname = models.CharField(max_length=50)
     ECSlists = models.ManyToManyField(ECS)
-    configfiles = models.ManyToManyField(Configfile)
+    configfiles = models.ManyToManyField(Configfile, null=True, blank=True)
     port = models.PositiveSmallIntegerField(null=True)
     testpage = models.CharField(max_length=30, null=True)
     devcharge = models.CharField(max_length=10, null=True)

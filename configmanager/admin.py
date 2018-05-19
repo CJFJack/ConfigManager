@@ -40,7 +40,7 @@ class SiteAdmin(admin.ModelAdmin):
     filter_horizontal = ('ECSlists', 'configfiles')
 
     list_display = ('fullname', 'get_ECSlists', 'deployattention', 'status', 'modified_time')
-    list_filter = ['port']
+    list_filter = ['status', 'port']
     search_fields = ['fullname']
 
     def save_model(self, request, obj, form, change):

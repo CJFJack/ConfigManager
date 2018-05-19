@@ -28,13 +28,14 @@ class ECS(models.Model):
 
 
 class Configfile(models.Model):
-    sitecluster = models.CharField(max_length=30, null=True)
+    sitecluster = models.CharField(max_length=30)
     filename = models.CharField(max_length=30)
     content = models.TextField(null=True, blank=True)
+    modified_user = models.CharField(max_length=20)
     modified_time = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
-        return self.filename
+        return self.sitecluster
 
 
 class Site(models.Model):
@@ -48,7 +49,7 @@ class Site(models.Model):
     shortname = models.CharField(max_length=30)
     configdirname = models.CharField(max_length=50)
     ECSlists = models.ManyToManyField(ECS)
-    configfiles = models.ManyToManyField(Configfile, null=True, blank=True)
+    configfiles = models.ManyToManyField(Configfile, blank=True)
     port = models.PositiveSmallIntegerField(null=True)
     testpage = models.CharField(max_length=30, null=True)
     devcharge = models.CharField(max_length=10, null=True)

@@ -82,8 +82,12 @@ DATABASES = {
         'PASSWORD': 'Python@123',
         'HOST': '127.0.0.1',
         'PORT': '3306',
+       # 'OPTIONS': {
+       #     'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+       # }
    }
 }
+
 
 
 # Password validation

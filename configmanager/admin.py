@@ -2,13 +2,11 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
+from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
 from .models import Site, ECS, Configfile
 
-#class ConfigfileInline(admin.TabularInline):
-#    model = Configfile
-#    extra = 0
 
 class ECSAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -19,8 +17,8 @@ class ECSAdmin(admin.ModelAdmin):
     ]
 
     list_display = ('name', 'instanceid', 'IP', 'status', 'modified_user', 'modified_time') 
-    list_filter = ['name']
-    search_fields = ['name']
+    list_filter = ['status', 'name']
+    search_fields = ['name', 'IP']
 
     def save_model(self, request, obj, form, change):
         obj.modified_user = request.user.username
@@ -51,7 +49,8 @@ class SiteAdmin(admin.ModelAdmin):
         super(SiteAdmin, self).save_model(request, obj, form, change)
 
 
-class ConfigfileAdmin(admin.ModelAdmin):
+@admin.register(Configfile)
+class ConfigfileAdmin(SimpleHistoryAdmin):
     fieldsets = [
         (None, {'fields': ['sitecluster', 'filename', 'content']}),
     ]
@@ -64,4 +63,3 @@ class ConfigfileAdmin(admin.ModelAdmin):
 
 admin.site.register(ECS, ECSAdmin)
 admin.site.register(Site, SiteAdmin)
-admin.site.register(Configfile, ConfigfileAdmin)

@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from simple_history.models import HistoricalRecords
 
 # Create your models here.
 
@@ -33,6 +34,7 @@ class Configfile(models.Model):
     content = models.TextField(null=True, blank=True)
     modified_user = models.CharField(max_length=20)
     modified_time = models.DateTimeField(auto_now=True)
+    history = HistoricalRecords()
 
     def __unicode__(self):
         return self.sitecluster

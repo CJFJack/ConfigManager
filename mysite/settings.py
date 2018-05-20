@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['13.125.249.158']
 # Application definition
 
 INSTALLED_APPS = [
+    'simple_history',
     'configmanager.apps.ConfigmanagerConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -48,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 ROOT_URLCONF = 'mysite.urls'

@@ -89,6 +89,15 @@ class Apply(models.Model):
         (TESTMANAGERAPPROVAL, '测试经理审批中'),
         (TECHNICALDIRECTORYAPPROVAL, '技术总监审批中'),
     )
+    APPROVAL = 'Y'
+    NOAPPROVAL = 'N'
+    apply_status_CHOICES = (
+        (APPROVAL, '审批通过'),
+        (NOAPPROVAL, '审批不通过'),
+    )
+
+    def apply_user_default(self, request, obj, form, change):
+        return request.user.username
 
     applyproject = models.CharField(max_length=50)
     status = models.CharField(
@@ -96,18 +105,23 @@ class Apply(models.Model):
         choices=status_CHOICES,
         default=WAITFORCOMMIT,
     ) 
-    apply_user = models.CharField(max_length=20)
+    apply_user = models.CharField(max_length=20, default='admin', editable=False)
     apply_time = models.DateTimeField(auto_now_add=True)
     deploy_user = models.CharField(max_length=20, null=True, blank=True)
     deploy_time = models.DateTimeField(null=True, blank=True)
     confamendexplain = models.TextField(null=True, blank=True)
     remarkexplain = models.TextField(null=True, blank=True)
+    apply_status = models.CharField(
+        max_length=1,
+        choices=apply_status_CHOICES,
+        default=APPROVAL,                                                                                                                    
+    )
 
     def __unicode__(self):
         return self.applyproject
 
 
-class deployitem(models.Model):
+class Deployitem(models.Model):
     TRUNK = 'T'
     BRANCH = 'B'
     type_CHOICES = (
@@ -116,11 +130,11 @@ class deployitem(models.Model):
     )
     DEPLOYED = 'Y'
     WAITFORDEPLOY = 'N'
-    status_CHOICES = (
-        (DEPLOYED, 'Y'),
-        (WAITFORDEPLOY, 'N'),
+    deploy_status_CHOICES = (
+        (DEPLOYED, '已发布'),
+        (WAITFORDEPLOY, '待发布'),
     )
-
+    
     applyproject = models.ForeignKey(Apply, on_delete=models.CASCADE)
     deployorderby = models.PositiveSmallIntegerField(null=True,blank=True)
     jenkinsversion = models.PositiveSmallIntegerField(null=True,blank=True)
@@ -130,14 +144,14 @@ class deployitem(models.Model):
         default=TRUNK,
     ) 
     deploysite = models.ManyToManyField(Site, blank=True)
-    status = models.CharField(
+    deploy_status = models.CharField(
         max_length=1,
-        choices=status_CHOICES,
+        choices=deploy_status_CHOICES,
         default=WAITFORDEPLOY,                                                                                                                    
     )
     
     def __unicode__(self):
-        return self.jenkinsversion
+        return self.deploy_status
     
 
 

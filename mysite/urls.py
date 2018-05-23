@@ -20,5 +20,4 @@ urlpatterns = [
     url(r'^\Z', include('configmanager.urls')),
     url(r'^config/', include('configmanager.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'^apply/', include('applydeploy.urls')),
 ]

@@ -5,7 +5,7 @@ from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
-from .models import Site, ECS, Configfile
+from .models import Site, ECS, Configfile, Apply, Deployitem
 
 
 class ECSAdmin(admin.ModelAdmin):
@@ -58,7 +58,7 @@ class SiteAdmin(admin.ModelAdmin):
     ]
     filter_horizontal = ('ECSlists', 'configfiles')
 
-    list_display = ('fullname',  'deployattention', 'get_ECSlists', 'get_configfiles', 'status', 'modified_user', 'modified_time')
+    list_display = ('fullname', 'deployattention', 'get_ECSlists', 'get_configfiles', 'status', 'modified_user', 'modified_time')
     list_filter = ['status', 'port']
     search_fields = ['fullname', 'port']
     actions = [make_sites_disable, make_sites_enable]
@@ -73,12 +73,28 @@ class ConfigfileAdmin(SimpleHistoryAdmin):
     fieldsets = [
         (None, {'fields': ['sitecluster', 'filename', 'content']}),
     ]
-    list_display=('sitecluster', 'filename', 'modified_user', 'modified_time')
+    list_display = ('sitecluster', 'filename', 'modified_user', 'modified_time')
     search_fields = ['sitecluster']
     
     def save_model(self, request, obj, form, change):
         obj.modified_user = request.user.username
         super(ConfigfileAdmin, self).save_model(request, obj, form, change)
 
+
+class DeployitemInline(admin.TabularInline):
+    model = Deployitem
+    extra = 0
+    filter_horizontal = ('deploysite',)
+
+
+class ApplyAdmin(admin.ModelAdmin):
+    fieldsets = [
+        (None, {'fields': ['applyproject', 'confamendexplain', 'remarkexplain', 'apply_status']}),
+    ]
+    inlines = [DeployitemInline]
+    list_display = ('applyproject', 'status', 'apply_user', 'apply_time', 'deploy_user', 'deploy_time')
+
+
 admin.site.register(ECS, ECSAdmin)
 admin.site.register(Site, SiteAdmin)
+admin.site.register(Apply, ApplyAdmin)

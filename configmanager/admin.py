@@ -34,6 +34,24 @@ class SiteAdmin(admin.ModelAdmin):
     def get_configfiles(self, obj):
         return ', '.join([c.filename for c in obj.configfiles.all()])
     get_configfiles.short_description = 'configfiles'
+
+    def make_sites_disable(self, request, queryset):
+        rows_updated = queryset.update(status='N')
+        if rows_updated == 1:
+            message_bit = "1 site was"
+        else:
+            message_bit = "%s sites were" % rows_updated
+        self.message_user(request, "%s successfully marked as disable." % message_bit)
+    make_sites_disable.short_description = "Disable selected sites"
+
+    def make_sites_enable(self, request, queryset):
+        rows_updated = queryset.update(status='Y')
+        if rows_updated == 1:
+            message_bit = "1 site was"
+        else:
+            message_bit = "%s sites were" % rows_updated
+        self.message_user(request, "%s successfully marked as enable." % message_bit)
+    make_sites_enable.short_description = "Enabke selected site"
  
     fieldsets = [
         ('site_info', {'fields': ['fullname', 'shortname', 'configdirname', 'ECSlists', 'configfiles', 'port', 'testpage', 'status', 'deployattention', 'devcharge']}),
@@ -42,7 +60,8 @@ class SiteAdmin(admin.ModelAdmin):
 
     list_display = ('fullname',  'deployattention', 'get_ECSlists', 'get_configfiles', 'status', 'modified_user', 'modified_time')
     list_filter = ['status', 'port']
-    search_fields = ['fullname']
+    search_fields = ['fullname', 'port']
+    actions = [make_sites_disable, make_sites_enable]
 
     def save_model(self, request, obj, form, change):
         obj.modified_user = request.user.username

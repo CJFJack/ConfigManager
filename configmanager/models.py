@@ -68,3 +68,77 @@ class Site(models.Model):
         return self.fullname
 
    
+class Apply(models.Model):
+    WAITFORCOMMIT = 'WC'
+    WAITFORDEPLOY = 'WD'
+    CANCELED = 'C'
+    DEPLOYED = 'D'
+    DEVMANAGERAPPROVAL = 'DA'
+    OPERMANAGERAPPROVAL = 'OA'
+    ENGINEERAPPROVAL = 'EA'
+    TESTMANAGERAPPROVAL = 'TA'
+    TECHNICALDIRECTORYAPPROVAL = 'TDA'
+    status_CHOICES = (
+        (WAITFORCOMMIT, '待提交'),
+        (WAITFORDEPLOY, '待发布'),
+        (CANCELED, '已取消'),
+        (DEPLOYED, '已发布'),
+        (DEVMANAGERAPPROVAL, '研发经理审批中'),
+        (OPERMANAGERAPPROVAL, '运维经理审批中'),
+        (ENGINEERAPPROVAL, '运维工程师审批中'),
+        (TESTMANAGERAPPROVAL, '测试经理审批中'),
+        (TECHNICALDIRECTORYAPPROVAL, '技术总监审批中'),
+    )
+
+    applyproject = models.CharField(max_length=50)
+    status = models.CharField(
+        max_length=3,
+        choices=status_CHOICES,
+        default=WAITFORCOMMIT,
+    ) 
+    apply_user = models.CharField(max_length=20)
+    apply_time = models.DateTimeField(auto_now_add=True)
+    deploy_user = models.CharField(max_length=20, null=True, blank=True)
+    deploy_time = models.DateTimeField(null=True, blank=True)
+    confamendexplain = models.TextField(null=True, blank=True)
+    remarkexplain = models.TextField(null=True, blank=True)
+
+    def __unicode__(self):
+        return self.applyproject
+
+
+class deployitem(models.Model):
+    TRUNK = 'T'
+    BRANCH = 'B'
+    type_CHOICES = (
+        (TRUNK, '主干'),
+        (BRANCH, '分支'),
+    )
+    DEPLOYED = 'Y'
+    WAITFORDEPLOY = 'N'
+    status_CHOICES = (
+        (DEPLOYED, 'Y'),
+        (WAITFORDEPLOY, 'N'),
+    )
+
+    applyproject = models.ForeignKey(Apply, on_delete=models.CASCADE)
+    deployorderby = models.PositiveSmallIntegerField(null=True,blank=True)
+    jenkinsversion = models.PositiveSmallIntegerField(null=True,blank=True)
+    type = models.CharField(
+        max_length=1,
+        choices=type_CHOICES,
+        default=TRUNK,
+    ) 
+    deploysite = models.ManyToManyField(Site, blank=True)
+    status = models.CharField(
+        max_length=1,
+        choices=status_CHOICES,
+        default=WAITFORDEPLOY,                                                                                                                    
+    )
+    
+    def __unicode__(self):
+        return self.jenkinsversion
+    
+
+
+

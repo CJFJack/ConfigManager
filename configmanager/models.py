@@ -105,7 +105,7 @@ class Apply(models.Model):
         choices=status_CHOICES,
         default=WAITFORCOMMIT,
     ) 
-    apply_user = models.CharField(max_length=20, default='admin', editable=False)
+    apply_user = models.CharField(max_length=20,null=True, blank=True)
     apply_time = models.DateTimeField(auto_now_add=True)
     deploy_user = models.CharField(max_length=20, null=True, blank=True)
     deploy_time = models.DateTimeField(null=True, blank=True)

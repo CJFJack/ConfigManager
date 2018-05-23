@@ -94,6 +94,11 @@ class ApplyAdmin(admin.ModelAdmin):
     inlines = [DeployitemInline]
     list_display = ('applyproject', 'status', 'apply_user', 'apply_time', 'deploy_user', 'deploy_time')
 
+    def save_model(self, request, obj, form, change):
+        if obj.apply_user is None:
+            obj.apply_user = request.user.username
+            super(ApplyAdmin, self).save_model(request, obj, form, change)
+
 
 admin.site.register(ECS, ECSAdmin)
 admin.site.register(Site, SiteAdmin)

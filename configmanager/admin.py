@@ -6,6 +6,7 @@ from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
 from .models import Site, ECS, Configfile, Apply, Deployitem
+import logging
 
 
 class ECSAdmin(admin.ModelAdmin):
@@ -84,10 +85,15 @@ class ConfigfileAdmin(SimpleHistoryAdmin):
 class DeployitemInline(admin.TabularInline):
     model = Deployitem
     extra = 0
-    filter_horizontal = ('deploysite',)
+#    filter_horizontal = ('deploysite',)
 
 
 class ApplyAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj):
+        if obj.status == 'WC':
+            self.readonly_fields = ['applyproject',]
+        return self.readonly_fields
+
     fieldsets = [
         (None, {'fields': ['applyproject', 'confamendexplain', 'remarkexplain', 'apply_status']}),
     ]

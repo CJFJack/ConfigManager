@@ -99,19 +99,21 @@ class Apply(models.Model):
     def apply_user_default(self, request, obj, form, change):
         return request.user.username
 
-    applyproject = models.CharField(max_length=50)
+    applyproject = models.CharField("申请编号", max_length=50)
     status = models.CharField(
+        "状态",
         max_length=3,
         choices=status_CHOICES,
         default=WAITFORCOMMIT,
     ) 
-    apply_user = models.CharField(max_length=20,null=True, blank=True)
-    apply_time = models.DateTimeField(auto_now_add=True)
-    deploy_user = models.CharField(max_length=20, null=True, blank=True)
-    deploy_time = models.DateTimeField(null=True, blank=True)
-    confamendexplain = models.TextField(null=True, blank=True)
-    remarkexplain = models.TextField(null=True, blank=True)
+    apply_user = models.CharField("申请人", max_length=20,null=True, blank=True)
+    apply_time = models.DateTimeField("申请时间", auto_now_add=True)
+    deploy_user = models.CharField("发布人", max_length=20, null=True, blank=True)
+    deploy_time = models.DateTimeField("发布时间", null=True, blank=True)
+    confamendexplain = models.TextField("配置修改说明", null=True, blank=True)
+    remarkexplain = models.TextField("备注事项", null=True, blank=True)
     apply_status = models.CharField(
+        "审核状态",
         max_length=1,
         choices=apply_status_CHOICES,
         default=APPROVAL,                                                                                                                    
@@ -136,15 +138,17 @@ class Deployitem(models.Model):
     )
     
     applyproject = models.ForeignKey(Apply, on_delete=models.CASCADE)
-    deployorderby = models.PositiveSmallIntegerField(null=True,blank=True)
-    jenkinsversion = models.PositiveSmallIntegerField(null=True,blank=True)
+    deployorderby = models.PositiveSmallIntegerField("发布顺序", null=True,blank=True)
+    jenkinsversion = models.PositiveSmallIntegerField("jenkins版本号", null=True,blank=True)
     type = models.CharField(
+        "代码类型",
         max_length=1,
         choices=type_CHOICES,
         default=TRUNK,
     ) 
-    deploysite = models.ManyToManyField(Site, blank=True)
+    deploysite = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True, verbose_name="发布站点",) 
     deploy_status = models.CharField(
+        "发布状态",
         max_length=1,
         choices=deploy_status_CHOICES,
         default=WAITFORDEPLOY,                                                                                                                    

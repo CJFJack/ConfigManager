@@ -156,7 +156,3 @@ class Deployitem(models.Model):
     
     def __unicode__(self):
         return self.deploy_status
-    
-
-
-

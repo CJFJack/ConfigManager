@@ -85,20 +85,36 @@ class ConfigfileAdmin(SimpleHistoryAdmin):
 class DeployitemInline(admin.TabularInline):
     model = Deployitem
     extra = 0
-#    filter_horizontal = ('deploysite',)
+    def get_readonly_fields(self, request, obj=Apply):
+        if obj and obj.status == 'WC':
+            self.readonly_fields =  ['deploy_status',]
+            return self.readonly_fields
+        if obj and obj.status != 'WC' and obj.status != 'WD':
+            self.readonly_fields = ['deployorderby', 'jenkinsversion', 'deploysite', 'type', 'deploy_status']
+            return self.readonly_fields
+        if obj and obj.status == 'WD':
+            self.readonly_fields = ['deployorderby', 'jenkinsversion', 'deploysite', 'type']
+            return self.readonly_fields
+        else:
+            self.readonly_fields = ['deploy_status',]
+            return self.readonly_fields
 
 
 class ApplyAdmin(admin.ModelAdmin):
-    def get_readonly_fields(self, request, obj):
-        if obj.status == 'WC':
-            self.readonly_fields = ['applyproject',]
-        return self.readonly_fields
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.status != 'WC':
+            self.readonly_fields =  ['applyproject', 'confamendexplain', 'remarkexplain', 'status']
+            return self.readonly_fields
+        else:
+            self.readonly_fields = ['status',]
+            return self.readonly_fields
 
     fieldsets = [
-        (None, {'fields': ['applyproject', 'confamendexplain', 'remarkexplain', 'apply_status']}),
+        (None, {'fields': ['applyproject', 'confamendexplain', 'remarkexplain', 'status','apply_status']}),
     ]
     inlines = [DeployitemInline]
     list_display = ('applyproject', 'status', 'apply_user', 'apply_time', 'deploy_user', 'deploy_time')
+    list_filter = ('status',)
 
     def save_model(self, request, obj, form, change):
         if obj.apply_user is None:

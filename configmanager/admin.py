@@ -6,8 +6,7 @@ from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
 from .models import Site, ECS, Configfile, Apply, Deployitem
-import logging
-
+from datetime import datetime
 
 class ECSAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -102,11 +101,66 @@ class DeployitemInline(admin.TabularInline):
 
 class ApplyAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
-        if obj and obj.status != 'WC':
-            self.readonly_fields =  ['applyproject', 'confamendexplain', 'remarkexplain', 'status']
+        user_group = request.user.groups.all()[0].name
+        if request.user.username == 'admin':
+            self.readonly_fields = []
             return self.readonly_fields
-        else:
-            self.readonly_fields = ['status',]
+        '''创建时'''
+        if not obj:
+            self.readonly_fields = ['status', 'apply_status']
+            return self.readonly_fields
+        '''已取消、已发布'''
+        if obj and (obj.status == 'D' or obj.status == 'C'):
+            self.readonly_fields = ['applyproject', 'confamendexplain', 'remarkexplain', 'status', 'apply_status']
+            return self.readonly_fields
+        '''待提交'''
+        if obj and obj.status == 'WC':
+            if user_group == '研发经理' or user_group == '测试工程师' or user_group == '研发工程师':
+                self.readonly_fields = ['status',]
+            else:
+                self.readonly_fields = ['applyproject', 'confamendexplain', 'remarkexplain', 'status', 'apply_status']
+            return self.readonly_fields
+        '''研发经理审批中'''
+        if obj and obj.status == 'DA':
+            if user_group == '研发经理': 
+                self.readonly_fields = ['applyproject', 'confamendexplain', 'remarkexplain', 'status']
+            else:
+                self.readonly_fields = ['applyproject', 'confamendexplain', 'remarkexplain', 'status', 'apply_status']
+            return self.readonly_fields
+        '''测试经理审批中'''
+        if obj and obj.status == 'TA':
+            if user_group == '测试经理': 
+                self.readonly_fields = ['applyproject', 'confamendexplain', 'remarkexplain', 'status']
+            else:
+                self.readonly_fields = ['applyproject', 'confamendexplain', 'remarkexplain', 'status', 'apply_status']
+            return self.readonly_fields
+        '''运维工程师审批中'''
+        if obj and obj.status == 'EA':
+            if user_group == '运维工程师': 
+                self.readonly_fields = ['applyproject', 'confamendexplain', 'remarkexplain', 'status']
+            else:
+                self.readonly_fields = ['applyproject', 'confamendexplain', 'remarkexplain', 'status', 'apply_status']
+            return self.readonly_fields
+        '''运维经理审批中'''
+        if obj and obj.status == 'OA':
+            if user_group == '运维经理': 
+                self.readonly_fields = ['applyproject', 'confamendexplain', 'remarkexplain', 'status']
+            else:
+                self.readonly_fields = ['applyproject', 'confamendexplain', 'remarkexplain', 'status', 'apply_status']
+            return self.readonly_fields
+        '''技术总监审批中'''
+        if obj and obj.status == 'TDA':
+            if user_group == '技术总监': 
+                self.readonly_fields = ['applyproject', 'confamendexplain', 'remarkexplain', 'status']
+            else:
+                self.readonly_fields = ['applyproject', 'confamendexplain', 'remarkexplain', 'status', 'apply_status']
+            return self.readonly_fields
+        '''待发布'''
+        if obj and obj.status == 'WD':
+            if user_group == '运维工程师': 
+                self.readonly_fields = ['applyproject', 'confamendexplain', 'remarkexplain', 'status']
+            else:
+                self.readonly_fields = ['applyproject', 'confamendexplain', 'remarkexplain', 'status', 'apply_status']
             return self.readonly_fields
 
     fieldsets = [
@@ -171,10 +225,12 @@ class ApplyAdmin(admin.ModelAdmin):
         '''状态待发布，审核不通过'''
         if obj.status == 'WD' and obj.apply_status == 'N':
             obj.apply_status = ''
-        '''状态待发布，审核通过'''
+        '''状态待发布，审核通过，记录发布人、发布时间'''
         if obj.status == 'WD' and obj.apply_status == 'Y':
             obj.status = 'D'
             obj.apply_status = 'Y'
+            obj.deploy_user = request.user.username
+            obj.deploy_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S') 
         super(ApplyAdmin, self).save_model(request, obj, form, change)
 
 

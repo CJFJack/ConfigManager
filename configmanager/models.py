@@ -89,6 +89,7 @@ class Apply(models.Model):
         (TESTMANAGERAPPROVAL, '测试经理审批中'),
         (TECHNICALDIRECTORYAPPROVAL, '技术总监审批中'),
     )
+
     APPROVAL = 'Y'
     NOAPPROVAL = 'N'
     apply_status_CHOICES = (
@@ -113,10 +114,11 @@ class Apply(models.Model):
     confamendexplain = models.TextField("配置修改说明", null=True, blank=True)
     remarkexplain = models.TextField("备注事项", null=True, blank=True)
     apply_status = models.CharField(
-        "审核状态",
         max_length=1,
         choices=apply_status_CHOICES,
-        default=APPROVAL,                                                                                                                    
+        null=True,
+        blank=True,
+        verbose_name="审核状态"
     )
 
     def __unicode__(self):

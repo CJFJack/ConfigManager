@@ -110,16 +110,72 @@ class ApplyAdmin(admin.ModelAdmin):
             return self.readonly_fields
 
     fieldsets = [
-        (None, {'fields': ['applyproject', 'confamendexplain', 'remarkexplain', 'status','apply_status']}),
+        (None, {'fields': ['applyproject', 'confamendexplain', 'remarkexplain', 'status', 'apply_status']}),
     ]
     inlines = [DeployitemInline]
     list_display = ('applyproject', 'status', 'apply_user', 'apply_time', 'deploy_user', 'deploy_time')
     list_filter = ('status',)
+    search_fields = ('applyproject',)
 
     def save_model(self, request, obj, form, change):
+        '''记录发布申请人'''
         if obj.apply_user is None:
             obj.apply_user = request.user.username
-            super(ApplyAdmin, self).save_model(request, obj, form, change)
+        '''状态待提交，审核通过'''
+        if obj.status == 'WC' and obj.apply_status == 'Y':
+            obj.status = 'DA'
+            obj.apply_status = ''
+        '''状态待提交，审核不通过'''
+        if obj.status == 'WC' and obj.apply_status == 'N':
+            obj.status = 'C'
+        '''状态研发经理审批中，审核不通过'''
+        if obj.status == 'DA' and obj.apply_status == 'N':
+            obj.status = 'WC'
+            obj.apply_status = ''
+        '''状态研发经理审批中，审核通过'''
+        if obj.status == 'DA' and obj.apply_status == 'Y':
+            obj.status = 'TA'
+            obj.apply_status = ''
+        '''状态测试经理审批中，审核不通过'''
+        if obj.status == 'TA' and obj.apply_status == 'N':
+            obj.status = 'WC'
+            obj.apply_status = ''
+        '''状态测试经理审批中，审核通过'''
+        if obj.status == 'TA' and obj.apply_status == 'Y':
+            obj.status = 'EA'
+            obj.apply_status = ''
+        '''状态运维工程师审批中，审核不通过'''
+        if obj.status == 'EA' and obj.apply_status == 'N':
+            obj.status = 'WC'
+            obj.apply_status = ''
+        '''状态运维工程师审批中，审核通过'''
+        if obj.status == 'EA' and obj.apply_status == 'Y':
+            obj.status = 'OA'
+            obj.apply_status = ''
+        '''状态运维经理审批中，审核不通过'''
+        if obj.status == 'OA' and obj.apply_status == 'N':
+            obj.status = 'WC'
+            obj.apply_status = ''
+        '''状态运维经理审批中，审核通过'''
+        if obj.status == 'OA' and obj.apply_status == 'Y':
+            obj.status = 'TDA'
+            obj.apply_status = ''
+        '''状态技术总监审批中，审核不通过'''
+        if obj.status == 'TDA' and obj.apply_status == 'N':
+            obj.status = 'WC'
+            obj.apply_status = ''
+        '''状态技术总监审批中，审核通过'''
+        if obj.status == 'TDA' and obj.apply_status == 'Y':
+            obj.status = 'WD'
+            obj.apply_status = ''
+        '''状态待发布，审核不通过'''
+        if obj.status == 'WD' and obj.apply_status == 'N':
+            obj.apply_status = ''
+        '''状态待发布，审核通过'''
+        if obj.status == 'WD' and obj.apply_status == 'Y':
+            obj.status = 'D'
+            obj.apply_status = 'Y'
+        super(ApplyAdmin, self).save_model(request, obj, form, change)
 
 
 admin.site.register(ECS, ECSAdmin)

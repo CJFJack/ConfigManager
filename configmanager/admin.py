@@ -7,6 +7,8 @@ from simple_history.admin import SimpleHistoryAdmin
 # Register your models here.
 from .models import Site, ECS, Configfile, Apply, Deployitem
 from datetime import datetime
+from django.core.files import File
+import os
 
 class ECSAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -78,6 +80,13 @@ class ConfigfileAdmin(SimpleHistoryAdmin):
     
     def save_model(self, request, obj, form, change):
         obj.modified_user = request.user.username
+        config_path = os.path.join('/releaseconfig', obj.sitecluster)
+        if not os.path.exists(config_path):
+            os.mkdir(config_path)
+        file_name = os.path.join(config_path, obj.filename)
+        with open(file_name, 'w') as f:
+            myfile = File(f)
+            myfile.write(obj.content)
         super(ConfigfileAdmin, self).save_model(request, obj, form, change)
 
 

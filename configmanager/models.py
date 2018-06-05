@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from simple_history.models import HistoricalRecords
+from django.utils.html import format_html
 
 # Create your models here.
 
@@ -63,7 +64,7 @@ class Site(models.Model):
         choices=status_CHOICES,
         default=ENABLE,
     )
-    
+       
     def __unicode__(self):
         return self.fullname
 
@@ -148,7 +149,7 @@ class Deployitem(models.Model):
         choices=type_CHOICES,
         default=TRUNK,
     ) 
-    deploysite = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True, verbose_name="发布站点",) 
+    deploysite = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True, verbose_name="发布站点") 
     deploy_status = models.CharField(
         "发布状态",
         max_length=1,
@@ -158,3 +159,5 @@ class Deployitem(models.Model):
     
     def __unicode__(self):
         return self.deploy_status
+
+

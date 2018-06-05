@@ -10,6 +10,7 @@ from datetime import datetime
 from django.core.files import File
 import os
 
+
 class ECSAdmin(admin.ModelAdmin):
     fieldsets = [
         ('server_info',      {'fields': ['name']}),
@@ -70,6 +71,10 @@ class SiteAdmin(admin.ModelAdmin):
         super(SiteAdmin, self).save_model(request, obj, form, change)
 
 
+class SiteInline(admin.TabularInline):
+    model = Site
+    extra = 0
+
 @admin.register(Configfile)
 class ConfigfileAdmin(SimpleHistoryAdmin):
     fieldsets = [
@@ -106,6 +111,13 @@ class DeployitemInline(admin.TabularInline):
         else:
             self.readonly_fields = ['deploy_status',]
             return self.readonly_fields
+
+    def get_ECSlists(self, obj):
+        return obj.deploy_site.ECSlists
+        
+    fieldsets = [
+        (None, {'fields': ['deployorderby', 'jenkinsversion', 'type', 'deploysite', 'deploy_status']}),
+    ]
 
 
 class ApplyAdmin(admin.ModelAdmin):
@@ -179,6 +191,7 @@ class ApplyAdmin(admin.ModelAdmin):
     list_display = ('applyproject', 'status', 'apply_user', 'apply_time', 'deploy_user', 'deploy_time')
     list_filter = ('status',)
     search_fields = ('applyproject',)
+    date_hierarchy = 'apply_time'
 
     def save_model(self, request, obj, form, change):
         '''记录发布申请人'''
@@ -241,8 +254,25 @@ class ApplyAdmin(admin.ModelAdmin):
             obj.deploy_user = request.user.username
             obj.deploy_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S') 
         super(ApplyAdmin, self).save_model(request, obj, form, change)
+    
+    list_per_page = 10
 
+
+class DeployitemAdmin(admin.ModelAdmin):
+    def get_ECSlists(self, obj):
+        return ', '.join([e.name for e in obj.deploysite.ECSlists.all()])
+    get_ECSlists.short_description = 'ECSs'
+
+    list_display = ['applyproject', 'deployorderby', 'jenkinsversion', 'type', 'deploysite', 'get_ECSlists', 'deploy_status']
+    list_filter = ['applyproject',]
+    search_fields = ['applyproject',]
+    
+
+
+admin.site.site_title = '运维管理平台'
 
 admin.site.register(ECS, ECSAdmin)
 admin.site.register(Site, SiteAdmin)
 admin.site.register(Apply, ApplyAdmin)
+admin.site.register(Deployitem, DeployitemAdmin)
+

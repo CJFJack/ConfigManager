@@ -1,0 +1,18 @@
+<h1>ECS列表</h1>
+{% if ECS_list %}
+    <ul>
+    <table border="1">
+    {% for ecs in ECS_list %}
+    <tr>
+        <td><a href="{% url 'configmanager:ecschange' ecs.id %}">{{ ecs.name }}</a></td>
+        <td>{{ ecs.instanceid }}</td>
+        <td>{{ ecs.IP }}</td>
+        <td>{{ ecs.status }}</td>
+        <td>{{ ecs.modified_user }}</td>
+        <td>{{ ecs.modified_time }}</td>
+    </tr>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No ECS are available.</p>
+{% endif %}

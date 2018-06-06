@@ -1,0 +1,29 @@
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% url 'configmanager:ecsadd_method' %}" method="post">
+{% csrf_token %}
+    <div>
+        <span>站点名称：</span>
+        <input type="text" name="name" id="id_name"  maxlength="30">
+    </div>
+    <div>
+        <label>实例ID：</label>
+        <input type="text" name="instanceid" id="id_instanceid"  maxlength="30">
+    </div>
+    <div>
+        <label>IP地址：</label>
+        <input type="text" name="IP" id="id_ipadd"  maxlength="30">
+    </div>
+    <div>
+        <label>状态：</label>
+        <select name='status'>
+              <option value ="Y">启用</option>
+              <option value ="N">禁用</option>
+        </select>
+    </div>
+    <input type="submit" value="保存" />
+</form>
+<form action="{% url 'configmanager:ecslist' %}" method="get">
+{% csrf_token %}
+    <input type="submit" value="返回" />
+</form>

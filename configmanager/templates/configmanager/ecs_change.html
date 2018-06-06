@@ -1,11 +1,11 @@
-<h1>{{ ecs.ecs_name }}</h1>
+<h1>{{ ecs.name }}</h1>
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="{% url 'configmanager:save' ecs.id %}" method="post">
+<form action="{% url 'configmanager:ecssave' ecs.id %}" method="post">
 {% csrf_token %}
     <div>
-        <label>站点名称：</label>
+        <span>站点名称：</span>
         <input type="text" name="name" value={{ ecs.name }} id="id_name"  maxlength="30">
     </div>
     <div>
@@ -18,18 +18,30 @@
     </div>
     <div>
         <label>状态：</label>
-        <select>
+        <select name='status'>
+            {% if ecs.status == "Y" %}
               <option value ="Y">启用</option>
               <option value ="N">禁用</option>
+            {% endif %}
+            {% if ecs.status == "N" %}
+              <option value ="N">禁用</option>
+              <option value ="Y">启用</option>
+            {% endif %}
         </select>
     </div>
     <div>
-        <p>修改人：{{ ecs.modified_user }}</p>
+        <p><span>修改人：</span>{{ ecs.modified_user }}</p>
     </div>
     <div>
-        <p>最后修改时间：{{ ecs.modified_time }}</p>
+        <p><span>最后修改时间：</span>{{ ecs.modified_time }}</p>
     </div>
-<input type="submit" value="保存" />
-<input type="submit" value="删除" />
-<input type="submit" value="返回" />
+    <input type="submit" value="保存" />
+</form>
+<form action="{% url 'configmanager:ecsdelete' ecs.id %}" method="post">
+{% csrf_token %}
+    <input type="submit" value="删除" />
+</form>
+<form action="{% url 'configmanager:ecslist' %}" method="get">
+{% csrf_token %}
+    <input type="submit" value="返回" />
 </form>

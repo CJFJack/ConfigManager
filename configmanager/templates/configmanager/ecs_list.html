@@ -1,15 +1,43 @@
-<h1>ECS列表</h1>
+<h1>ECS管理 > ECS列表</h1>
+<a href="{% url 'configmanager:ecsadd' %}">新增ECS</a></br>
+<a href="{% url 'configmanager:index' %}">返回</a>
 {% if ECS_list %}
     <ul>
     <table border="1">
+    <th>ECS名称</th>
+    <th>实例ID</th>
+    <th>IP地址</th>
+    <th>状态</th>
+    <th>修改人</th>
+    <th>修改日期</th>
+    <th>操作</th>
     {% for ecs in ECS_list %}
     <tr>
         <td><a href="{% url 'configmanager:ecschange' ecs.id %}">{{ ecs.name }}</a></td>
         <td>{{ ecs.instanceid }}</td>
         <td>{{ ecs.IP }}</td>
-        <td>{{ ecs.status }}</td>
+        <td>
+            {% if ecs.status == 'Y' %}<span>启用</span>
+            {% else %}<span>禁用</span>
+            {% endif %}
+        </td>
         <td>{{ ecs.modified_user }}</td>
         <td>{{ ecs.modified_time }}</td>
+        <td>
+            <a href="{% url 'configmanager:ecschange' ecs.id %}">修改</a>
+            <form action="{% url 'configmanager:ecsdelete' ecs.id %}" method="post">
+            {% csrf_token %}
+                <input type="submit" value="删除" />
+            </form>  
+            <form action="{% url 'configmanager:ecsenable' ecs.id %}" method="post">
+            {% csrf_token %}
+                <input type="submit" value="启用" />
+            </form>  
+            <form action="{% url 'configmanager:ecsdisable' ecs.id %}" method="post">
+            {% csrf_token %}
+                <input type="submit" value="禁用" />
+            </form>  
+        </td>
     </tr>
     {% endfor %}
     </ul>

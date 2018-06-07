@@ -83,3 +83,18 @@ def ecs_add(request):
     ecs.save()                                                                                                                            
     return HttpResponseRedirect(reverse('configmanager:ecslist'))   
 
+
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class SiteListView(generic.ListView):
+    template_name = 'configmanager/site_list.html'
+    context_object_name = 'Site_list'
+    def get_queryset(self):
+        return Site.objects.order_by('fullname')
+
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class SiteChangeView(generic.DetailView):
+    model = Site
+    template_name = 'configmanager/site_change.html'
+

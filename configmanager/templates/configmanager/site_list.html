@@ -1,0 +1,26 @@
+{% extends 'configmanager/__base__.html' %}
+{% block goback %}{% url 'configmanager:index' %}{% endblock %}
+{% block content %}
+<h1>站点管理 > 站点列表</h1>
+{% if Site_list %}
+    <ul>
+    <table border="1">
+    <th>站点名称</th>
+    <th>站点简称</th>
+    <th>配置文件夹名称</th>
+    <th>配置文件名称</th>
+    <th>所属ECS</th>
+    {% for site in Site_list %}
+    <tr>
+        <td><a href="{% url 'configmanager:sitechange' site.id %}">{{ site.fullname }}</a></td>
+        <td>{{ site.shortname }}</td>
+        <td>{{ site.configdirname }}</td>
+        <td></td>
+        <td></td>
+    </tr>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No ECS are available.</p>
+{% endif %}
+{% endblock %}

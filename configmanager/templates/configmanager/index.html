@@ -1,16 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>运维管理平台|系统管理</title>
-</head>
-<body>
+{% extends 'configmanager/__base__.html' %}
+{% block content %}
     <h1>ECS管理</h1>
     <li>
-        <a href='/configmanager/ecs'>ECS列表</a>
+        <a href="{% url 'configmanager:ecslist' %}">ECS列表</a>
     </li>
     <li>
-        <a href=''>添加ECS</a>
+        <a href="{% url 'configmanager:ecsadd' %}">添加ECS</a>
     </li>
     <h1>站点管理</h1>
     <li>
@@ -33,5 +28,4 @@
     <li>
         <a href=''>发布申请列表</a>
     </li>
-</body>
-</html>
+{% endblock %}

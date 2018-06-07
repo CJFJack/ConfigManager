@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 from django.views.decorators import csrf
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
+from django.contrib.auth import authenticate, login  
+from django.contrib.auth.forms import UserCreationForm
 
 # Create your views here.
 
@@ -13,6 +15,7 @@ from django.http import HttpResponse
 from django.views import generic
 
 app_name = 'configmanager'
+
 
 def index(request):
     return render_to_response('configmanager/index.html')
@@ -75,22 +78,3 @@ def ecs_add(request):
     ecs.save()                                                                                                                            
     return HttpResponseRedirect(reverse('configmanager:ecslist'))   
 
-
-
-# 表单
-def search_form(request):
-    return render_to_response('configmanager/search_form.html')
- 
-# 接收请求数据
-def search(request):  
-    request.encoding='utf-8'
-    if 'q' in request.GET:
-        message = '你搜索的内容为: ' + request.GET['q']
-        return HttpResponse(message)
-    elif request.POST:
-        ctx ={}
-        ctx['rlt'] = request.POST['q']
-        return render(request, "configmanager/post.html", ctx)
-    else:
-        message = '你提交了空表单'
-        return HttpResponse(message)

@@ -1,6 +1,9 @@
+{% extends 'configmanager/__base__.html' %}
+{% block goback %}{% url 'configmanager:ecslist' %}{% endblock %}
+{% block content %}
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="{% url 'configmanager:ecsadd_method' %}" method="post">
+<form action="{% url 'configmanager:ecsaddmethod' %}" method="post">
 {% csrf_token %}
     <div>
         <span>站点名称：</span>
@@ -27,3 +30,4 @@
 {% csrf_token %}
     <input type="submit" value="返回" />
 </form>
+{% endblock %}

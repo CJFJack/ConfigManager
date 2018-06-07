@@ -1,3 +1,6 @@
+{% extends 'configmanager/__base__.html' %}
+{% block goback %}{% url 'configmanager:ecslist' %}{% endblock %}
+{% block content %}
 <h1>{{ ecs.name }}</h1>
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
@@ -45,3 +48,4 @@
 {% csrf_token %}
     <input type="submit" value="返回" />
 </form>
+{% endblock %}

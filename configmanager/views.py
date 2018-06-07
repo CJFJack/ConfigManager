@@ -3,8 +3,6 @@ from __future__ import unicode_literals
 from django.views.decorators import csrf
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
-from django.contrib.auth import authenticate, login  
-from django.contrib.auth.forms import UserCreationForm
 
 # Create your views here.
 
@@ -13,14 +11,19 @@ from django.shortcuts import render_to_response
 from .models import ECS, Site
 from django.http import HttpResponse
 from django.views import generic
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+
 
 app_name = 'configmanager'
 
 
+@login_required(login_url='/login/')
 def index(request):
     return render_to_response('configmanager/index.html')
 
  
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
 class ECSListView(generic.ListView):
     template_name = 'configmanager/ecs_list.html'
     context_object_name = 'ECS_list'
@@ -28,11 +31,13 @@ class ECSListView(generic.ListView):
         return ECS.objects.order_by('name')
 
 
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
 class ECSChangeView(generic.DetailView):
     model = ECS
     template_name = 'configmanager/ecs_change.html'
 
 
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
 class ECSAddView(generic.ListView):
     model = ECS
     template_name = 'configmanager/ecs_add.html'

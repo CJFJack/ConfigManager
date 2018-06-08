@@ -18,4 +18,5 @@ urlpatterns = [
     url(r'^ecs/addmethod/$', views.ecs_add, name='ecsaddmethod'),
     url(r'^site/$', views.SiteListView.as_view(), name='sitelist'),
     url(r'^site/(?P<pk>[0-9]+)/change/$', views.SiteChangeView.as_view(), name='sitechange'),
+    url(r'^site/(?P<pk>[0-9]+)/changeconfigfiles/$', views.changeconfigfiles, name='changeconfigfiles'),
 ]

@@ -8,11 +8,12 @@ from django.urls import reverse
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
-from .models import ECS, Site
+from .models import ECS, Site, Configfile
 from django.http import HttpResponse
 from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.views.generic import TemplateView
 
 
 app_name = 'configmanager'
@@ -102,9 +103,23 @@ class SiteListView(generic.ListView):
     def get_queryset(self):
         return Site.objects.order_by('fullname')
 
+    def get_context_data(self, **kwargs):
+         context = super(SiteListView, self).get_context_data(**kwargs)
+         context['configfile'] = Site.configfiles
+         return context            
+
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class SiteChangeView(generic.DetailView):
-    model = Site
     template_name = 'configmanager/site_change.html'
+    def get_queryset(self):
+        return Site.objects.order_by('fullname')
 
+    def get_context_data(self, **kwargs):
+         context = super(SiteChangeView, self).get_context_data(**kwargs)
+         context['configfile'] = Configfile.objects.order_by('sitecluster')
+         return context
+
+
+def changeconfigfiles(request):
+    pass

@@ -23,6 +23,16 @@ def index(request):
     return render_to_response('configmanager/index.html')
 
  
+@login_required(login_url='/login/')
+def deploymanager(request):
+    return render_to_response('configmanager/deploymanager.html')
+
+ 
+@login_required(login_url='/login/')
+def systemmanager(request):
+    return render_to_response('configmanager/systemmanager.html')
+
+
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class ECSListView(generic.ListView):
     template_name = 'configmanager/ecs_list.html'

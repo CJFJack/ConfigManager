@@ -1,9 +1,8 @@
 {% extends 'configmanager/__base__.html' %}
 {% block goback %}{% url 'configmanager:index' %}{% endblock %}
 {% block content %}
-<h1>ECS管理 > ECS列表</h1>
+<h2>ECS管理 > ECS列表</h2>
 <a href="{% url 'configmanager:ecsadd' %}">新增ECS</a></br>
-<a href="{% url 'configmanager:index' %}">返回</a>
 {% if ECS_list %}
     <ul>
     <table border="1">

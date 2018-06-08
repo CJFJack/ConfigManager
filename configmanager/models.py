@@ -64,7 +64,7 @@ class Site(models.Model):
         choices=status_CHOICES,
         default=ENABLE,
     )
-       
+
     def __unicode__(self):
         return self.fullname
 

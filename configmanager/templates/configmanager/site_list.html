@@ -1,7 +1,7 @@
 {% extends 'configmanager/__base__.html' %}
 {% block goback %}{% url 'configmanager:index' %}{% endblock %}
 {% block content %}
-<h1>站点管理 > 站点列表</h1>
+<h2>站点管理 > 站点列表</h2>
 {% if Site_list %}
     <ul>
     <table border="1">
@@ -15,8 +15,16 @@
         <td><a href="{% url 'configmanager:sitechange' site.id %}">{{ site.fullname }}</a></td>
         <td>{{ site.shortname }}</td>
         <td>{{ site.configdirname }}</td>
-        <td></td>
-        <td></td>
+        <td>
+            {% for configfile in site.configfiles.all %}
+                <p>{{ configfile }}</p>
+            {% endfor %}
+        </td>
+        <td>
+            {% for ecs in site.ECSlists.all %}
+                <p>{{ ecs }}</p>
+            {% endfor %}
+        </td>
     </tr>
     {% endfor %}
     </ul>

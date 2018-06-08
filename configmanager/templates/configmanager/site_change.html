@@ -1,15 +1,16 @@
 {% extends 'configmanager/__base__.html' %}
+{% block title %}修改站点 | {% endblock %}
 {% block goback %}{% url 'configmanager:sitelist' %}{% endblock %}
 {% block content %}
 <h2>{{ site.fullname }}</h2>
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="" method="post">
+<form action="" method="get">
 {% csrf_token %}
     <div>
         <span>站点名称：</span>
-        <input type="text" name="name" value={{ site.fullname }} id="id_fullname"  maxlength="30">
+        <input type="text" name="fullname" value={{ site.fullname }} id="id_fullname"  maxlength="30">
     </div>
     <div>
         <label>站点简称：</label>
@@ -23,7 +24,7 @@
         <form action="{% url 'configmanager:changeconfigfiles' site.id %}" method="post">
         {% csrf_token %}
         <label>配置文件</label>
-        <select multiple="multiple" size="auto">
+        <select multiple="multiple" name="unselected" size="auto">
             {% for unselected_configfile in configfile %}
                 {% if unselected_configfile not in site.configfiles.all %}
                 <option value={{ unselected_configfile }}>{{ unselected_configfile }}</option>
@@ -32,7 +33,7 @@
         </select>
         <input type="submit" name="select" value="选择=>" />
         <input type="submit" name="delete" value="<=删除" />
-        <select multiple="multiple" size="auto">
+        <select multiple="multiple" name="selected" size="auto">
             {% for selected_configfile in site.configfiles.all %}
                 <option value={{ selected_configfile }}>{{ selected_configfile }}</option>
             {% endfor %}

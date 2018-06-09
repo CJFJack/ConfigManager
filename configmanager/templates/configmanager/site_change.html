@@ -6,7 +6,7 @@
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="" method="post">
+<form action="{% url 'configmanager:sitesave' site.id %}" method="post">
 {% csrf_token %}
     <div>
         <span>站点名称：</span>
@@ -22,11 +22,6 @@
     </div>
     <div>
         <label>配置文件</label>
-        {% for configfile in configfile %}
-            <span>
-                <input type="checkbox" name={{ configfile.sitecluster }} value={{ configfile.sitecluster }} {% if configfile in site.configfiles.all %}checked="checked"{% endif %}/>{{ configfile.sitecluster }}
-            </span>
-        {% endfor %}
     </div>
     <input type="submit" value="保存" />
 </form>

@@ -105,7 +105,7 @@ class SiteListView(generic.ListView):
 
     def get_context_data(self, **kwargs):
          context = super(SiteListView, self).get_context_data(**kwargs)
-         context['configfile'] = Site.configfiles
+         context['configfile'] = Site.configfile_set
          return context            
 
 
@@ -121,6 +121,15 @@ class SiteChangeView(generic.DetailView):
          return context
 
 
+def site_save(request, site_id):
+    site = get_object_or_404(Site, pk=site_id)
+    site.fullname = request.POST['fullname']
+    site.shortname = request.POST['shortname']
+    site.configdirname = request.POST['configdirname']
+    site.save()
+    return HttpResponseRedirect(reverse('configmanager:sitelist'))
+
+
 def changeconfigfiles(request, site_id):
     if request.method == 'POST':
         if request.POST.has_key('add'):
@@ -128,7 +137,7 @@ def changeconfigfiles(request, site_id):
         if request.POST.has_key('reduce'):
             selected = request.POST['selected']
             s = Site.objects.get(pk=site_id)
-            c = s.configfiles.get(sitecluster=selected)
+            c = s.configfile_set.get(sitecluster=selected)
             c.delete()
             c.save()
     return HttpResponseRedirect(reverse('configmanager:sitechange', args=site_id)) 

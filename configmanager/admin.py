@@ -28,6 +28,28 @@ class ECSAdmin(admin.ModelAdmin):
         super(ECSAdmin, self).save_model(request, obj, form, change)
 
 
+class ConfigfileInline(admin.TabularInline):
+    model = Configfile
+    extra = 0
+    readonly_fields = ['site',]
+    fieldsets = [
+        (None, {'fields': ['filename', 'content']}),
+    ]
+    list_display = ('site', 'filename', 'modified_user', 'modified_time')
+    #search_fields = ['']
+    
+    def save_model(self, request, obj, form, change):
+        obj.modified_user = request.user.username
+        config_path = os.path.join('/releaseconfig', obj.filename)
+        if not os.path.exists(config_path):
+            os.mkdir(config_path)
+        file_name = os.path.join(config_path, obj.filename)
+        with open(file_name, 'w') as f:
+            myfile = File(f)
+            myfile.write(obj.content)
+        super(ConfigfileInline, self).save_model(request, obj, form, change)
+
+ 
 class SiteAdmin(admin.ModelAdmin):
 
     def get_ECSlists(self, obj):
@@ -35,8 +57,8 @@ class SiteAdmin(admin.ModelAdmin):
     get_ECSlists.short_description = 'ECSs'
 
     def get_configfiles(self, obj):
-        return ', '.join([c.filename for c in obj.configfiles.all()])
-    get_configfiles.short_description = 'configfiles'
+        return ', '.join([c.filename for c in obj.configfile_set.all()])
+    get_configfiles.short_description = 'Configfiles'
 
     def make_sites_disable(self, request, queryset):
         rows_updated = queryset.update(status='N')
@@ -57,11 +79,12 @@ class SiteAdmin(admin.ModelAdmin):
     make_sites_enable.short_description = "Enabke selected site"
  
     fieldsets = [
-        ('site_info', {'fields': ['fullname', 'shortname', 'configdirname', 'ECSlists', 'configfiles', 'port', 'testpage', 'status', 'deployattention', 'devcharge']}),
+        ('site_info', {'fields': ['fullname', 'shortname', 'configdirname', 'ECSlists', 'port', 'testpage', 'status', 'deployattention', 'devcharge']}),
     ]
-    filter_horizontal = ('ECSlists', 'configfiles')
+    filter_horizontal = ('ECSlists',)
+    inlines = [ConfigfileInline] 
 
-    list_display = ('fullname', 'deployattention', 'get_ECSlists', 'get_configfiles', 'status', 'modified_user', 'modified_time')
+    list_display = ('fullname', 'shortname', 'configdirname', 'get_ECSlists', 'get_configfiles', 'status', 'modified_user', 'modified_time')
     list_filter = ['status', 'port']
     search_fields = ['fullname', 'port']
     actions = [make_sites_disable, make_sites_enable]
@@ -69,30 +92,6 @@ class SiteAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.modified_user = request.user.username
         super(SiteAdmin, self).save_model(request, obj, form, change)
-
-
-class SiteInline(admin.TabularInline):
-    model = Site
-    extra = 0
-
-@admin.register(Configfile)
-class ConfigfileAdmin(SimpleHistoryAdmin):
-    fieldsets = [
-        (None, {'fields': ['sitecluster', 'filename', 'content']}),
-    ]
-    list_display = ('sitecluster', 'filename', 'modified_user', 'modified_time')
-    search_fields = ['sitecluster']
-    
-    def save_model(self, request, obj, form, change):
-        obj.modified_user = request.user.username
-        config_path = os.path.join('/releaseconfig', obj.sitecluster)
-        if not os.path.exists(config_path):
-            os.mkdir(config_path)
-        file_name = os.path.join(config_path, obj.filename)
-        with open(file_name, 'w') as f:
-            myfile = File(f)
-            myfile.write(obj.content)
-        super(ConfigfileAdmin, self).save_model(request, obj, form, change)
 
 
 class DeployitemInline(admin.TabularInline):
@@ -275,4 +274,5 @@ admin.site.register(ECS, ECSAdmin)
 admin.site.register(Site, SiteAdmin)
 admin.site.register(Apply, ApplyAdmin)
 admin.site.register(Deployitem, DeployitemAdmin)
+admin.site.register(Configfile,SimpleHistoryAdmin)
 

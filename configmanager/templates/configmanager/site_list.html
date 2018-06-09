@@ -17,7 +17,7 @@
         <td>{{ site.shortname }}</td>
         <td>{{ site.configdirname }}</td>
         <td>
-            {% for configfile in site.configfiles.all %}
+            {% for configfile in site.configfile_set.all %}
                 <p>{{ configfile.filename }}</p>
             {% endfor %}
         </td>

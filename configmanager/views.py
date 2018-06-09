@@ -121,12 +121,14 @@ class SiteChangeView(generic.DetailView):
          return context
 
 
-def changeconfigfiles(request):
-    if request.POST.has_key('select'):
-        select = request.POST['select'] 
-    if request.POST.has_key('delete'):
-        selected = request.POST['selected']
-        ecs = ECS.objects.get(pk=ecs_id)
-        ecs.configfiles.get(sitecluster='selected')
-        ecs.delete()
-        ecs.save()
+def changeconfigfiles(request, site_id):
+    if request.method == 'POST':
+        if request.POST.has_key('add'):
+            select = request.POST['select'] 
+        if request.POST.has_key('reduce'):
+            selected = request.POST['selected']
+            s = Site.objects.get(pk=site_id)
+            c = s.configfiles.get(sitecluster=selected)
+            c.delete()
+            c.save()
+    return HttpResponseRedirect(reverse('configmanager:sitechange', args=site_id)) 

@@ -24,12 +24,12 @@
         <label>状态：</label>
         <select name='status'>
             {% if ecs.status == "Y" %}
-              <option value ="Y">启用</option>
-              <option value ="N">禁用</option>
+                <option value ="Y">启用</option>
+                <option value ="N">禁用</option>
             {% endif %}
             {% if ecs.status == "N" %}
-              <option value ="N">禁用</option>
-              <option value ="Y">启用</option>
+                <option value ="N">禁用</option>
+                <option value ="Y">启用</option>
             {% endif %}
         </select>
     </div>

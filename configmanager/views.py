@@ -116,9 +116,9 @@ class SiteChangeView(generic.DetailView):
         return Site.objects.order_by('fullname')
 
     def get_context_data(self, **kwargs):
-         context = super(SiteChangeView, self).get_context_data(**kwargs)
-         context['configfile'] = Configfile.objects.order_by('sitecluster')
-         return context
+        context = super(SiteChangeView, self).get_context_data(**kwargs)
+        context['configfiles'] = ';'.join([f.filename for f in Site.configfile_set])
+        return context
 
 
 def site_save(request, site_id):
@@ -129,15 +129,3 @@ def site_save(request, site_id):
     site.save()
     return HttpResponseRedirect(reverse('configmanager:sitelist'))
 
-
-def changeconfigfiles(request, site_id):
-    if request.method == 'POST':
-        if request.POST.has_key('add'):
-            select = request.POST['select'] 
-        if request.POST.has_key('reduce'):
-            selected = request.POST['selected']
-            s = Site.objects.get(pk=site_id)
-            c = s.configfile_set.get(sitecluster=selected)
-            c.delete()
-            c.save()
-    return HttpResponseRedirect(reverse('configmanager:sitechange', args=site_id)) 

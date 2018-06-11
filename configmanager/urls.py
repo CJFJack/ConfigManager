@@ -19,5 +19,4 @@ urlpatterns = [
     url(r'^site/$', views.SiteListView.as_view(), name='sitelist'),
     url(r'^site/(?P<pk>[0-9]+)/change/$', views.SiteChangeView.as_view(), name='sitechange'),
     url(r'^site/(?P<site_id>[0-9]+)/save/$', views.site_save, name='sitesave'),
-    url(r'^site/(?P<site_id>[0-9]+)/changeconfigfiles/$', views.changeconfigfiles, name='changeconfigfiles'),
 ]

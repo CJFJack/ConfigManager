@@ -117,15 +117,30 @@ class SiteChangeView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(SiteChangeView, self).get_context_data(**kwargs)
-        context['configfiles'] = ';'.join([f.filename for f in Site.configfile_set])
+        configfiles = Site.configfile_set
+        ECSs = ECS.objects.all()
+        Sites = Site.objects.all()
+        context['configfiles'] = configfiles
+        context['ECSs'] = ECSs
+        context['Sites'] = Sites
         return context
 
 
-def site_save(request, site_id):
-    site = get_object_or_404(Site, pk=site_id)
-    site.fullname = request.POST['fullname']
-    site.shortname = request.POST['shortname']
-    site.configdirname = request.POST['configdirname']
-    site.save()
-    return HttpResponseRedirect(reverse('configmanager:sitelist'))
+@login_required(login_url='/login/')
+def site_change(request, site_id):
+    s = get_object_or_404(Site, pk=site_id)
+    f = ';'.join([f.filename for f in s.configfile_set.all()]) 
+    return render(request, 'configmanager/site_change.html', {'site': s, 'configfiles': f})
 
+
+def site_save(request, site_id):
+    if request.POST.has_key('site-save'):
+        site = get_object_or_404(Site, pk=site_id)
+        site.fullname = request.POST['fullname']
+        site.shortname = request.POST['shortname']
+        site.configdirname = request.POST['configdirname']
+        site.port = request.POST['port']
+        site.save()
+        return HttpResponseRedirect(reverse('configmanager:sitelist'))
+    if request.POST.has_key('site-goback'):
+        return HttpResponseRedirect(reverse('configmanager:sitelist'))

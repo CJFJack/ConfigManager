@@ -8,26 +8,60 @@
 
 <form action="{% url 'configmanager:sitesave' site.id %}" method="post">
 {% csrf_token %}
-    <div>
-        <span>站点名称：</span>
-        <input type="text" name="fullname" value={{ site.fullname }} id="id_fullname"  maxlength="30">
-    </div>
-    <div>
-        <label>站点简称：</label>
-        <input type="text" name="shortname" value={{ site.shortname }} id="id_shortname"  maxlength="30">
-    </div>
-    <div>
-        <label>配置文件夹名称</label>
-        <input type="text" name="configdirname" value={{ site.configdirname }} id="id_configdirname"  maxlength="30">
-    </div>
-    <div>
-        <label>配置文件</label>
-        <input type="text" name="configfiles" value={{ configfiles }} id="id_configfiles"  maxlength="30">
-    </div>
-    <input type="submit" value="保存" />
-</form>
-<form action="{% url 'configmanager:sitelist' %}" method="get">
-{% csrf_token %}
-    <input type="submit" value="返回" />
+<table>
+    <tbody>
+    <tr>
+        <th>站点名称</th>
+        <td><input type="text" name="fullname" value={{ site.fullname }} id="id_fullname"  maxlength="30"></td>
+    </tr>
+    <tr>
+        <th>站点简称</th>
+        <td><input type="text" name="shortname" value={{ site.shortname }} id="id_shortname"  maxlength="30"></td>
+    </tr>
+    <tr>
+        <th>配置文件夹名称</th>
+        <td><input type="text" name="configdirname" value={{ site.configdirname }} id="id_configdirname"  maxlength="30"></td>
+    </tr>
+    <tr>
+        <th>配置文件</th>
+        <td><input type="text" name="configfiles" value={{ configfiles }} id="id_configfiles"  maxlength="30"></td>
+    </tr>
+    <tr>
+        <th>所属ECS</th>
+        <td>{% for ecs in ECSs %}
+            <span><input type="checkbox" name=ecs_{{ ecs.name }} value={{ ecs.name }} {% if ecs in site.ECSlists.all %}checked="checked"{% endif %} />{{ ecs.name }}</span>
+        {% endfor %}</td>
+    </tr>
+    <tr>
+        <th>所属站点族</th>
+        <td>
+        {% for s in Sites %}
+            {% if s.id != site.id %}
+                <span><input type="checkbox" name=site_{{ s.id }} value={{ s.fullname }} />{{ s.fullname }}</span>
+            {% endif %}
+        {% endfor %}
+        </td>
+    </tr>
+    <tr>
+        <th>端口号</th>
+        <td><input type="text" name="port" value={{ site.port }} id="id_port"  maxlength="30"></td>
+    </tr>
+    <tr>
+        <th>测试页面</th>
+        <td><input type="text" name="testpage" value={{ site.testpage }} id="id_testpage"  maxlength="30"></td>
+    </tr>
+    <tr>
+        <th>状态</th>
+        <td>
+            <input type="radio" name="id_sitestatus_y" value="Y" id="id_sitestatus_y" {% if site.status == "Y" %}checked{% endif %}> 
+            <label for="id_sitestatusy">启用</label>
+            <input type="radio" name="id_sitestatus_n" value="N" id="id_sitestatus_n" {% if site.status == "N" %}checked{% endif %}> 
+            <label for="id_sitestatusn">禁用</label>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<input type="submit" name="site-save" value="保存" />
+<input type="submit" name="site-goback" value="返回" />
 </form>
 {% endblock %}

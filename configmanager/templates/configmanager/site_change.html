@@ -29,7 +29,7 @@
     <tr>
         <th>所属ECS</th>
         <td>{% for ecs in ECSs %}
-            <span><input type="checkbox" name=ecs_{{ ecs.name }} value={{ ecs.name }} {% if ecs in site.ECSlists.all %}checked="checked"{% endif %} />{{ ecs.name }}</span>
+            <span><input type="checkbox" name={{ ecs.name }} value={{ ecs.name }} {% if ecs in site.ECSlists.all %}checked="checked"{% endif %} />{{ ecs.name }}</span>
         {% endfor %}</td>
     </tr>
     <tr>
@@ -37,7 +37,7 @@
         <td>
         {% for s in Sites %}
             {% if s.id != site.id %}
-                <span><input type="checkbox" name=site_{{ s.id }} value={{ s.fullname }} />{{ s.fullname }}</span>
+                <span><input type="checkbox" name={{ s.id }} value={{ s.fullname }} />{{ s.fullname }}</span>
             {% endif %}
         {% endfor %}
         </td>

@@ -135,12 +135,22 @@ def site_change(request, site_id):
 
 def site_save(request, site_id):
     if request.POST.has_key('site-save'):
-        site = get_object_or_404(Site, pk=site_id)
-        site.fullname = request.POST['fullname']
-        site.shortname = request.POST['shortname']
-        site.configdirname = request.POST['configdirname']
-        site.port = request.POST['port']
-        site.save()
+        s = get_object_or_404(Site, pk=site_id)
+        s.fullname = request.POST['fullname']
+        s.shortname = request.POST['shortname']
+        s.configdirname = request.POST['configdirname']
+        s.port = request.POST['port']
+        s.save()
+        for key in request.POST:
+            try:
+                e = ECS.objects.get(name=key)
+            except:
+                pass
+            else:
+                s.ECSlists.add(e)
+        for es in s.ECSlists.all():
+            if not request.POST.has_key(es.name):
+                s.ECSlists.remove(es)
         return HttpResponseRedirect(reverse('configmanager:sitelist'))
     if request.POST.has_key('site-goback'):
         return HttpResponseRedirect(reverse('configmanager:sitelist'))

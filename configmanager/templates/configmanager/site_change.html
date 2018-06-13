@@ -37,9 +37,14 @@
         <td>
         {% for s in Sites %}
             {% if s.id != site.id %}
-                <span><input type="checkbox" name={{ s.id }} value={{ s.fullname }} />{{ s.fullname }}</span>
+                <span><input type="checkbox" name={{ s.fullname }} value={{ s.fullname }}
+                    {% with 'Siterace.get_raceid' s.id as selected_site_raceid %}
+                        {% if current_site_raceid == selected_site_raceid %}checked{% endif %}
+                    {% endwith %}
+                />{{ s.fullname }}</span>
             {% endif %}
         {% endfor %}
+        {% endwith %}
         </td>
     </tr>
     <tr>

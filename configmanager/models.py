@@ -29,10 +29,6 @@ class ECS(models.Model):
         return self.name
 
 
-class SiteRace(models.Model):
-    RaceID = models.PositiveSmallIntegerField()
-
-
 class Site(models.Model):
     ENABLE = 'Y'
     DISABLE = 'N'
@@ -55,7 +51,6 @@ class Site(models.Model):
         choices=status_CHOICES,
         default=ENABLE,
     )
-    siterace = models.ForeignKey(SiteRace, on_delete=models.CASCADE, blank=True, null=True)
 
     def __unicode__(self):
         return self.fullname
@@ -165,3 +160,11 @@ class Deployitem(models.Model):
         return self.deploy_status
 
 
+class Siterace(models.Model):
+    raceid = models.BigIntegerField()
+    siteid = models.PositiveSmallIntegerField()
+    
+    @classmethod
+    def get_raceid(self, siteid):
+        sr = self.objects.get(siteid=siteid)
+        return sr.raceid

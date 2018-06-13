@@ -5,7 +5,7 @@ from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
-from .models import Site, ECS, Configfile, Apply, Deployitem
+from .models import Site, ECS, Configfile, Apply, Deployitem, Siterace
 from datetime import datetime
 from django.core.files import File
 import os
@@ -275,4 +275,5 @@ admin.site.register(Site, SiteAdmin)
 admin.site.register(Apply, ApplyAdmin)
 admin.site.register(Deployitem, DeployitemAdmin)
 admin.site.register(Configfile,SimpleHistoryAdmin)
+admin.site.register(Siterace)
 

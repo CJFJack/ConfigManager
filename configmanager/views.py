@@ -3,12 +3,13 @@ from __future__ import unicode_literals
 from django.views.decorators import csrf
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
+from time import time
 
 # Create your views here.
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
-from .models import ECS, Site, Configfile
+from .models import ECS, Site, Configfile, Siterace
 from django.http import HttpResponse
 from django.views import generic
 from django.contrib.auth.decorators import login_required
@@ -120,9 +121,11 @@ class SiteChangeView(generic.DetailView):
         configfiles = Site.configfile_set
         ECSs = ECS.objects.all()
         Sites = Site.objects.all()
+        Siteraces = Siterace.objects.all()
         context['configfiles'] = configfiles
         context['ECSs'] = ECSs
         context['Sites'] = Sites
+        context['Siteraces'] = Siteraces
         return context
 
 
@@ -141,6 +144,7 @@ def site_save(request, site_id):
         s.configdirname = request.POST['configdirname']
         s.port = request.POST['port']
         s.save()
+        ''''增加所属ECS'''
         for key in request.POST:
             try:
                 e = ECS.objects.get(name=key)
@@ -148,9 +152,29 @@ def site_save(request, site_id):
                 pass
             else:
                 s.ECSlists.add(e)
+        '''减少所属ECS'''
         for es in s.ECSlists.all():
             if not request.POST.has_key(es.name):
                 s.ECSlists.remove(es)
+        '''增加关联站点'''
+        L = []
+        raceid=int(round(time() * 1000))
+        for sr in Siterace.objects.all():
+            L.append(sr.siteid)
+        if s.id not in L:
+            sr_create = Siterace(raceid=raceid, siteid=s.id)
+            sr_create.save()
+        for key in request.POST:
+            try:
+                relation_s = Site.objects.get(fullname=key)
+            except:
+                pass
+            else:
+                if relation_s.id not in L:
+                    relation_sr_create = Siterace(raceid=raceid, siteid=relation_s.id)
+                    relation_sr_create.save()
+        
         return HttpResponseRedirect(reverse('configmanager:sitelist'))
+
     if request.POST.has_key('site-goback'):
         return HttpResponseRedirect(reverse('configmanager:sitelist'))

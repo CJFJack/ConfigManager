@@ -53,11 +53,15 @@ class Site(models.Model):
     )
 
     def get_relation_sites(self):
-        raceid = Siterace.objects.get(siteid=self.id).raceid
+        raceid = Siterace.objects.filter(siteid=self.id)[:1][0].raceid
         L = []
-        for sr in Siterace.objects.filter(raceid=raceid):
-            L.append(sr.siteid.fullname)
-        return L
+        if not Siterace.objects.filter(raceid=raceid):
+            return Flase
+        else:
+            for sr in Siterace.objects.filter(raceid=raceid):
+                if sr.siteid.id != self.id:
+                    L.append(sr.siteid.fullname)
+            return L
 
     def __unicode__(self):
         return self.fullname

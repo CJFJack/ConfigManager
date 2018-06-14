@@ -159,20 +159,21 @@ def site_save(request, site_id):
         '''增加关联站点'''
         L = []
         raceid=int(round(time() * 1000))
-        for sr in Siterace.objects.all():
-            L.append(sr.siteid)
-        if s not in L:
-            s.siterace_set.create(raceid=raceid)
+                        
         for key in request.POST:
             try:
                 relation_s = Site.objects.get(fullname=key)
             except:
                 pass
             else:
-                if relation_s not in L:
-                    sr = Siterace.objects.get(siteid=s.id)
-                    raceid = sr.raceid
-                    relation_s.siterace_set.create(raceid=raceid)    
+                L.append(relation_s)
+                if L:
+                    if s.siterace_set.all():
+                        s.siterace_set.all().delete()
+                    if relation_s.siterace_set.all():
+                        relation_s.siterace_set.all().delete()
+                    relation_s.siterace_set.create(raceid=raceid)
+        s.siterace_set.create(raceid=raceid)
         '''减少关联站点'''
         L = []
         for key in request.POST:

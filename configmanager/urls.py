@@ -5,6 +5,7 @@ from . import views
 app_name = 'configmanager'
 
 urlpatterns = [
+    url(r'^$', views.index, name='index'),
     url(r'^index/$', views.index, name='index'),
     url(r'^deploymanager/$', views.deploymanager, name='deploymanager'),
     url(r'^systemmanager/$', views.systemmanager, name='systemmanager'),

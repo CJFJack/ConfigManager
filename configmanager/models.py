@@ -52,6 +52,13 @@ class Site(models.Model):
         default=ENABLE,
     )
 
+    def get_relation_sites(self):
+        raceid = Siterace.objects.get(siteid=self.id).raceid
+        L = []
+        for sr in Siterace.objects.filter(raceid=raceid):
+            L.append(sr.siteid.fullname)
+        return L
+
     def __unicode__(self):
         return self.fullname
 
@@ -162,9 +169,8 @@ class Deployitem(models.Model):
 
 class Siterace(models.Model):
     raceid = models.BigIntegerField()
-    siteid = models.PositiveSmallIntegerField()
+    siteid = models.ForeignKey(Site, on_delete=models.CASCADE)
     
-    @classmethod
-    def get_raceid(self, siteid):
-        sr = self.objects.get(siteid=siteid)
-        return sr.raceid
+    def __unicode__(self):
+        return str(self.raceid)
+    

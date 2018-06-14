@@ -38,13 +38,17 @@
         {% for s in Sites %}
             {% if s.id != site.id %}
                 <span><input type="checkbox" name={{ s.fullname }} value={{ s.fullname }}
-                    {% with 'Siterace.get_raceid' s.id as selected_site_raceid %}
-                        {% if current_site_raceid == selected_site_raceid %}checked{% endif %}
-                    {% endwith %}
+                    {% for s_raceid in s.siterace_set.all %}
+                        {% for site_raceid in site.siterace_set.all %}
+                            {% if s_raceid.raceid == site_raceid.raceid %}
+                                checked
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                    {% if s.siterace_set.all == site.siterace_set.all %}checked{% endif %}
                 />{{ s.fullname }}</span>
             {% endif %}
         {% endfor %}
-        {% endwith %}
         </td>
     </tr>
     <tr>

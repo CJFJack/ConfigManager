@@ -112,9 +112,8 @@ class SiteListView(generic.ListView):
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class SiteChangeView(generic.DetailView):
+    model = Site
     template_name = 'configmanager/site_change.html'
-    def get_queryset(self):
-        return Site.objects.order_by('fullname')
 
     def get_context_data(self, **kwargs):
         context = super(SiteChangeView, self).get_context_data(**kwargs)
@@ -136,6 +135,7 @@ def site_change(request, site_id):
     return render(request, 'configmanager/site_change.html', {'site': s, 'configfiles': f})
 
 
+@login_required(login_url='/login/')
 def site_save(request, site_id):
     if request.POST.has_key('site-save'):
         s = get_object_or_404(Site, pk=site_id)
@@ -161,20 +161,39 @@ def site_save(request, site_id):
         raceid=int(round(time() * 1000))
         for sr in Siterace.objects.all():
             L.append(sr.siteid)
-        if s.id not in L:
-            sr_create = Siterace(raceid=raceid, siteid=s.id)
-            sr_create.save()
+        if s not in L:
+            s.siterace_set.create(raceid=raceid)
         for key in request.POST:
             try:
                 relation_s = Site.objects.get(fullname=key)
             except:
                 pass
             else:
-                if relation_s.id not in L:
-                    relation_sr_create = Siterace(raceid=raceid, siteid=relation_s.id)
-                    relation_sr_create.save()
+                if relation_s not in L:
+                    sr = Siterace.objects.get(siteid=s.id)
+                    raceid = sr.raceid
+                    relation_s.siterace_set.create(raceid=raceid)    
+        '''减少关联站点'''
+        L = []
+        for key in request.POST:
+            try:
+                relation_s = Site.objects.get(fullname=key)
+            except:
+                pass
+            else:
+                L.append(relation_s.fullname)
+        for rs in s.get_relation_sites():
+            if rs not in L:
+                rs_obj = Site.objects.get(fullname=rs)
+                rs_obj.siterace_set.all().delete()                        
         
         return HttpResponseRedirect(reverse('configmanager:sitelist'))
 
     if request.POST.has_key('site-goback'):
         return HttpResponseRedirect(reverse('configmanager:sitelist'))
+
+
+@login_required(login_url='/login/')
+def get_raceid(request, siteid):
+    sr = Stierace.objects.get(siteid=siteid)
+    return sr.raceid

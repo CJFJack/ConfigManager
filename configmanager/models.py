@@ -52,16 +52,41 @@ class Site(models.Model):
         default=ENABLE,
     )
 
-    def get_relation_sites(self):
-        raceid = Siterace.objects.filter(siteid=self.id)[:1][0].raceid
-        L = []
-        if not Siterace.objects.filter(raceid=raceid):
-            return Flase
+    def exist_or_not_in_siterace(self):
+        try:
+            raceid = Siterace.objects.filter(siteid=self.id)[:1][0].raceid
+        except:
+            return False
         else:
+            return True
+    
+    def get_raceid(self):
+        '''
+        返回站点对应的raceid，若无则返回False
+        '''
+        try:
+            raceid = Siterace.objects.filter(siteid=self.id)[:1][0].raceid
+        except:
+            return 0
+        else:
+            return raceid
+
+    def get_relation_sites(self):
+        '''
+        返回所有关联站点fullname属性的list，若无关联站点，则返回False
+        '''
+        raceid = self.get_raceid() 
+        if not raceid:
+            return False
+        else:
+            L = []
             for sr in Siterace.objects.filter(raceid=raceid):
                 if sr.siteid.id != self.id:
                     L.append(sr.siteid.fullname)
+        if L:
             return L
+        else:
+            return False
 
     def __unicode__(self):
         return self.fullname
@@ -178,3 +203,20 @@ class Siterace(models.Model):
     def __unicode__(self):
         return str(self.raceid)
     
+
+class Person(models.Model):
+    name = models.CharField(max_length=128)
+
+    def __unicode__(self):              # __unicode__ on Python 2
+        return self.name
+
+class Group(models.Model):
+    name = models.CharField(max_length=128)
+    members = models.ManyToManyField(Person, through='Membership')
+
+    def __unicode__(self):              # __unicode__ on Python 2
+        return self.name
+
+class Membership(models.Model):
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)

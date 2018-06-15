@@ -5,7 +5,7 @@ from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
-from .models import Site, ECS, Configfile, Apply, Deployitem, Siterace
+from .models import Site, ECS, Configfile, Apply, Deployitem, Siterace, Person, Group, Membership
 from datetime import datetime
 from django.core.files import File
 import os
@@ -266,6 +266,21 @@ class DeployitemAdmin(admin.ModelAdmin):
     list_filter = ['applyproject',]
     search_fields = ['applyproject',]
     
+
+
+class MembershipInline(admin.TabularInline):
+    model = Group.members.through
+@admin.register(Person)
+class PersonAdmin(admin.ModelAdmin):
+    inlines = [
+        MembershipInline,
+    ]
+@admin.register(Group)
+class GroupAdmin(admin.ModelAdmin):
+    inlines = [
+        MembershipInline,
+    ]
+    exclude = ('members',)
 
 
 admin.site.site_title = '运维管理平台'

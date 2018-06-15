@@ -144,6 +144,7 @@ def site_save(request, site_id):
         s.configdirname = request.POST['configdirname']
         s.port = request.POST['port']
         s.save()
+
         ''''增加所属ECS'''
         for key in request.POST:
             try:
@@ -152,28 +153,17 @@ def site_save(request, site_id):
                 pass
             else:
                 s.ECSlists.add(e)
+
         '''减少所属ECS'''
         for es in s.ECSlists.all():
             if not request.POST.has_key(es.name):
                 s.ECSlists.remove(es)
+
         '''增加关联站点'''
         L = []
         raceid=int(round(time() * 1000))
-                        
-        for key in request.POST:
-            try:
-                relation_s = Site.objects.get(fullname=key)
-            except:
-                pass
-            else:
-                L.append(relation_s)
-                if L:
-                    if s.siterace_set.all():
-                        s.siterace_set.all().delete()
-                    if relation_s.siterace_set.all():
-                        relation_s.siterace_set.all().delete()
-                    relation_s.siterace_set.create(raceid=raceid)
-        s.siterace_set.create(raceid=raceid)
+        
+                
         '''减少关联站点'''
         L = []
         for key in request.POST:
@@ -183,18 +173,16 @@ def site_save(request, site_id):
                 pass
             else:
                 L.append(relation_s.fullname)
-        for rs in s.get_relation_sites():
-            if rs not in L:
-                rs_obj = Site.objects.get(fullname=rs)
-                rs_obj.siterace_set.all().delete()                        
+        if s.get_relation_sites():
+            for rs in s.get_relation_sites():
+                if rs not in L:
+                    rs_obj = Site.objects.get(fullname=rs)
+                    rs_obj.siterace_set.all().delete()                        
+        if s.siterace_set.count() == 1:
+            s.siterace_set.all().delete()
         
         return HttpResponseRedirect(reverse('configmanager:sitelist'))
 
     if request.POST.has_key('site-goback'):
         return HttpResponseRedirect(reverse('configmanager:sitelist'))
 
-
-@login_required(login_url='/login/')
-def get_raceid(request, siteid):
-    sr = Stierace.objects.get(siteid=siteid)
-    return sr.raceid

@@ -159,6 +159,21 @@ def site_save(request, site_id):
             if not request.POST.has_key(es.name):
                 s.ECSlists.remove(es)
 
+        '''减少关联站点'''
+        L = []
+        for key in request.POST:
+            try:
+                relation_s = Site.objects.get(fullname=key)
+            except:
+                pass
+            else:
+                L.append(relation_s.fullname)
+        if s.get_relation_sites():
+            for rs in s.get_relation_sites():
+                if rs not in L:
+                    rs_obj = Site.objects.get(fullname=rs)
+                    rs_obj.siterace_set.all().delete()                        
+ 
         '''增加关联站点'''
         if not s.exist_or_not_in_siterace():
             for key in request.POST:
@@ -187,24 +202,10 @@ def site_save(request, site_id):
                     if not relation_s.exist_or_not_in_siterace():
                         raceid = s.get_raceid()
                         relation_s.siterace_set.create(raceid=raceid) 
-                    
-        '''减少关联站点'''
-        L = []
-        for key in request.POST:
-            try:
-                relation_s = Site.objects.get(fullname=key)
-            except:
-                pass
-            else:
-                L.append(relation_s.fullname)
-        if s.get_relation_sites():
-            for rs in s.get_relation_sites():
-                if rs not in L:
-                    rs_obj = Site.objects.get(fullname=rs)
-                    rs_obj.siterace_set.all().delete()                        
+       
         if not s.get_relation_sites():
             s.siterace_set.all().delete()
-        
+
         return HttpResponseRedirect(reverse('configmanager:sitelist'))
 
     if request.POST.has_key('site-goback'):

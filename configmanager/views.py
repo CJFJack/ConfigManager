@@ -7,6 +7,7 @@ from time import time
 
 # Create your views here.
 
+from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from .models import ECS, Site, Configfile, Siterace
@@ -29,7 +30,14 @@ def index(request):
 def nav_top(request):
     return render_to_response('configmanager/nav_top.html')
 
- 
+
+@login_required(login_url='/login/')
+def welcome(request):
+    print request.user.username
+    context = {}
+    return render(request, 'configmanager/welcome.html', context)
+
+
 @login_required(login_url='/login/')
 def deploymanager(request):
     return render_to_response('configmanager/deploymanager.html')

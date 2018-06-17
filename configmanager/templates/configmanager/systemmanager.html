@@ -1,17 +1,17 @@
 {% extends 'configmanager/__base__.html' %}
 {% block content %}
-    <h2>ECS管理</h2>
-    <li>
+    <div><h2>ECS管理</h2></div>
+    <div>
         <a href="{% url 'configmanager:ecslist' %}" target="nav_right">ECS列表</a>
-    </li>
-    <li>
+    </div>
+    <div>
         <a href="{% url 'configmanager:ecsadd' %}" target="nav_right">添加ECS</a>
-    </li>
-    <h2>站点管理</h2>
-    <li>
+    </div>
+    <div><h2>站点管理</h2></div>
+    <div>
         <a href="{% url 'configmanager:sitelist' %}" target="nav_right">站点列表</a>
-    </li>
-    <li>
+    </div>
+    <div>
         <a href='' target="nav_right">添加站点</a>
-    </li>
+    </div>
 {% endblock %}

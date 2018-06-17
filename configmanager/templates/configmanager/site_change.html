@@ -12,7 +12,7 @@
     <tbody>
     <tr>
         <th>站点名称</th>
-        <td><input type="text" name="fullname" value={{ site.fullname }} id="id_fullname"  maxlength="30"></td>
+        <td><input type="text" name="fullname" value={{ site.fullname }} id="id_fullname"  maxlength="30" style="width:200px;"></td>
     </tr>
     <tr>
         <th>站点简称</th>
@@ -24,7 +24,7 @@
     </tr>
     <tr>
         <th>配置文件</th>
-        <td><input type="text" name="configfiles" value={{ configfiles }} id="id_configfiles"  maxlength="30"></td>
+        <td><input type="text" name="configfiles" value={{ site.get_configfiles }} id="id_configfiles"  maxlength="30" style="width:350px;"></td>
     </tr>
     <tr>
         <th>所属ECS</th>

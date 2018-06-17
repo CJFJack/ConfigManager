@@ -87,6 +87,12 @@ class Site(models.Model):
             return L
         else:
             return False
+    
+    def get_configfiles(self):
+        '''
+        返回配置文件filename的list，以分号分隔
+        '''
+        return ';'.join([c.filename for c in self.configfile_set.all()])
 
     def __unicode__(self):
         return self.fullname

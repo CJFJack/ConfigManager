@@ -3,7 +3,6 @@
 {% block goback %}{% url 'configmanager:index' %}{% endblock %}
 {% block content %}
 <h2>ECS管理 > ECS列表</h2>
-<a href="{% url 'configmanager:ecsadd' %}">新增ECS</a></br>
 {% if ECS_list %}
     <ul>
     <table border="1">

@@ -7,6 +7,7 @@ app_name = 'configmanager'
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^index/$', views.index, name='index'),
+    url(r'^nav_top/$', views.nav_top, name='nav_top'),
     url(r'^deploymanager/$', views.deploymanager, name='deploymanager'),
     url(r'^systemmanager/$', views.systemmanager, name='systemmanager'),
     url(r'^ecs/$', views.ECSListView.as_view(), name='ecslist'),

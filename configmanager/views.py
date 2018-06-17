@@ -24,6 +24,11 @@ app_name = 'configmanager'
 def index(request):
     return render_to_response('configmanager/index.html')
 
+
+@login_required(login_url='/login/')
+def nav_top(request):
+    return render_to_response('configmanager/nav_top.html')
+
  
 @login_required(login_url='/login/')
 def deploymanager(request):

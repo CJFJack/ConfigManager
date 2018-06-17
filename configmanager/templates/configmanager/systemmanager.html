@@ -2,16 +2,16 @@
 {% block content %}
     <h2>ECS管理</h2>
     <li>
-        <a href="{% url 'configmanager:ecslist' %}">ECS列表</a>
+        <a href="{% url 'configmanager:ecslist' %}" target="nav_right">ECS列表</a>
     </li>
     <li>
-        <a href="{% url 'configmanager:ecsadd' %}">添加ECS</a>
+        <a href="{% url 'configmanager:ecsadd' %}" target="nav_right">添加ECS</a>
     </li>
     <h2>站点管理</h2>
     <li>
-        <a href="{% url 'configmanager:sitelist' %}">站点列表</a>
+        <a href="{% url 'configmanager:sitelist' %}" target="nav_right">站点列表</a>
     </li>
     <li>
-        <a href=''>添加站点</a>
+        <a href='' target="nav_right">添加站点</a>
     </li>
 {% endblock %}

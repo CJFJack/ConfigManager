@@ -1,31 +1,10 @@
-{% extends 'configmanager/__base__.html' %}
-{% block content %}
-    <h2>ECS管理</h2>
-    <li>
-        <a href="{% url 'configmanager:ecslist' %}">ECS列表</a>
-    </li>
-    <li>
-        <a href="{% url 'configmanager:ecsadd' %}">添加ECS</a>
-    </li>
-    <h2>站点管理</h2>
-    <li>
-        <a href="{% url 'configmanager:sitelist' %}">站点列表</a>
-    </li>
-    <li>
-        <a href=''>添加站点</a>
-    </li>
-    <h2>配置管理</h2>
-    <li>
-        <a href=''>配置修改</a>
-    </li>
-    <li>
-        <a href=''>待生效配置</a>
-    </li>
-    <h2>发布管理</h2>
-    <li>
-        <a href=''>待发布申请</a>
-    </li>
-    <li>
-        <a href=''>发布申请列表</a>
-    </li>
-{% endblock %}
+<!DOCTYPE html>
+<html>
+    <frameset rows="15%,85%">
+        <frame src="{% url 'configmanager:nav_top' %}">
+        <frameset cols="10%,90%">
+            <frame src="" name="nav_left">
+            <frame src="" name="nav_right">
+        </frameset>
+    </frameset>
+</html>

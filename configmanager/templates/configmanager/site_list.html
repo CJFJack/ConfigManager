@@ -13,7 +13,7 @@
     <th>所属ECS</th>
     {% for site in Site_list %}
     <tr>
-        <td><a href="{% url 'configmanager:sitechange' site.id %}" target="_blank">{{ site.fullname }}</a></td>
+        <td><a href="{% url 'configmanager:sitechange' site.id %}">{{ site.fullname }}</a></td>
         <td>{{ site.shortname }}</td>
         <td>{{ site.configdirname }}</td>
         <td>

@@ -156,6 +156,11 @@ def site_save(request, site_id):
         s.shortname = request.POST['shortname']
         s.configdirname = request.POST['configdirname']
         s.port = request.POST['port']
+        s.testpage = request.POST['testpage']
+        #s.status = request.POST['status']
+        s.devcharge = request.POST['devcharge']
+        s.deployattention = request.POST['deployattention']
+        s.modified_user = request.user.username
         s.save()
 
         ''''增加所属ECS'''

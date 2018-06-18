@@ -42,7 +42,7 @@ class Site(models.Model):
     ECSlists = models.ManyToManyField(ECS)
     port = models.PositiveSmallIntegerField(null=True)
     testpage = models.CharField(max_length=30, null=True)
-    devcharge = models.CharField(max_length=10, null=True)
+    devcharge = models.CharField(max_length=10, null=True, blank=True)
     deployattention = models.TextField(null=True, blank=True)
     modified_time = models.DateTimeField(auto_now=True)
     modified_user = models.CharField(max_length=20, default='admin')

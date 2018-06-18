@@ -60,10 +60,10 @@
     <tr>
         <th>状态</th>
         <td>
-            <input type="radio" name="id_sitestatus_y" value="Y" id="id_sitestatus_y" {% if site.status == "Y" %}checked{% endif %}> 
-            <label for="id_sitestatusy">启用</label>
-            <input type="radio" name="id_sitestatus_n" value="N" id="id_sitestatus_n" {% if site.status == "N" %}checked{% endif %}> 
-            <label for="id_sitestatusn">禁用</label>
+            <select name="status" id="id_status">
+                <option value="Y" {% if site.status == 'Y' %}selected{% endif %}>启用</option>
+                <option value="N" {% if site.status == 'N' %}selected{% endif %}>禁用</option>
+            </select>
         </td>
     </tr>
     <tr>

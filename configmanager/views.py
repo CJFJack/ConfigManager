@@ -4,6 +4,7 @@ from django.views.decorators import csrf
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from time import time
+from re import split
 
 # Create your views here.
 
@@ -148,6 +149,48 @@ def site_change(request, site_id):
     return render(request, 'configmanager/site_change.html', {'site': s, 'configfiles': f})
 
 
+def add_relation_ecs(request, site):
+
+    for key in request.POST:
+        try:
+            e = ECS.objects.get(name=key)
+        except:
+            pass
+        else:
+            site.ECSlists.add(e)
+
+
+def add_relation_site(request, site):
+
+    if not site.exist_or_not_in_siterace():                                                                                              
+        for key in request.POST:                                                                                                      
+            try:                                                                                                                      
+                relation_s = Site.objects.get(fullname=key)                                                                           
+            except:                                                                                                                   
+                pass                                                                                                                  
+            else:                                                                                                                     
+                raceid = relation_s.get_raceid()                                                                                      
+                if raceid != 0:                                                                                                       
+                    site.siterace_set.create(raceid=raceid)                                                                              
+                                                                                                                                      
+    if not site.exist_or_not_in_siterace():                                                                                              
+        raceid=int(round(time() * 1000))                                                                                              
+        site.siterace_set.create(raceid=raceid)                                                                                          
+                                                                                                                                      
+    L = []                                                                                                                            
+    raceid=int(round(time() * 1000))                                                                                                  
+    if site.exist_or_not_in_siterace():                                                                                                  
+        for key in request.POST:                                                                                                      
+            try:                                                                                                                      
+                relation_s = Site.objects.get(fullname=key)                                                                           
+            except:                                                                                                                   
+                pass                                                                                                                  
+            else:                                                                                                                     
+                if not relation_s.exist_or_not_in_siterace():                                                                         
+                    raceid = site.get_raceid()                                                                                           
+                    relation_s.siterace_set.create(raceid=raceid)
+
+
 @login_required(login_url='/login/')
 def site_save(request, site_id):
     if request.POST.has_key('site-save'):
@@ -162,15 +205,15 @@ def site_save(request, site_id):
         s.deployattention = request.POST['deployattention']
         s.modified_user = request.user.username
         s.save()
+        
+        '''新增或删除关联配置文件'''
+        post_filenames_list = []
+        post_filenames = request.POST['configfiles']
+        post_filenames_list = post_filenames.split(';')
+        s.update_configfiles(post_filenames_list=post_filenames_list)
 
         ''''增加所属ECS'''
-        for key in request.POST:
-            try:
-                e = ECS.objects.get(name=key)
-            except:
-                pass
-            else:
-                s.ECSlists.add(e)
+        add_relation_ecs(request=request, site=s) 
 
         '''减少所属ECS'''
         for es in s.ECSlists.all():
@@ -193,34 +236,9 @@ def site_save(request, site_id):
                     rs_obj.siterace_set.all().delete()                        
  
         '''增加关联站点'''
-        if not s.exist_or_not_in_siterace():
-            for key in request.POST:
-                try:
-                    relation_s = Site.objects.get(fullname=key)
-                except:
-                    pass
-                else:
-                    raceid = relation_s.get_raceid()
-                    if raceid != 0:
-                        s.siterace_set.create(raceid=raceid)
-
-        if not s.exist_or_not_in_siterace():
-            raceid=int(round(time() * 1000))
-            s.siterace_set.create(raceid=raceid)
-                
-        L = []
-        raceid=int(round(time() * 1000))
-        if s.exist_or_not_in_siterace():
-            for key in request.POST:
-                try:
-                    relation_s = Site.objects.get(fullname=key)
-                except:
-                    pass
-                else:
-                    if not relation_s.exist_or_not_in_siterace():
-                        raceid = s.get_raceid()
-                        relation_s.siterace_set.create(raceid=raceid) 
-       
+        add_relation_site(request, s)
+      
+        '''若站点没有任何关联站点族，则将其从站点族中删除'''
         if not s.get_relation_sites():
             s.siterace_set.all().delete()
 
@@ -229,3 +247,49 @@ def site_save(request, site_id):
     if request.POST.has_key('site-goback'):
         return HttpResponseRedirect(reverse('configmanager:sitelist'))
 
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class SiteAddView(generic.ListView):
+    model = Site
+    template_name = 'configmanager/site_add.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(SiteAddView, self).get_context_data(**kwargs)
+        ECSs = ECS.objects.all()
+        Siteraces = Siterace.objects.all()
+        context['ECSs'] = ECSs
+        context['Siteraces'] = Siteraces
+        return context 
+
+
+@login_required(login_url='/login/')
+def site_add(request):
+    if request.POST.has_key('site-save'):
+        '''保存站点基础信息'''
+        fullname = request.POST['fullname']
+        shortname = request.POST['shortname']
+        configdirname = request.POST['configdirname']
+        port = request.POST['port']
+        testpage = request.POST['testpage']
+        status = request.POST['status']
+        devcharge = request.POST['devcharge']
+        deployattention = request.POST['deployattention']
+        modified_user = request.user.username
+        site = Site(fullname=fullname, shortname=shortname, configdirname=configdirname, port=port, testpage=testpage, status=status, devcharge=devcharge, deployattention=deployattention, modified_user=modified_user)
+        site.save()
+        '''添加关联ECS、所属站点族'''
+        add_relation_site(request, site)
+        add_relation_ecs(request, site)
+        '''新增或删除关联配置文件'''
+        post_filenames_list = []
+        post_filenames = request.POST['configfiles']
+        post_filenames_list = post_filenames.split(';')
+        site.update_configfiles(post_filenames_list=post_filenames_list)
+    return HttpResponseRedirect(reverse('configmanager:sitelist'))
+
+
+@login_required(login_url='/login/')
+def site_delete(request, site_id):
+    site = get_object_or_404(Site, pk=site_id)
+    site.delete()
+    return HttpResponseRedirect(reverse('configmanager:sitelist'))

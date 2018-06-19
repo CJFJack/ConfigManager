@@ -94,6 +94,23 @@ class Site(models.Model):
         '''
         return ';'.join([c.filename for c in self.configfile_set.all()])
 
+    def update_configfiles(self, post_filenames_list):
+        '''
+        新增或删除关联的配置文件
+        '''
+        relation_filenames_list = []
+        for c in self.configfile_set.all():
+            relation_filenames_list.append(c.filename)
+        '''新增'''
+        for pfl in post_filenames_list:
+            if pfl not in relation_filenames_list:
+                self.configfile_set.create(filename=pfl)
+        '''删除'''
+        for rfl in relation_filenames_list:
+            if rfl not in post_filenames_list:
+                c = self.configfile_set.get(filename=rfl)
+                c.delete()
+
     def __unicode__(self):
         return self.fullname
 

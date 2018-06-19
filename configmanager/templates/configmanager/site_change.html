@@ -24,7 +24,7 @@
     </tr>
     <tr>
         <th>配置文件</th>
-        <td><input type="text" name="configfiles" value="{{ site.get_configfiles }}" id="id_configfiles"  maxlength="30" style="width:350px;"></td>
+        <td><input type="text" name="configfiles" value="{{ site.get_configfiles }}" id="id_configfiles"  maxlength="300" style="width:350px;"></td>
     </tr>
     <tr>
         <th>所属ECS</th>
@@ -75,7 +75,7 @@
     <tr>
         <th>发布注意事项</th>
         <td>
-            <textarea name="deployattention" id="id_deployattention" rows="15" cols="60"></textarea>
+            <textarea name="deployattention" id="id_deployattention" rows="15" cols="60">{{ site.deployattention }}</textarea>
         </td>
     </tr>
     <tr>

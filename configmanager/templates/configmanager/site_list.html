@@ -11,6 +11,7 @@
     <th>配置文件夹名称</th>
     <th>配置文件名称</th>
     <th>所属ECS</th>
+    <th>操作</th>
     {% for site in Site_list %}
     <tr>
         <td><a href="{% url 'configmanager:sitechange' site.id %}">{{ site.fullname }}</a></td>
@@ -25,6 +26,13 @@
             {% for ecs in site.ECSlists.all %}
                 <p>{{ ecs }}</p>
             {% endfor %}
+        </td>
+        <td>
+            <a href="{% url 'configmanager:sitechange' site.id %}">修改</a>
+            <form action="{% url 'configmanager:sitedelete' site.id %}" method="post">
+            {% csrf_token %}
+                <input type="submit" value="删除" />
+            </form>
         </td>
     </tr>
     {% endfor %}

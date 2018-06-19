@@ -2,7 +2,8 @@
 {% block title %}修改ECS | {% endblock %}
 {% block goback %}{% url 'configmanager:ecslist' %}{% endblock %}
 {% block content %}
-<h2>{{ ecs.name }}</h2>
+<h2>ECS管理 > 修改ECS</h2>
+<h3>{{ ecs.name }}</h3>
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 

@@ -1,0 +1,49 @@
+{% extends 'configmanager/__base__.html' %}
+{% block title %}修改配置 | {% endblock %}
+{% block content %}
+<h2>配置管理 > 修改配置</h2>
+{% if site_list %}
+<table border="1">
+    <th>站点名称</th>
+    <th>发布注意事项</th>
+    <th>配置文件</th>
+    <th>所属ECS 配置状态 操作</th>
+    <th>所属ECS SLB状态 健康状态 操作</th>
+    <th>健康检查</th>
+    <th>配置修改人</th>
+    <th>修改日期</th>
+    {% for site in site_list %}
+    <tr>
+        <td>
+            <a href="{% url 'configmanager:sitechange' site.id %}">{{ site.fullname }}</a>
+        </td>
+        <td>{{ site.deployattention }}</td>
+        <td>
+            {% for configfile in site.configfile_set.all %}
+                <span><a href="{% url 'configmanager:configchange' configfile.id %}">{{ configfile.filename }}</a></span><br />
+            {% endfor %}
+        </td>
+        <td>
+            {% for ecs in site.ECSlists.all %}
+                <p>{{ ecs }}</p>
+            {% endfor %}
+        </td>
+        <td>
+            {% for ecs in site.ECSlists.all %}
+                <p>{{ ecs }}</p>
+            {% endfor %}
+        </td>
+        <td></td>
+        <td>
+            
+        </td>
+        <td>
+            
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>No ECS are available.</p>
+{% endif %}
+{% endblock %}

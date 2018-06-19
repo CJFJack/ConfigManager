@@ -2,7 +2,7 @@
 {% block goback %}{% url 'configmanager:ecslist' %}{% endblock %}
 {% block content %}
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
+<h2>ECS管理 > 添加ECS</h2>
 <form action="{% url 'configmanager:ecsaddmethod' %}" method="post">
 {% csrf_token %}
     <div>

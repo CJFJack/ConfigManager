@@ -293,3 +293,15 @@ def site_delete(request, site_id):
     site = get_object_or_404(Site, pk=site_id)
     site.delete()
     return HttpResponseRedirect(reverse('configmanager:sitelist'))
+
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class ConfigListView(generic.ListView):
+    model = Site
+    template_name = 'configmanager/config_list.html'
+
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class ConfigChangeView(generic.DetailView):
+    model = Configfile
+    template_name = 'configmanager/config_change.html'

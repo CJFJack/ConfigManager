@@ -37,7 +37,7 @@ class ConfigfileInline(admin.TabularInline):
     ]
     list_display = ('site', 'filename', 'modified_user', 'modified_time')
     #search_fields = ['']
-    
+
     def save_model(self, request, obj, form, change):
         obj.modified_user = request.user.username
         config_path = os.path.join('/releaseconfig', obj.filename)

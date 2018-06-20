@@ -93,6 +93,15 @@ class Site(models.Model):
         返回配置文件filename的list，以分号分隔
         '''
         return ';'.join([c.filename for c in self.configfile_set.all()])
+    
+    def get_configfiles_id(self):
+        '''
+        返回配置文件filename的list，以逗号分隔
+        '''
+        L = []
+        for c in self.configfile_set.all():
+            L.append(c.id)
+        return L
 
     def update_configfiles(self, post_filenames_list):
         '''
@@ -122,7 +131,7 @@ class Configfile(models.Model):
     modified_user = models.CharField(max_length=20)
     modified_time = models.DateTimeField(auto_now=True)
     history = HistoricalRecords()
-
+    
     def __unicode__(self):
         return self.filename
 

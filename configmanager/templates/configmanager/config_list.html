@@ -15,7 +15,7 @@
     {% for site in site_list %}
     <tr>
         <td>
-            <a href="{% url 'configmanager:sitechange' site.id %}">{{ site.fullname }}</a>
+            <a href="{% url 'configmanager:sitechange' site.id %}" target="_blank">{{ site.fullname }}</a>
         </td>
         <td>{{ site.deployattention }}</td>
         <td>
@@ -35,10 +35,14 @@
         </td>
         <td></td>
         <td>
-            
+            {% for config in site.configfile_set.all %} 
+                <p>{{ config.modified_user }}</p>
+            {% endfor %}
         </td>
         <td>
-            
+            {% for config in site.configfile_set.all %} 
+                <p>{{ config.modified_time }}</p>
+            {% endfor %}
         </td>
     </tr>
     {% endfor %}

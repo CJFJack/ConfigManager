@@ -305,3 +305,31 @@ class ConfigListView(generic.ListView):
 class ConfigChangeView(generic.DetailView):
     model = Configfile
     template_name = 'configmanager/config_change.html'
+
+
+@login_required(login_url='/login/')
+def config_save(request, configfile_id):
+    if request.POST.has_key('config-save'):
+        def relation_config_save(request, configfileid):
+            c = get_object_or_404(Configfile, pk=configfileid)
+            c.content = request.POST['configcontent']
+            c.modified_user = request.user.username
+            c.save()
+        
+        relation_config_save(request, configfileid=configfile_id)
+    
+        c = get_object_or_404(Configfile, pk=configfile_id)    
+        for key in request.POST:
+            try:
+                s = Site.objects.get(fullname=key)
+            except:
+                pass
+            else:
+                for p_c in s.configfile_set.all():
+                    if p_c.filename == c.filename:
+                        relation_config_save(request, configfileid=p_c.id)
+            
+        return HttpResponseRedirect(reverse('configmanager:configlist'))
+    if request.POST.has_key('config-goback'):
+        return HttpResponseRedirect(reverse('configmanager:configlist'))
+

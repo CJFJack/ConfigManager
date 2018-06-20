@@ -310,14 +310,15 @@ class ConfigChangeView(generic.DetailView):
 @login_required(login_url='/login/')
 def config_save(request, configfile_id):
     if request.POST.has_key('config-save'):
+        '''保存配置函数'''
         def relation_config_save(request, configfileid):
             c = get_object_or_404(Configfile, pk=configfileid)
             c.content = request.POST['configcontent']
             c.modified_user = request.user.username
             c.save()
-        
+        '''保存本站点配置文件'''
         relation_config_save(request, configfileid=configfile_id)
-    
+        '''保存关联站点配置文件'''
         c = get_object_or_404(Configfile, pk=configfile_id)    
         for key in request.POST:
             try:

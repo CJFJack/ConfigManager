@@ -18,9 +18,9 @@
             <a href="{% url 'configmanager:sitechange' site.id %}" target="_blank">{{ site.fullname }}</a>
         </td>
         <td>{{ site.deployattention }}</td>
-        <td>
+        <td align="right">
             {% for configfile in site.configfile_set.all %}
-                <span><a href="{% url 'configmanager:configchange' configfile.id %}">{{ configfile.filename }}</a></span><br />
+                <span>{{ configfile.filename }}&nbsp;</span><span><a href="{% url 'configmanager:configchange' configfile.id %}">修改</a>&nbsp;</span><br />
             {% endfor %}
         </td>
         <td>

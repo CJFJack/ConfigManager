@@ -135,6 +135,28 @@ class Configfile(models.Model):
     def __unicode__(self):
         return self.filename
 
+
+class Release(models.Model):
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    ECS = models.ForeignKey(ECS, on_delete=models.CASCADE)
+    HAVEDEPLOY = 'Y'
+    WAITDEPLOY = 'N'
+    status_CHOICES = (
+        (HAVEDEPLOY, '已发布'),
+        (WAITDEPLOY, '待发布'),
+    )
+    status = models.CharField(
+        "配置状态",
+        max_length=1,
+        choices=status_CHOICES,
+        default=WAITDEPLOY,
+    )
+    modified_user = models.CharField(max_length=20)
+    modified_time = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return self.ECS
+
   
 class Apply(models.Model):
     WAITFORCOMMIT = 'WC'

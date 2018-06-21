@@ -119,6 +119,19 @@ class Site(models.Model):
             if rfl not in post_filenames_list:
                 c = self.configfile_set.get(filename=rfl)
                 c.delete()
+     
+    def if_have_undeploy_config(self):
+        '''
+        判断配置是否发布，若存在一台或以上服务器未发布，则返回True，否则返回False
+        '''
+        result = False
+        for r in self.release_set.all():
+            if r.status == 'N':
+                result = True
+                break
+            else:
+                continue
+        return result
 
     def __unicode__(self):
         return self.fullname

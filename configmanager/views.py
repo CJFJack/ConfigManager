@@ -304,6 +304,12 @@ class ConfigListView(generic.ListView):
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
+class UndeployConfigListView(generic.ListView):
+    model = Site
+    template_name = 'configmanager/undeploy_config_list.html'
+
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
 class ConfigChangeView(generic.DetailView):
     model = Configfile
     template_name = 'configmanager/config_change.html'
@@ -331,9 +337,7 @@ def config_save(request, configfile_id):
                     r = Release.objects.get(site_id=siteid, ECS_id=ecsid)
                     r.status = 'N'
                     r.save()
-        '''保存本站点配置文件'''
-        relation_config_save(request, configfileid=configfile_id)
-        '''保存关联站点配置文件'''
+        '''保存配置内容'''
         c = get_object_or_404(Configfile, pk=configfile_id)    
         for key in request.POST:
             try:
@@ -352,6 +356,7 @@ def config_save(request, configfile_id):
 
 @login_required(login_url='/login/')
 def config_deploy(request, release_id):
+    print request.META['HTTP_REFERER']
     '''更新Release表信息'''
     r = Release.objects.get(pk=release_id)
     r.status = 'Y'
@@ -367,4 +372,7 @@ def config_deploy(request, release_id):
         with open(file_name, 'w') as f:
             myfile = File(f)
             myfile.write(c.content)
-    return HttpResponseRedirect(reverse('configmanager:configlist'))
+    if 'undeployconfig' in request.META['HTTP_REFERER']:
+        return HttpResponseRedirect(reverse('configmanager:undeployconfiglist'))
+    else:
+        return HttpResponseRedirect(reverse('configmanager:configlist'))

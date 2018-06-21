@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^site/addmethod/$', views.site_add, name='siteaddmethod'),
     url(r'^site/(?P<site_id>[0-9]+)/delete/$', views.site_delete, name='sitedelete'),
     url(r'^config/$', views.ConfigListView.as_view(), name='configlist'),
+    url(r'^undeployconfig/$', views.UndeployConfigListView.as_view(), name='undeployconfiglist'),
     url(r'^config/(?P<pk>[0-9]+)/change/$', views.ConfigChangeView.as_view(), name='configchange'),
     url(r'^config/(?P<configfile_id>[0-9]+)/save/$', views.config_save, name='configsave'),
     url(r'^config/(?P<release_id>[0-9]+)/deploy/$', views.config_deploy, name='configdeploy'),

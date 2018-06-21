@@ -1,0 +1,63 @@
+{% extends 'configmanager/__base__.html' %}
+{% block title %}修改配置 | {% endblock %}
+{% block content %}
+<h2>配置管理 > 修改配置</h2>
+{% if site_list %}
+<table border="1">
+    <th>站点名称</th>
+    <th>发布注意事项</th>
+    <th>配置文件</th>
+    <th>所属ECS 配置状态 操作</th>
+    <th>所属ECS SLB状态 健康状态 操作</th>
+    <th>健康检查</th>
+    <th>配置修改人</th>
+    <th>修改日期</th>
+    {% for site in site_list %}
+    {% if site.if_have_undeploy_config %}
+    <tr>
+        <td>
+            <a href="{% url 'configmanager:sitechange' site.id %}" target="_blank">{{ site.fullname }}</a>
+        </td>
+        <td>{{ site.deployattention }}</td>
+        <td align="right">
+            {% for configfile in site.configfile_set.all %}
+                <p>{{ configfile.filename }}&nbsp;<a href="{% url 'configmanager:configchange' configfile.id %}">修改</a>&nbsp;</p>
+            {% endfor %}
+        </td>
+        <td align="right">
+            {% for r in site.release_set.all %}
+                <p>
+                    {{ r.ECS }}&nbsp;
+                    {% if r.status == "N" %}
+                        待生效&nbsp;<a href="{% url 'configmanager:configdeploy' r.id %}" >发布</a>&nbsp;
+                    {% endif %}
+                    {% if r.status == "Y" %}
+                        已生效&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% endif %}
+                </p>
+            {% endfor %}
+        </td>
+        <td>
+            {% for ecs in site.ECSlists.all %}
+                <p>{{ ecs }}</p>
+            {% endfor %}
+        </td>
+        <td></td>
+        <td>
+            {% for config in site.configfile_set.all %} 
+                <p>{{ config.modified_user }}</p>
+            {% endfor %}
+        </td>
+        <td>
+            {% for config in site.configfile_set.all %} 
+                <p>{{ config.modified_time }}</p>
+            {% endfor %}
+        </td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+</table>
+{% else %}
+    <p>No ECS are available.</p>
+{% endif %}
+{% endblock %}

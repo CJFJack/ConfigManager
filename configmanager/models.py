@@ -287,3 +287,28 @@ class Group(models.Model):
 class Membership(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
+
+
+class AuthUser(models.Model):
+    did = models.IntegerField(blank=True, null=True) 
+
+
+class ConfigmanagerHistoricalconfigfile(models.Model):
+    id = models.IntegerField()
+    filename = models.CharField(max_length=30)
+    content = models.TextField(blank=True, null=True)
+    modified_user = models.CharField(max_length=20)
+    modified_time = models.DateTimeField()
+    history_id = models.AutoField(primary_key=True)
+    history_date = models.DateTimeField()
+    history_change_reason = models.CharField(max_length=100, blank=True, null=True)
+    history_type = models.CharField(max_length=1)
+    history_user = models.ForeignKey('AuthUser', models.DO_NOTHING, blank=True, null=True)
+    site_id = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'configmanager_historicalconfigfile'
+    
+    def __unicode__(self):
+        return self.filename

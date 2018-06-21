@@ -20,7 +20,11 @@
         <td>{{ site.deployattention }}</td>
         <td align="right">
             {% for configfile in site.configfile_set.all %}
-                <p>{{ configfile.filename }}&nbsp;<a href="{% url 'configmanager:configchange' configfile.id %}">修改</a>&nbsp;</p>
+                <p>
+                    {{ configfile.filename }}&nbsp;
+                    <a href="{% url 'configmanager:configchange' configfile.id %}">修改</a>&nbsp;
+                    <a href="{% url 'configmanager:configchange' configfile.id %}">历史记录</a>&nbsp;
+                </p>
             {% endfor %}
         </td>
         <td align="right">

@@ -5,13 +5,15 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from time import time
 from re import split
+from django.core.files import File
+import os
 
 # Create your views here.
 
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
-from .models import ECS, Site, Configfile, Siterace
+from .models import ECS, Site, Configfile, Siterace, Release
 from django.http import HttpResponse
 from django.views import generic
 from django.contrib.auth.decorators import login_required
@@ -312,10 +314,23 @@ def config_save(request, configfile_id):
     if request.POST.has_key('config-save'):
         '''保存配置函数'''
         def relation_config_save(request, configfileid):
+            '''保存基本配置信息'''
             c = get_object_or_404(Configfile, pk=configfileid)
             c.content = request.POST['configcontent']
             c.modified_user = request.user.username
             c.save()
+            siteid = c.site.id
+            '''更新release状态为待发布u"N"'''
+            for ecs in c.site.ECSlists.all():
+                ecsid = ecs.id
+                r = Release.objects.filter(site_id=siteid).filter(ECS_id=ecsid)
+                if not r:
+                    r = Release(site_id=siteid, ECS_id=ecsid)
+                    r.save()
+                else:
+                    r = Release.objects.get(site_id=siteid, ECS_id=ecsid)
+                    r.status = 'N'
+                    r.save()
         '''保存本站点配置文件'''
         relation_config_save(request, configfileid=configfile_id)
         '''保存关联站点配置文件'''
@@ -334,3 +349,22 @@ def config_save(request, configfile_id):
     if request.POST.has_key('config-goback'):
         return HttpResponseRedirect(reverse('configmanager:configlist'))
 
+
+@login_required(login_url='/login/')
+def config_deploy(request, release_id):
+    '''更新Release表信息'''
+    r = Release.objects.get(pk=release_id)
+    r.status = 'Y'
+    r.modified_user = request.user.username
+    r.save()
+    '''生成配置文件'''
+    ecs = r.ECS.name
+    config_path = os.path.join('/release', r.site.fullname, ecs, 'releaseconfig')
+    if not os.path.exists(config_path):
+        os.makedirs(config_path)
+    for c in r.site.configfile_set.all():
+        file_name = os.path.join(config_path, c.filename)
+        with open(file_name, 'w') as f:
+            myfile = File(f)
+            myfile.write(c.content)
+    return HttpResponseRedirect(reverse('configmanager:configlist'))

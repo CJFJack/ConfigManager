@@ -155,7 +155,7 @@ class Release(models.Model):
     modified_time = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
-        return self.ECS
+        return self.status
 
   
 class Apply(models.Model):

@@ -20,12 +20,20 @@
         <td>{{ site.deployattention }}</td>
         <td align="right">
             {% for configfile in site.configfile_set.all %}
-                <span>{{ configfile.filename }}&nbsp;</span><span><a href="{% url 'configmanager:configchange' configfile.id %}">修改</a>&nbsp;</span><br />
+                <p>{{ configfile.filename }}&nbsp;<a href="{% url 'configmanager:configchange' configfile.id %}">修改</a>&nbsp;</p>
             {% endfor %}
         </td>
-        <td>
-            {% for ecs in site.ECSlists.all %}
-                <p>{{ ecs }}</p>
+        <td align="right">
+            {% for r in site.release_set.all %}
+                <p>
+                    {{ r.ECS }}&nbsp;
+                    {% if r.status == "N" %}
+                        待生效&nbsp;<a href="{% url 'configmanager:configdeploy' r.id %}" >发布</a>&nbsp;
+                    {% endif %}
+                    {% if r.status == "Y" %}
+                        已生效&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% endif %}
+                </p>
             {% endfor %}
         </td>
         <td>

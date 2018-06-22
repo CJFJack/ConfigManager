@@ -1,0 +1,26 @@
+{% extends 'configmanager/__base__.html' %}
+{% block title %}历史记录 | {% endblock %}
+{% block content %}
+<h2>配置管理 > 历史记录</h2>
+{% if confighistory_list %}
+<table border="1">
+    <th>修改编号</th>
+    <th>修改人</th>
+    <th>修改时间</th>
+    <th>操作</th>
+    {% for ch in confighistory_list %}
+    <tr>
+        <td>{{ ch.history_id }}</td>
+        <td>{{ ch.modified_user }}</td>
+        <td>{{ ch.modified_time }}</td>
+        <td>
+            <a href="">恢复</a>
+            <a href="">查看内容</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>No ConfigChangeHistory are available.</p>
+{% endif %}
+{% endblock %}

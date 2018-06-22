@@ -13,7 +13,7 @@ import os
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
-from .models import ECS, Site, Configfile, Siterace, Release
+from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile
 from django.http import HttpResponse
 from django.views import generic
 from django.contrib.auth.decorators import login_required
@@ -376,3 +376,11 @@ def config_deploy(request, release_id):
         return HttpResponseRedirect(reverse('configmanager:undeployconfiglist'))
     else:
         return HttpResponseRedirect(reverse('configmanager:configlist'))
+
+
+@login_required(login_url='/login/')
+def config_history(request, configfile_id):
+    confighistory_list = ConfigmanagerHistoricalconfigfile.objects.filter(id=configfile_id).order_by('-modified_time')
+    template_name = 'configmanager/config_history.html'
+    return render_to_response(template_name, {'confighistory_list': confighistory_list})
+    

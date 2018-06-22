@@ -30,4 +30,5 @@ urlpatterns = [
     url(r'^config/(?P<pk>[0-9]+)/change/$', views.ConfigChangeView.as_view(), name='configchange'),
     url(r'^config/(?P<configfile_id>[0-9]+)/save/$', views.config_save, name='configsave'),
     url(r'^config/(?P<release_id>[0-9]+)/deploy/$', views.config_deploy, name='configdeploy'),
+    url(r'^config/(?P<configfile_id>[0-9]+)/history/$', views.config_history, name='confighistory'),
 ]

@@ -5,17 +5,21 @@
 {% if confighistory_list %}
 <table border="1">
     <th>修改编号</th>
+    <th>站点名称</th>
+    <th>配置文件名</th>
     <th>修改人</th>
     <th>修改时间</th>
     <th>操作</th>
     {% for ch in confighistory_list %}
     <tr>
         <td>{{ ch.history_id }}</td>
+        <td>{{ ch.get_site_fullname }}</td>
+        <td>{{ ch.filename }}</td>
         <td>{{ ch.modified_user }}</td>
         <td>{{ ch.modified_time }}</td>
         <td>
-            <a href="">恢复</a>
-            <a href="">查看内容</a>
+            <a href="">&nbsp;恢复&nbsp;</a>
+            <a href="{% url 'configmanager:confighistorydetail' ch.history_id %}">&nbsp;查看内容&nbsp;</a>
         </td>
     </tr>
     {% endfor %}
@@ -23,4 +27,5 @@
 {% else %}
     <p>No ConfigChangeHistory are available.</p>
 {% endif %}
+<a href="{% url 'configmanager:configlist' %}">返回</a>
 {% endblock %}

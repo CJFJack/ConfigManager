@@ -310,5 +310,9 @@ class ConfigmanagerHistoricalconfigfile(models.Model):
         managed = False
         db_table = 'configmanager_historicalconfigfile'
     
+    def get_site_fullname(self):
+        s= Site.objects.get(pk=self.site_id)
+        return s.fullname
+    
     def __unicode__(self):
         return self.filename

@@ -384,3 +384,24 @@ def config_history(request, configfile_id):
     template_name = 'configmanager/config_history.html'
     return render_to_response(template_name, {'confighistory_list': confighistory_list})
     
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class ConfigHistoryDetailView(generic.DetailView):
+    model = ConfigmanagerHistoricalconfigfile
+    template_name = 'configmanager/config_history_detail.html'
+    context_object_name = 'confighistorydetail'
+
+
+@login_required(login_url='/login/')
+def config_rollback(request, confighistorydetail_id):
+    ch = ConfigmanagerHistoricalconfigfile.objects.get(pk=confighistorydetail_id)
+    configfileid=ch.id
+    if request.POST.has_key('config-rollback'):
+        rollbackcontent = ch.content
+        c = Configfile.objects.get(pk=configfileid)
+        c.content = rollbackcontent
+        c.save()
+        return HttpResponseRedirect(reverse('configmanager:configlist'))
+    if request.POST.has_key('config-goback'):
+        return HttpResponseRedirect(reverse('configmanager:confighistory', args=(configfileid,)))
+

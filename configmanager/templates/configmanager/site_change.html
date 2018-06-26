@@ -4,6 +4,7 @@
 {% block content %}
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
 <h2>站点管理 > 修改站点</h2>
 <h3>{{ site.fullname }}</h3>
 <form action="{% url 'configmanager:sitesave' site.id %}" method="post">

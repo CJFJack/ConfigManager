@@ -13,7 +13,7 @@ import os
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
-from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile
+from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply
 from django.http import HttpResponse
 from django.views import generic
 from django.contrib.auth.decorators import login_required
@@ -405,3 +405,14 @@ def config_rollback(request, confighistorydetail_id):
     if request.POST.has_key('config-goback'):
         return HttpResponseRedirect(reverse('configmanager:confighistory', args=(configfileid,)))
 
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class ApplyListView(generic.ListView):
+    model = Apply
+    template_name = 'configmanager/Apply_list.html'
+
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class ApplyChangeView(generic.DetailView):
+    model = Apply
+    template_name = 'configmanager/apply_change.html'

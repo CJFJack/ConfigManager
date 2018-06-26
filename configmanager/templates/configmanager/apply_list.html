@@ -1,0 +1,60 @@
+{% extends 'configmanager/__base__.html' %}
+{% block title %}发布申请列表 | {% endblock %}
+{% block content %}
+<h2>发布管理 > 发布申请列表</h2>
+{% if apply_list %}
+<table border="1">
+    <th>申请编号</th>
+    <th>状态</th>
+    <th>申请人</th>
+    <th>申请时间</th>
+    <th>发布人</th>
+    <th>发布时间</th>
+    <th>操作</th>
+    {% for apply in apply_list %}
+    <tr>
+        <td>
+            <a href="{% url 'configmanager:applychange' apply.id %}">{{ apply.applyproject }}</a>
+        </td>
+        <td>
+            {% if apply.status == "WC" %}
+                <span>待提交</span>
+            {% elif apply.status == "WD" %}
+                <span>待发布</span>
+            {% elif apply.status == "C" %}
+                <span>已取消</span>
+            {% elif apply.status == "D" %}
+                <span>已发布</span>
+            {% elif apply.status == "DA" %}
+                <span>研发经理审批中</span>
+            {% elif apply.status == "OA" %}
+                <span>运维经理审批中</span>
+            {% elif apply.status == "EA" %}
+                <span>运维工程师审批中</span>
+            {% elif apply.status == "TA" %}
+                <span>测试经理审批中</span>
+            {% elif apply.status == "TDA" %}
+                <span>技术总监审批中</span>
+            {% endif %}
+        </td>
+        <td>
+            {{ apply.apply_user }}
+        </td>
+        <td>
+            {{ apply.apply_time }}
+        </td>
+        <td>
+            {{ apply.deploy_user }}
+        </td>
+        <td>
+            {{ apply.deploy_time }}
+        </td>
+        <td>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>No apply are available.</p>
+{% endif %}
+{% endblock %}

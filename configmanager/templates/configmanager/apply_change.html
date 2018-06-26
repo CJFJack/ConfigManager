@@ -28,28 +28,33 @@
                     <tr>
                         {% for deployitem in apply.deployitem_set.all %}
                             <td>
-                                <span>{{ deployitem.deployorderby }}</span>
+                                <input type="text" id="id_deployorderby" value="{{ deployitem.deployorderby }}" style="width:50px;">
                             </td>
                             <td>
-                                {% if deployitem.type == "T" %}
-                                    <span>主干</span>
+                                <select name="deploytype" id="id_deploytype">
+                                    <option value="T" {% if deployitem.type == 'T' %}selected{% endif %}>主干</option>
+                                    <option value="B" {% if deployitem.type == 'B' %}selected{% endif %}>分支</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" id="id_deployorderby" value="{{ deployitem.jenkinsversion }}" style="width:50px;">
+                            </td>
+                            <td>
+                                <span>{{ deployitem.deploysite }}</span>
+                            <td>
+                                <span>{{ deployitem.deploysite.devcharge }}</span>
+                            </td>
+                            <td>
+                                {% for ecs in deployitem.deploysite.ECSlists.all %}
+                                    <span>{{ ecs }}</span><br />
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% if deployitem.deploy_status == "Y" %}
+                                    <span>已发布</span>
                                 {% else %}
-                                    <span>分支</span>
+                                    <span>待发布</span>
                                 {% endif %}
-                            </td>
-                            <td>
-                                <span>{{ deployitem.jenkinsversion }}</span>
-                            </td>
-                            <td>
-                                <span>{{ deployitem.site.fullname }}</span>
-                            <td>
-                                <span>{{ deployitem.apply.devcharge }}</span>
-                            </td>
-                            <td>
-                                <span>{{ deployitem.site.ECSlists }}</span>
-                            </td>
-                            <td>
-                                <span>{{ deployitem.deploy_status }}</span>
                             </td>
                             <td>
                             </td>

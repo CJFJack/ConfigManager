@@ -416,3 +416,9 @@ class ApplyListView(generic.ListView):
 class ApplyChangeView(generic.DetailView):
     model = Apply
     template_name = 'configmanager/apply_change.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super(ApplyChangeView, self).get_context_data(**kwargs)
+        Sites = Site.objects.all()
+        context['Sites'] = Sites
+        return context

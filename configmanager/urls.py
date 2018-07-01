@@ -35,4 +35,5 @@ urlpatterns = [
     url(r'^config/(?P<confighistorydetail_id>[0-9]+)/rollback/$', views.config_rollback, name='configrollback'),
     url(r'^apply/$', views.ApplyListView.as_view(), name='applylist'),
     url(r'^apply/(?P<pk>[0-9]+)/change/$', views.ApplyChangeView.as_view(), name='applychange'),
+    url(r'^apply/(?P<apply_id>[0-9]+)/save/$', views.apply_save, name='applysave'),
 ]

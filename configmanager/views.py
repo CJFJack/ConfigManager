@@ -19,6 +19,8 @@ from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
+from django.forms import formset_factory
+from myapp.forms import DeployitemForm
 
 
 app_name = 'configmanager'
@@ -422,3 +424,18 @@ class ApplyChangeView(generic.DetailView):
         Sites = Site.objects.all()
         context['Sites'] = Sites
         return context
+
+
+@login_required(login_url='/login/')
+def apply_save(request, apply_id):
+    if request.POST.has_key('apply-save'):
+        a = get_object_or_404(Apply, pk=apply_id)
+        a.confamendexplain = request.POST['confamendexplain']
+        a.remarkexplain = request.POST['remarkexplain']
+        a.save()
+    return HttpResponseRedirect(reverse('configmanager:applylist'))
+
+
+@login_required(login_url='/login/')
+def manager_deployitem
+    pass 

@@ -7,26 +7,27 @@
 
 <script type="text/javascript">
 function insRow()
-  {
-  var x=document.getElementById('deploysite').insertRow(-1)
-  var y0=x.insertCell(0)
-  var y1=x.insertCell(1)
-  var y2=x.insertCell(2)
-  var y3=x.insertCell(3)
-  var y4=x.insertCell(4)
-  var y5=x.insertCell(5)
-  var y6=x.insertCell(6)
-  var y7=x.insertCell(7)
-  y0.innerHTML='<input type="text" value="" style="width:50px;">'
-  y1.innerHTML='<select id="id_deploytype"><option></option><option value="T" >主干</option><option value="B" >分支</option></select>'
-  y2.innerHTML='<input type="text" value="" style="width:50px;">'
-  y3.innerHTML='<select name="deploysite" id="id_deploysite"><option></option>{% for s in Sites %}<option value={{ s.id }} {% if s.fullname == deployitem.deploysite.fullname %}selected{% endif %}>{{ s.fullname }}</option>{% endfor %}</select>'
-  }
+{
+var x=document.getElementById('deploysite').insertRow(-1)
+var y0=x.insertCell(0)
+var y1=x.insertCell(1)
+var y2=x.insertCell(2)
+var y3=x.insertCell(3)
+y0.innerHTML='<input name="" type="text" value="" style="width:50px;">'
+y1.innerHTML='<select name="" id="id_deploytype"><option></option><option value="T" >主干</option><option value="B" >分支</option></select>'
+y2.innerHTML='<input name="" type="text" value="" style="width:50px;">'
+y3.innerHTML='<select name="deploysiteid" id="id_deploysite" onchange="deploysiteid()"><option></option>{% for s in Sites %}<option value={{ s.id }} {% if s.fullname == deployitem.deploysite.fullname %}selected{% endif %}>{{ s.fullname }}</option>{% endfor %}</select>'
+}
 
+function deploysiteid()
+{
+var mylist=document.getElementById("id_deploysite")
+document.getElementById("id_deploysite").value=mylist.options[mylist.selectedIndex].text
+}
 
 </script>
 
-<form action="" method="post">
+<form action="{% url 'configmanager:applysave' apply.id %}" method="post">
 {% csrf_token %}
 <table>
     <tbody>
@@ -49,19 +50,19 @@ function insRow()
                     <tr>
                         {% for deployitem in apply.deployitem_set.all %}
                             <td>
-                                <input type="text" id="id_deployorderby" value="{{ deployitem.deployorderby }}" style="width:50px;">
+                                <input type="text" name="{{ deployitem.deploysite.id }}_deployorderby" id="id_deployorderby" value="{{ deployitem.deployorderby }}" style="width:50px;">
                             </td>
                             <td>
-                                <select name="deploytype" id="id_deploytype">
+                                <select name="{{ deployitem.deploysite.id }}_deploytype" id="id_deploytype">
                                     <option value="T" {% if deployitem.type == 'T' %}selected{% endif %}>主干</option>
                                     <option value="B" {% if deployitem.type == 'B' %}selected{% endif %}>分支</option>
                                 </select>
                             </td>
                             <td>
-                                <input type="text" id="id_deployorderby" value="{{ deployitem.jenkinsversion }}" style="width:50px;">
+                                <input type="text" name="{{ deployitem.deploysite.id }}_jenkinsversion" id="id_jenkinsversion" value="{{ deployitem.jenkinsversion }}" style="width:50px;">
                             </td>
                             <td>
-                                <select name="deploysite" id="id_deploysite">
+                                <select name="{{ deployitem.deploysite.id }}_deploysiteid" id="id_deploysite" onchange="deploysiteid()">
                                 {% for s in Sites %}
                                     <option value={{ s.id }} {% if s.fullname == deployitem.deploysite.fullname %}selected{% endif %}>{{ s.fullname }}</option>      
                                 {% endfor %}
@@ -104,7 +105,7 @@ function insRow()
         </tr>
         <tr>
             <th>状态</th>
-            <td> 
+            <td name="deploystatus"> 
                 {% if apply.status == "WC" %}
                     <span>待提交</span>
                 {% elif apply.status == "WD" %}

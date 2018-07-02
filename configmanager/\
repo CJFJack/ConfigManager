@@ -1,0 +1,24 @@
+<form method="post" action="">
+    {{ formset.management_form }}
+    {% for form in formset %}
+        {{ form }} <br/>
+    {% endfor %}
+<input type="submit" name="deployitem-save" value="保存" />
+</form>
+
+<form method="post" action="">
+    {{ formset.management_form }}
+    <th>发布优先级</th>                                                                                                   
+    <th>代码类型</th>                                                                                                     
+    <th>Jenkins版本号</th>                                                                                                
+    <th>发布站点</th>                                                                                                     
+    <th>研发负责人</th>                                                                                                   
+    <th>所属ECS</th>                                                                                                      
+    <th>发布状态</th>                                                                                                     
+    <th>操作</th><br/> 
+    {% for form in formset %}
+        {% for field in form %}
+            {{ field }}
+        {% endfor %}<br/>
+    {% endfor %}
+</form>

@@ -1,0 +1,24 @@
+<form method="post" action="">
+{% csrf_token %}
+<table>
+    <thead>
+        {% for form in formset %}
+            {% if forloop.first %}
+                {% for field in form %}
+                    {% if field.label != "Id" and field.label != "Applyproject" %}
+                    <th>{{ field.label_tag }}</th>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+    </thead>
+    <tbody>
+            <tr>
+                {% for field in form %}
+                    <td>{{ field }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<input type="submit" name="deployitem-save" value="保存" />
+</form>

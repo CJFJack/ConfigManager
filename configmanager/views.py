@@ -13,14 +13,16 @@ import os
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
-from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply
+from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem
+from .forms import DeployitemForm
 from django.http import HttpResponse
 from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 from django.forms import formset_factory
-from myapp.forms import DeployitemForm
+from django.forms import modelformset_factory
+from django.forms import inlineformset_factory
 
 
 app_name = 'configmanager'
@@ -152,7 +154,7 @@ def site_change(request, site_id):
     f = ';'.join([f.filename for f in s.configfile_set.all()]) 
     return render(request, 'configmanager/site_change.html', {'site': s, 'configfiles': f})
 
-
+@login_required(login_url='/login/')
 def add_relation_ecs(request, site):
 
     for key in request.POST:
@@ -163,7 +165,7 @@ def add_relation_ecs(request, site):
         else:
             site.ECSlists.add(e)
 
-
+@login_required(login_url='/login/')
 def add_relation_site(request, site):
 
     if not site.exist_or_not_in_siterace():                                                                                              
@@ -423,6 +425,9 @@ class ApplyChangeView(generic.DetailView):
         context = super(ApplyChangeView, self).get_context_data(**kwargs)
         Sites = Site.objects.all()
         context['Sites'] = Sites
+        DeployitemFormSet = inlineformset_factory(Apply, Deployitem, fields=('deployorderby', 'jenkinsversion', 'type', 'deploysite', 'deploy_status'), can_delete=True)
+        formset = DeployitemFormSet(instance=apply) 
+        context['formset'] = formset
         return context
 
 
@@ -437,5 +442,19 @@ def apply_save(request, apply_id):
 
 
 @login_required(login_url='/login/')
-def manager_deployitem
-    pass 
+def manager_deployitem(request, apply_id):
+    apply = Apply.objects.get(pk=apply_id)
+    DeployitemFormSet = inlineformset_factory(Apply, Deployitem, fields=('deployorderby', 'jenkinsversion', 'type', 'deploysite', 'deploy_status'), extra=1, can_delete=True)
+    if request.method == 'POST':
+        formset = DeployitemFormSet(request.POST, request.FILES, instance=apply)
+        if formset.is_valid():
+            formset.save()
+            # do something.
+            return HttpResponseRedirect(author.get_absolute_url())
+    else:
+        formset = DeployitemFormSet(instance=apply)
+    return render(request, 'configmanager/manage_deployitem.html', {'formset': formset})
+
+
+
+

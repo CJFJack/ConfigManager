@@ -5,27 +5,6 @@
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<script type="text/javascript">
-function insRow()
-{
-var x=document.getElementById('deploysite').insertRow(-1)
-var y0=x.insertCell(0)
-var y1=x.insertCell(1)
-var y2=x.insertCell(2)
-var y3=x.insertCell(3)
-y0.innerHTML='<input name="" type="text" value="" style="width:50px;">'
-y1.innerHTML='<select name="" id="id_deploytype"><option></option><option value="T" >主干</option><option value="B" >分支</option></select>'
-y2.innerHTML='<input name="" type="text" value="" style="width:50px;">'
-y3.innerHTML='<select name="deploysiteid" id="id_deploysite" onchange="deploysiteid()"><option></option>{% for s in Sites %}<option value={{ s.id }} {% if s.fullname == deployitem.deploysite.fullname %}selected{% endif %}>{{ s.fullname }}</option>{% endfor %}</select>'
-}
-
-function deploysiteid()
-{
-var mylist=document.getElementById("id_deploysite")
-document.getElementById("id_deploysite").value=mylist.options[mylist.selectedIndex].text
-}
-
-</script>
 
 <form action="{% url 'configmanager:applysave' apply.id %}" method="post">
 {% csrf_token %}
@@ -38,58 +17,12 @@ document.getElementById("id_deploysite").value=mylist.options[mylist.selectedInd
         <tr>
             <th>选择发布站点</th>
             <td>
-                <table id="deploysite">
-                    <th>发布优先级</th>
-                    <th>代码类型</th>
-                    <th>Jenkins版本号</th>
-                    <th>发布站点</th>
-                    <th>研发负责人</th>
-                    <th>所属ECS</th>
-                    <th>发布状态</th>
-                    <th>操作</th>
-                    <tr>
-                        {% for deployitem in apply.deployitem_set.all %}
-                            <td>
-                                <input type="text" name="{{ deployitem.deploysite.id }}_deployorderby" id="id_deployorderby" value="{{ deployitem.deployorderby }}" style="width:50px;">
-                            </td>
-                            <td>
-                                <select name="{{ deployitem.deploysite.id }}_deploytype" id="id_deploytype">
-                                    <option value="T" {% if deployitem.type == 'T' %}selected{% endif %}>主干</option>
-                                    <option value="B" {% if deployitem.type == 'B' %}selected{% endif %}>分支</option>
-                                </select>
-                            </td>
-                            <td>
-                                <input type="text" name="{{ deployitem.deploysite.id }}_jenkinsversion" id="id_jenkinsversion" value="{{ deployitem.jenkinsversion }}" style="width:50px;">
-                            </td>
-                            <td>
-                                <select name="{{ deployitem.deploysite.id }}_deploysiteid" id="id_deploysite" onchange="deploysiteid()">
-                                {% for s in Sites %}
-                                    <option value={{ s.id }} {% if s.fullname == deployitem.deploysite.fullname %}selected{% endif %}>{{ s.fullname }}</option>      
-                                {% endfor %}
-                                </select>
-                            <td>
-                                <span>{{ deployitem.deploysite.devcharge }}</span>
-                            </td>
-                            <td>
-                                {% for ecs in deployitem.deploysite.ECSlists.all %}
-                                    <span>{{ ecs }}</span><br />
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% if deployitem.deploy_status == "Y" %}
-                                    <span>已发布</span>
-                                {% else %}
-                                    <span>待发布</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                            </td>
-                    </tr>
-                        {% endfor %}
-                    </tr>
-                </table>
-                <button type="button" onclick="insRow()">添加另一个站点</button>
-            </td>
+            {% csrf_token %}
+            {{ formset.management_form }}
+            {% for form in formset %}
+                {{ form }} <br/>
+            {% endfor %}
+           </td>
         </tr>
         <tr>
             <th valign="top">配置修改说明</th>

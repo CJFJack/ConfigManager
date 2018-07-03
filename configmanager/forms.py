@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 from django.forms import ModelForm
-from .models import Deployitem
-from django.core.exceptions import NON_FIELD_ERRORS
+from .models import Apply, Deployitem
+from django.forms.models import inlineformset_factory
 
 
-class DeployitemForm(ModelForm):
+class ApplyForm(ModelForm):
     class Meta:
-        model = Deployitem
+        model = Apply
         fields = '__all__'
-        error_messages = {
-            NON_FIELD_ERRORS: {
-                'unique_together': "%(model_name)s's %(field_labels)s are not unique.",
-            }
-        }
+        localized_fields = ('apply_time',)
+
+
+DeployitemFormSet = inlineformset_factory(Apply, Deployitem, fields=('deployorderby', 'jenkinsversion', 'deploysite', 'type', 'deploy_status'), extra=1) 

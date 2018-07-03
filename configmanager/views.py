@@ -14,15 +14,14 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem
-from .forms import DeployitemForm
+from .forms import ApplyForm, DeployitemFormSet
 from django.http import HttpResponse
 from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
-from django.forms import formset_factory
-from django.forms import modelformset_factory
 from django.forms import inlineformset_factory
+from django.views.generic.edit import UpdateView
 
 
 app_name = 'configmanager'
@@ -417,18 +416,40 @@ class ApplyListView(generic.ListView):
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
-class ApplyChangeView(generic.DetailView):
+class ApplyChangeView(UpdateView):
     model = Apply
+    form_class = ApplyForm 
     template_name = 'configmanager/apply_change.html'
     
     def get_context_data(self, **kwargs):
         context = super(ApplyChangeView, self).get_context_data(**kwargs)
-        Sites = Site.objects.all()
-        context['Sites'] = Sites
-        DeployitemFormSet = inlineformset_factory(Apply, Deployitem, fields=('deployorderby', 'jenkinsversion', 'type', 'deploysite', 'deploy_status'), can_delete=True)
-        formset = DeployitemFormSet(instance=apply) 
-        context['formset'] = formset
-        return context
+        if self.request.POST:
+            context['apply_form'] = ApplyForm(self.request.POST, instance=self.object)
+            context['deployitem_form'] = DeployitemFormSet(self.request.POST)
+        else:
+            context['apply_form'] = ApplyForm(instance=self.object)
+            context['deployitem_form'] = DeployitemFormSet(instance=self.object)
+        return context   
+    
+#    def post(self, request, *args, **kwargs):
+#        self.object = None
+#        form_class = self.get_form_class()
+#        apply_form = self.get_form(form_class)
+#        deployitem_form = DeployitemFormSet(self.request.POST)
+#        if (apply_form.is_valid() and deployitem_form.is_valid()):
+#            return self.form_valid(apply_form, deployitem_form)
+#        else:
+#            return self.form_invalid(apply_form, deployitem_form)
+#
+#    def form_valid(self, apply_form, deployitem_form):
+#        self.object = apply_form.save()
+#        deployitem_form.instance = self.object
+#        deployitem_form.save()
+#        return HttpResponseRedirect(reverse('configmanager:applylist'))
+#
+#    def form_invalid(self, apply_form, deployitem_form):
+#        return self.render_to_response(self.get_context_data(apply_form=apply_form, deployitem_form=deployitem_form))
+#        
 
 
 @login_required(login_url='/login/')
@@ -438,6 +459,12 @@ def apply_save(request, apply_id):
         a.confamendexplain = request.POST['confamendexplain']
         a.remarkexplain = request.POST['remarkexplain']
         a.save()
+        DeployitemFormSet = inlineformset_factory(Apply, Deployitem, fields=('deployorderby', 'jenkinsversion', 'type', 'deploysite', 'deploy_status'), extra=1, can_delete=True)
+        if request.method == 'POST':
+            formset = DeployitemFormSet(request.POST, request.FILES, instance=a)
+            if formset.is_valid():
+                formset.save()
+                return HttpResponseRedirect(reverse('configmanager:applylist'))
     return HttpResponseRedirect(reverse('configmanager:applylist'))
 
 
@@ -450,7 +477,7 @@ def manager_deployitem(request, apply_id):
         if formset.is_valid():
             formset.save()
             # do something.
-            return HttpResponseRedirect(author.get_absolute_url())
+            return HttpResponseRedirect(apply.get_absolute_url())
     else:
         formset = DeployitemFormSet(instance=apply)
     return render(request, 'configmanager/manage_deployitem.html', {'formset': formset})

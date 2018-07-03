@@ -6,7 +6,7 @@
             {% if forloop.first %}
                 {% for field in form %}
                     {% if field.label != "Id" and field.label != "Applyproject" %}
-                    <th>{{ field.label_tag }}</th>
+                    <th>{{ field.label }}</th>
                     {% endif %}
                 {% endfor %}
             {% endif %}

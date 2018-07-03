@@ -7,6 +7,8 @@
 
 
 <form action="{% url 'configmanager:applysave' apply.id %}" method="post">
+{{ apply_form.management_form }}
+{{ deployitem_form.management_form }}
 {% csrf_token %}
 <table>
     <tbody>
@@ -17,23 +19,38 @@
         <tr>
             <th>选择发布站点</th>
             <td>
-            {% csrf_token %}
-            {{ formset.management_form }}
-            {% for form in formset %}
-                {{ form }} <br/>
-            {% endfor %}
+                <table>
+                    <thead>
+                        {% for form in deployitem_form %}
+                            {% if forloop.first %}
+                                {% for field in form %}
+                                    {% if field.label != "Id" and field.label != "Applyproject" %}
+                                    <th>{{ field.label }}</th>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                    </thead>
+                    <tbody>
+                            <tr>
+                                {% for field in form %}
+                                    <td>{{ field }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
            </td>
         </tr>
         <tr>
             <th valign="top">配置修改说明</th>
             <td>
-                <textarea name="confamendexplain" id="id_confamendexplain" rows="15" cols="150">{{ apply.confamendexplain }}</textarea>
+                {{ apply_form.confamendexplain }}
             </td>
         </tr>
         <tr>
             <th valign="top">备注事项</th>
             <td>
-                <textarea name="remarkexplain" id="id_remarkexplain" rows="15" cols="150">{{ apply.remarkexplain }}</textarea>
+                {{ apply_form.remarkexplain }}
             </td>
         </tr>
         <tr>

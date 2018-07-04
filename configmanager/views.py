@@ -4,6 +4,7 @@ from django.views.decorators import csrf
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from time import time
+from datetime import datetime
 from re import split
 from django.core.files import File
 import os
@@ -462,6 +463,9 @@ class ApplyChangeView(UpdateView):
 def apply_save(request, apply_id):
     if request.POST.has_key('apply-save'):
         a = get_object_or_404(Apply, pk=apply_id)
+        time_str = request.POST['wishdeploy_time']
+        time = datetime.strptime(time_str, '%Y/%m/%d')
+        a.wishdeploy_time = time.strftime('%Y-%m-%d') 
         a.confamendexplain = request.POST['confamendexplain']
         a.remarkexplain = request.POST['remarkexplain']
         a.save()

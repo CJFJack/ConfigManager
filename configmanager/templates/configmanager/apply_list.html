@@ -45,6 +45,12 @@
             {{ apply.apply_time }}
         </td>
         <td>
+            {% if apply.wishdeploy_time is null %}
+            {% else %}
+                {{ apply.wishdeploy_time }}
+            {% endif %}
+        </td>
+        <td>
             {% if apply.deploy_user is null %}
             {% else %}
                 {{ apply.deploy_user }}

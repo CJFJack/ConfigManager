@@ -223,7 +223,7 @@ class Apply(models.Model):
         blank=True,
         verbose_name="审核状态"
     )
-    wishdeploy_time = models.DateTimeField("期望发布时间", null=True, blank=True)
+    wishdeploy_time = models.DateField("期望发布时间", null=True, blank=True)
 
     def __unicode__(self):
         return self.applyproject

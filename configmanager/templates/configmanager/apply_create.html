@@ -1,0 +1,49 @@
+{% extends 'configmanager/__base__.html' %}
+{% block title %}创建发布申请 | {% endblock %}
+{% block content %}
+<h2>发布管理 > 创建发布申请</h2>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+
+<form action="" method="post">
+{% csrf_token %}
+{{ apply_form.management_form }}
+{{ deployitem_form.management_form }}
+<table>
+    <tbody>
+        {% for field in form %}
+        <tr>
+            <th>{{ field.label }}</th>
+            <td>{{ field }}</td>
+        </tr>
+        {% endfor %}
+   </tbody>
+</table>
+
+<table>
+    <thead>
+        {% for form in deployitem_form %}
+            {% if forloop.first %}
+                {% for field in form %}
+                    {% if field.label != "Id" and field.label != "Applyproject" %}
+                    <th>{{ field.label }}</th>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+    </thead>
+    <tbody>
+            <tr>
+                {% for field in form %}
+                    <td>{{ field }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<input type="submit" name="create"value="创建" />
+<input type="submit" name="goback" value="返回" />
+</form>
+
+{% endblock %}

@@ -22,6 +22,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 from django.forms import inlineformset_factory
 from django.views.generic.edit import UpdateView
+from django.views.generic.edit import CreateView
 
 
 app_name = 'configmanager'
@@ -74,6 +75,7 @@ class ECSAddView(generic.ListView):
     template_name = 'configmanager/ecs_add.html'
 
 
+@login_required(login_url='/login/')
 def ecs_save(request, ecs_id):
     ecs = get_object_or_404(ECS, pk=ecs_id)
     ecs.name = request.POST['name']
@@ -85,6 +87,7 @@ def ecs_save(request, ecs_id):
     return HttpResponseRedirect(reverse('configmanager:ecslist'))
 
 
+@login_required(login_url='/login/')
 def ecs_enable(request, ecs_id):
     ecs = get_object_or_404(ECS, pk=ecs_id)
     ecs.status = 'Y'
@@ -92,6 +95,7 @@ def ecs_enable(request, ecs_id):
     return HttpResponseRedirect(reverse('configmanager:ecslist'))
 
 
+@login_required(login_url='/login/')
 def ecs_disable(request, ecs_id):
     ecs = get_object_or_404(ECS, pk=ecs_id)
     ecs.status = 'N'
@@ -99,12 +103,14 @@ def ecs_disable(request, ecs_id):
     return HttpResponseRedirect(reverse('configmanager:ecslist'))
 
 
+@login_required(login_url='/login/')
 def ecs_delete(request, ecs_id):
     ecs = get_object_or_404(ECS, pk=ecs_id)
     ecs.delete()
     return HttpResponseRedirect(reverse('configmanager:ecslist'))
 
 
+@login_required(login_url='/login/')
 def ecs_add(request):
     name = request.POST['name']                                                                                                       
     instanceid = request.POST['instanceid']                                                                                           
@@ -468,6 +474,42 @@ def apply_save(request, apply_id):
     return HttpResponseRedirect(reverse('configmanager:applylist'))
 
 
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class ApplyAdd(CreateView):
+    model = Apply
+    fields = ('applyproject', 'confamendexplain', 'remarkexplain')
+    template_name = 'configmanager/apply_create.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ApplyAdd, self).get_context_data(**kwargs)
+        if self.request.POST:
+            context['deployitem_form'] = DeployitemFormSet(self.request.POST, instance=self.object)
+        else:
+            context['deployitem_form'] = DeployitemFormSet(instance=self.object)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form_class = self.get_form_class()
+        apply_form = self.get_form(form_class)
+        deployitem_form = DeployitemFormSet(self.request.POST)
+        if (apply_form.is_valid() and deployitem_form.is_valid()):
+            return self.form_valid(apply_form, deployitem_form)
+        else:
+            return self.form_invalid(apply_form, deployitem_form)
+
+    def form_valid(self, apply_form, deployitem_form):
+        apply_form.instance.apply_user = self.request.user
+        self.object = apply_form.save()
+        deployitem_form.instance = self.object
+        deployitem_form.save()
+        return HttpResponseRedirect(reverse('configmanager:applylist'))
+
+    def form_invalid(self, apply_form, deployitem_form):
+        return self.render_to_response(
+            self.get_context_data(apply_form=apply_form, deployitem_form=deployitem_form))
+
+
 @login_required(login_url='/login/')
 def manager_deployitem(request, apply_id):
     apply = Apply.objects.get(pk=apply_id)
@@ -483,5 +525,10 @@ def manager_deployitem(request, apply_id):
     return render(request, 'configmanager/manage_deployitem.html', {'formset': formset})
 
 
-
+@login_required(login_url='/login/')
+def apply_delete(request, apply_id):
+    a = get_object_or_404(Apply, pk=apply_id)
+    a.delete()
+    return HttpResponseRedirect(reverse('configmanager:applylist'))
+    
 

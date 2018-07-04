@@ -210,10 +210,10 @@ class Apply(models.Model):
         choices=status_CHOICES,
         default=WAITFORCOMMIT,
     ) 
-    apply_user = models.CharField("申请人", max_length=20,null=True, blank=True)
+    apply_user = models.CharField("申请人", max_length=20, null=True, blank=True)
     apply_time = models.DateTimeField("申请时间", auto_now_add=True)
     deploy_user = models.CharField("发布人", max_length=20, null=True, blank=True)
-    deploy_time = models.DateTimeField("发布时间", null=True, blank=True)
+    deploy_time = models.DateTimeField("实际发布时间", null=True, blank=True)
     confamendexplain = models.TextField("配置修改说明", null=True, blank=True)
     remarkexplain = models.TextField("备注事项", null=True, blank=True)
     apply_status = models.CharField(
@@ -223,6 +223,7 @@ class Apply(models.Model):
         blank=True,
         verbose_name="审核状态"
     )
+    wishdeploy_time = models.DateTimeField("期望发布时间", null=True, blank=True)
 
     def __unicode__(self):
         return self.applyproject

@@ -8,8 +8,9 @@
     <th>状态</th>
     <th>申请人</th>
     <th>申请时间</th>
+    <th>期望发布时间</th>
     <th>发布人</th>
-    <th>发布时间</th>
+    <th>实际发布时间</th>
     <th>操作</th>
     {% for apply in apply_list %}
     <tr>
@@ -44,12 +45,21 @@
             {{ apply.apply_time }}
         </td>
         <td>
-            {{ apply.deploy_user }}
+            {% if apply.deploy_user is null %}
+            {% else %}
+                {{ apply.deploy_user }}
+            {% endif %}
         </td>
         <td>
-            {{ apply.deploy_time }}
+            {% if apply.deploy_time is null %}
+            {% else %}
+                {{ apply.deploy_time }}
+            {% endif %}
         </td>
         <td>
+            &nbsp;<a href={%  url 'configmanager:applychange' apply.id %}>修改</a>&nbsp;
+            &nbsp;<a href={%  url 'configmanager:applydelete' apply.id %}>删除</a>&nbsp;
+
         </td>
     </tr>
     {% endfor %}

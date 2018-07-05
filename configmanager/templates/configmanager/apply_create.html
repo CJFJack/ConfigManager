@@ -8,14 +8,22 @@
 
 <form action="" method="post">
 {% csrf_token %}
-{{ apply_form.management_form }}
+{{ form.management_form }}
 {{ deployitem_form.management_form }}
 <table>
     <tbody>
         {% for field in form %}
         <tr>
-            <th>{{ field.label }}</th>
-            <td>{{ field }}</td>
+            {% if field.label != "状态" and field.label != "申请人" and field.label != "发布人" and field.label != "实际发布时间" and field.label != "审核状态" and field.label != "期望发布日期" %}
+                <th>{{ field.label }}</th>
+                <td>{{ field }}</td>
+            {% endif %}
+            {% if field.label == "期望发布日期" %}
+                <th>期望发布日期</th>
+                <td>
+                    <input type="text" name="wishdeploy_time" id="id_wishdeploy_time" required="" class="vDateField" size="10">
+                </td>
+            {% endif %}
         </tr>
         {% endfor %}
    </tbody>
@@ -42,8 +50,8 @@
     </tbody>
 </table>
 
-<input type="submit" name="create"value="创建" />
-<input type="submit" name="goback" value="返回" />
+<input type="submit" name="create" value="创建" />
+<input type="button" name="goback" value="返回" onclick='location.href=("/apply")'/>
 </form>
 
 {% endblock %}

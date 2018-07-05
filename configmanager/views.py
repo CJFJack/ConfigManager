@@ -481,16 +481,26 @@ def apply_save(request, apply_id):
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class ApplyAdd(CreateView):
     model = Apply
-    fields = ('applyproject', 'confamendexplain', 'remarkexplain')
+    fields = ('applyproject', 'wishdeploy_time', 'confamendexplain', 'remarkexplain')
     template_name = 'configmanager/apply_create.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(ApplyAdd, self).get_context_data(**kwargs)
-        if self.request.POST:
-            context['deployitem_form'] = DeployitemFormSet(self.request.POST, instance=self.object)
-        else:
-            context['deployitem_form'] = DeployitemFormSet(instance=self.object)
-        return context
+    def get(self, request, *args, **kwargs):
+        self.object = None
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        deployitem_form = DeployitemFormSet()
+        return self.render_to_response(
+            self.get_context_data(form=form, deployitem_form=deployitem_form))
+
+#    def get_context_data(self, **kwargs):
+#        context = super(ApplyAdd, self).get_context_data(**kwargs)
+#        if self.request.POST:
+#            context['apply_form'] = ApplyForm(self.request.POST, instance=self.object)
+#            context['deployitem_form'] = DeployitemFormSet(self.request.POST)
+#        else:
+#            context['apply_form'] = ApplyForm(instance=self.object)
+#            context['deployitem_form'] = DeployitemFormSet(instance=self.object)
+#        return context
 
     def post(self, request, *args, **kwargs):
         self.object = None

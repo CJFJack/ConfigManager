@@ -5,6 +5,16 @@
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
+<script type="text/javascript">
+function insRow()
+  {
+  var x=document.getElementById('idd_deployitem').insertRow(-1)
+  var y0=x.insertCell(0)
+  var y1=x.insertCell(1)
+  y0.innerHTML='<input type="number" name="deployitem_orderby" min="0">'
+  y1.innerHTML='<input type="number" name="deployitem_jenkinsversion" min="0">'
+  }
+</script>
 
 <form action="{% url 'configmanager:applysave' apply.id %}" method="post">
 {{ apply_form.management_form }}
@@ -23,24 +33,29 @@
         <tr>
             <th>选择发布站点</th>
             <td>
-                <table>
+                <table id="idd_deployitem">
                     <thead>
-                        {% for form in deployitem_form %}
-                            {% if forloop.first %}
-                                {% for field in form %}
-                                    {% if field.label != "Id" and field.label != "Applyproject" %}
-                                    <th>{{ field.label }}</th>
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
+                        <tr>
+                            {% for form in deployitem_form %}
+                                {% if forloop.first %}
+                                    {% for field in form %}
+                                        {% if field.label != "Id" and field.label != "Applyproject" %}
+                                            <th>{{ field.label }}</th>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="id_deployitem_tbody">
+                        {% for form in deployitem_form %}
                             <tr>
                                 {% for field in form %}
                                     <td>{{ field }}</td>
                                 {% endfor %}
                             </tr>
                         {% endfor %}
+                        <tr class="add-row"><td colspan="7"><a href="#" onclick="insRow()">添加另一个 发布站点</a></td></tr>
                     </tbody>
                 </table>
            </td>

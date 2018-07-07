@@ -16,4 +16,4 @@ class ApplyForm(ModelForm):
         }
 
 
-DeployitemFormSet = inlineformset_factory(Apply, Deployitem, fields=('deployorderby', 'jenkinsversion', 'deploysite', 'type', 'deploy_status'), extra=1) 
+DeployitemFormSet = inlineformset_factory(Apply, Deployitem, fields=('deployorderby', 'jenkinsversion', 'deploysite', 'type', 'deploy_status'), extra=1, can_delete=True) 

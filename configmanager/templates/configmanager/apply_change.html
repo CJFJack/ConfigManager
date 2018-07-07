@@ -5,21 +5,66 @@
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<script type="text/javascript">
-function insRow()
-  {
-  var x=document.getElementById('idd_deployitem').insertRow(-1)
-  var y0=x.insertCell(0)
-  var y1=x.insertCell(1)
-  y0.innerHTML='<input type="number" name="deployitem_orderby" min="0">'
-  y1.innerHTML='<input type="number" name="deployitem_jenkinsversion" min="0">'
-  }
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
+<script type="text/html" id="item-template">
+<tr id="deployitem-set-__prefix__">
+    {{ deployitem_form.empty_form }}
+    {# <!-- or for crispy forms --> {% crispy deployitem_form.empty_form item_forms.form.helper %} #}
+</tr>
 </script>
 
+<script>
+//function insRow()
+//  {
+//  var x=document.getElementById('id_deployitem_tbody').insertRow(-1)
+//  var y0=x.insertCell(0)
+//  var y1=x.insertCell(1)
+//  y0.innerHTML='<input type="number" name="__prefix__deployitem_orderby" min="0">'
+//  y1.innerHTML='<input type="number" name="deployitem_jenkinsversion" min="0">'
+//  }
+//
+//function insRow()
+//{
+//var txt2=$("<td></td>").text("{{ empty_form }}"); 
+//$("#id_deployitem_tbody").append(txt2);
+//}
+//
+//$('#add-row').click(function() {
+//    var form_idx = $('#id_form-TOTAL_FORMS').val();
+//    $('#id_deployitem_tbody').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+//    $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+//});
+
+
+$(document).ready(function() {
+    $('.add-item').click(function(ev) {
+        ev.preventDefault();
+        var count = $('#id-deployitem-tbody').children().length;
+        var tmplMarkup = $('#item-template').html();
+        var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
+        $('tbody#id-deployitem-tbody').append(compiledTmpl);
+
+        // update form count
+        $('#id_item_items-TOTAL_FORMS').attr('value', count+1);
+
+        // some animate to scroll to view our new form
+      //  $('html, body').animate({
+      //          scrollTop: $("#add-item-button").position().top-200
+      //      }, 800);
+    });
+});
+
+</script>
+
+
+{{ deployitem_form.empty_form }}
+{{ deployitem_form.total_form_count }}
+{{ deployitem_form.initial_form_count }}
+
 <form action="{% url 'configmanager:applysave' apply.id %}" method="post">
+{% csrf_token %}
 {{ apply_form.management_form }}
 {{ deployitem_form.management_form }}
-{% csrf_token %}
 <table>
     <tbody>
         <tr>
@@ -47,15 +92,21 @@ function insRow()
                             {% endfor %}
                         </tr>
                     </thead>
-                    <tbody id="id_deployitem_tbody">
+                    <tbody id="id-deployitem-tbody">
                         {% for form in deployitem_form %}
-                            <tr>
-                                {% for field in form %}
-                                    <td>{{ field }}</td>
-                                {% endfor %}
+                            <tr id="deployitem-set-{{ forloop.counter0 }}">
+                                <td>{{ form.deployorderby }}</td>
+                                <td>{{ form.jenkinsversion }}</td>
+                                <td>{{ form.deploysite }}</td>
+                                <td>{{ form.type }}</td>
+                                <td>{{ form.deploy_status }}</td>
+                                <td>{{ form.DELETE }}</td>
+                                <td>{{ form.id }}</td>
+                                <td>{{ form.applyproject }}</td>
+                                {# <!-- or for crispy forms --> {% crispy deployitem_form %} #}
                             </tr>
                         {% endfor %}
-                        <tr class="add-row"><td colspan="7"><a href="#" onclick="insRow()">添加另一个 发布站点</a></td></tr>
+                        <tr class="add-row"><td colspan="7"><a href="#" class="add-item" >添加另一个 发布站点</a></td></tr>
                     </tbody>
                 </table>
            </td>

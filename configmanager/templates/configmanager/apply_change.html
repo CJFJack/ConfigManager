@@ -8,34 +8,19 @@
 <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
 <script type="text/html" id="item-template">
 <tr id="deployitem-set-__prefix__">
-    {{ deployitem_form.empty_form }}
+    <td>{{ deployitem_form.empty_form.deployorderby }}</td>
+    <td>{{ deployitem_form.empty_form.jenkinsversion }}</td>
+    <td>{{ deployitem_form.empty_form.deploysite }}</td>
+    <td>{{ deployitem_form.empty_form.type }}</td>
+    <td>{{ deployitem_form.empty_form.deploy_status }}</td>
+    <td>{{ deployitem_form.empty_form.DELETE }}</td>
+    <td>{{ deployitem_form.empty_form.id }}</td>
+    <td>{{ deployitem_form.empty_form.applyproject }}</td>
     {# <!-- or for crispy forms --> {% crispy deployitem_form.empty_form item_forms.form.helper %} #}
 </tr>
 </script>
 
 <script>
-//function insRow()
-//  {
-//  var x=document.getElementById('id_deployitem_tbody').insertRow(-1)
-//  var y0=x.insertCell(0)
-//  var y1=x.insertCell(1)
-//  y0.innerHTML='<input type="number" name="__prefix__deployitem_orderby" min="0">'
-//  y1.innerHTML='<input type="number" name="deployitem_jenkinsversion" min="0">'
-//  }
-//
-//function insRow()
-//{
-//var txt2=$("<td></td>").text("{{ empty_form }}"); 
-//$("#id_deployitem_tbody").append(txt2);
-//}
-//
-//$('#add-row').click(function() {
-//    var form_idx = $('#id_form-TOTAL_FORMS').val();
-//    $('#id_deployitem_tbody').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
-//    $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
-//});
-
-
 $(document).ready(function() {
     $('.add-item').click(function(ev) {
         ev.preventDefault();
@@ -53,11 +38,9 @@ $(document).ready(function() {
       //      }, 800);
     });
 });
-
 </script>
 
 
-{{ deployitem_form.empty_form }}
 {{ deployitem_form.total_form_count }}
 {{ deployitem_form.initial_form_count }}
 
@@ -78,7 +61,7 @@ $(document).ready(function() {
         <tr>
             <th>选择发布站点</th>
             <td>
-                <table id="idd_deployitem">
+                <table id="table_id_deployitem">
                     <thead>
                         <tr>
                             {% for form in deployitem_form %}
@@ -106,7 +89,9 @@ $(document).ready(function() {
                                 {# <!-- or for crispy forms --> {% crispy deployitem_form %} #}
                             </tr>
                         {% endfor %}
+                    <tfoot>
                         <tr class="add-row"><td colspan="7"><a href="#" class="add-item" >添加另一个 发布站点</a></td></tr>
+                    </tfoot>
                     </tbody>
                 </table>
            </td>

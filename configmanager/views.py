@@ -56,6 +56,11 @@ def systemmanager(request):
     return render_to_response('configmanager/systemmanager.html')
 
 
+#@login_required(login_url='/login/')
+#def obj_delete_confirm(request, obj, obj_id):
+#    return render_to_response('configmanager/systemmanager.html')
+
+
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class ECSListView(generic.ListView):
     template_name = 'configmanager/ecs_list.html'
@@ -536,4 +541,12 @@ def apply_delete(request, apply_id):
     a.delete()
     return HttpResponseRedirect(reverse('configmanager:applylist'))
     
+
+@login_required(login_url='/login/')
+def apply_status_change(request, apply_id):
+    a = get_object_or_404(Apply, pk=apply_id)
+    if a.status == 'WC':
+        a.status = 'DA'
+        a.save()
+    return HttpResponseRedirect(reverse('configmanager:applylist'))
 

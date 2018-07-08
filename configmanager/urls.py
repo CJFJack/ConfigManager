@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^nav_top/$', views.nav_top, name='nav_top'),
     url(r'^deploymanager/$', views.deploymanager, name='deploymanager'),
     url(r'^systemmanager/$', views.systemmanager, name='systemmanager'),
+    #url(r'^delete_confirm/$', views.obj_delete_confirm, name='delelteconfirm'),
     url(r'^ecs/$', views.ECSListView.as_view(), name='ecslist'),
     url(r'^ecs/(?P<pk>[0-9]+)/change/$', views.ECSChangeView.as_view(), name='ecschange'),
     url(r'^ecs/(?P<ecs_id>[0-9]+)/save/$', views.ecs_save, name='ecssave'),
@@ -39,4 +40,5 @@ urlpatterns = [
     url(r'^apply/(?P<apply_id>[0-9]+)/save/$', views.apply_save, name='applysave'),
     url(r'^deploy/(?P<apply_id>[0-9]+)/form/$', views.manager_deployitem, name='managerdeployitem'),
     url(r'^apply/(?P<apply_id>[0-9]+)/delete/$', views.apply_delete, name='applydelete'),
+    url(r'^apply/(?P<apply_id>[0-9]+)/statuschange/$', views.apply_status_change, name='applystatuschange'),
 ]

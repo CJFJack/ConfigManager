@@ -149,7 +149,8 @@ $(document).ready(function() {
         </tr>
     </tbody>
 </table>
-<input type="submit" name="apply-save"value="保存" />
+<input type={% if apply.status == 'WC' %}"button"{% else %}"hidden"{% endif %} name="apply-save"value="保存" />
+<input type={% if apply.status == 'WC' %}"button"{% else %}"hidden"{% endif %} name="commit" value="提交" onclick='location.href=("{% url 'configmanager:applystatuschange' apply.id %}")' />
 <input type="button" name="goback" value="返回" onclick='location.href=("/apply")'/>
 </form>
 

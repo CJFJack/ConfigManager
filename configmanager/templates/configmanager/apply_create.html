@@ -5,11 +5,47 @@
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
+<script type="text/html" id="item-template">
+<tr id="deployitem-set-__prefix__">
+    <td>{{ deployitem_form.empty_form.deployorderby }}</td>
+    <td>{{ deployitem_form.empty_form.jenkinsversion }}</td>
+    <td>{{ deployitem_form.empty_form.deploysite }}</td>
+    <td>{{ deployitem_form.empty_form.type }}</td>
+    <td>{{ deployitem_form.empty_form.deploy_status }}</td>
+    <td>{{ deployitem_form.empty_form.DELETE }}</td>
+    <td>{{ deployitem_form.empty_form.id }}</td>
+    <td>{{ deployitem_form.empty_form.applyproject }}</td>
+    {# <!-- or for crispy forms --> {% crispy deployitem_form.empty_form item_forms.
+form.helper %} #}
+</tr>
+</script>
+
+<script>
+$(document).ready(function() {
+    $('.add-item').click(function(ev) {
+        ev.preventDefault();
+        var count = $('#id-deployitem-tbody').children().length;
+        var tmplMarkup = $('#item-template').html();
+        var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
+        $('tbody#id-deployitem-tbody').append(compiledTmpl);
+
+        //update form count
+        $('#id_item_items-TOTAL_FORMS').attr('value', count+1);
+
+        // some animate to scroll to view our new form
+      //  $('html, body').animate({
+      //          scrollTop: $("#add-item-button").position().top-200
+      //      }, 800);
+    });
+});
+</script>
 
 <form action="" method="post">
 {% csrf_token %}
 {{ form.management_form }}
 {{ deployitem_form.management_form }}
+<input type="hidden" name="deployitem_set-TOTAL_FORMS" id="id_item_items-TOTAL_FORMS" value="{{ deployitem_form.total_form_count }}">
 <table>
     <tbody>
         {% for field in form %}
@@ -26,28 +62,32 @@
             {% endif %}
         </tr>
         {% endfor %}
+        <tr>
+            <th>选择发布站点</th>
+            <td>
+                <table id="table_id_deployitem">
+                    <thead>
+                        <tr>
+                            {% for form in deployitem_form %}
+                                {% if forloop.first %}
+                                    {% for field in form %}
+                                        {% if field.label != "Id" and field.label != "Applyproject" %}
+                                            <th>{{ field.label }}</th>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody id="id-deployitem-tbody">
+                    </tbody>
+                    <tfoot>
+                        <tr class="add-row"><td colspan="7"><a href="#" class="add-item" >添加另一个 发布站点</a></td></tr>
+                    </tfoot>
+                </table>
+           </td>
+        </tr>
    </tbody>
-</table>
-
-<table>
-    <thead>
-        {% for form in deployitem_form %}
-            {% if forloop.first %}
-                {% for field in form %}
-                    {% if field.label != "Id" and field.label != "Applyproject" %}
-                    <th>{{ field.label }}</th>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
-    </thead>
-    <tbody>
-            <tr>
-                {% for field in form %}
-                    <td>{{ field }}</td>
-                {% endfor %}
-            </tr>
-        {% endfor %}
-    </tbody>
 </table>
 
 <input type="submit" name="create" value="创建" />

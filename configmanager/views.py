@@ -489,6 +489,7 @@ class ApplyAdd(CreateView):
         form_class = self.get_form_class()
         form = self.get_form(form_class)
         deployitem_form = DeployitemFormSet()
+        print deployitem_form
         return self.render_to_response(
             self.get_context_data(form=form, deployitem_form=deployitem_form))
 

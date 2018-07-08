@@ -29,7 +29,7 @@ $(document).ready(function() {
         var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
         $('tbody#id-deployitem-tbody').append(compiledTmpl);
 
-        // update form count
+        //update form count
         $('#id_item_items-TOTAL_FORMS').attr('value', count+1);
 
         // some animate to scroll to view our new form
@@ -41,13 +41,11 @@ $(document).ready(function() {
 </script>
 
 
-{{ deployitem_form.total_form_count }}
-{{ deployitem_form.initial_form_count }}
-
 <form action="{% url 'configmanager:applysave' apply.id %}" method="post">
 {% csrf_token %}
 {{ apply_form.management_form }}
 {{ deployitem_form.management_form }}
+<input type="hidden" name="deployitem_set-TOTAL_FORMS" id="id_item_items-TOTAL_FORMS" value="{{ deployitem_form.total_form_count }}">
 <table>
     <tbody>
         <tr>
@@ -89,10 +87,10 @@ $(document).ready(function() {
                                 {# <!-- or for crispy forms --> {% crispy deployitem_form %} #}
                             </tr>
                         {% endfor %}
+                    </tbody>
                     <tfoot>
                         <tr class="add-row"><td colspan="7"><a href="#" class="add-item" >添加另一个 发布站点</a></td></tr>
                     </tfoot>
-                    </tbody>
                 </table>
            </td>
         </tr>

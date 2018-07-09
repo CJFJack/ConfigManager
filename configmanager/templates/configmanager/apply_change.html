@@ -31,17 +31,12 @@ $(document).ready(function() {
 
         //update form count
         $('#id_item_items-TOTAL_FORMS').attr('value', count+1);
-
-        // some animate to scroll to view our new form
-      //  $('html, body').animate({
-      //          scrollTop: $("#add-item-button").position().top-200
-      //      }, 800);
     });
 });
 </script>
 
 
-<form action="{% url 'configmanager:applysave' apply.id %}" method="post">
+<form action="{% url 'configmanager:applystatuschange' apply.id %}" method="post">
 {% csrf_token %}
 {{ apply_form.management_form }}
 {{ deployitem_form.management_form }}
@@ -54,7 +49,11 @@ $(document).ready(function() {
         </tr>
         <tr>
             <th>期望发布时间</th>
-            <td>{{ apply_form.wishdeploy_time }}</td>
+            {% if apply.status == "WC" %}
+                <td>{{ apply_form.wishdeploy_time }}</td>
+            {% else %}
+                <td>{{ apply.wishdeploy_time }}</td>
+            {% endif %}
         </tr>
         <tr>
             <th>选择发布站点</th>
@@ -97,13 +96,21 @@ $(document).ready(function() {
         <tr>
             <th valign="top">配置修改说明</th>
             <td>
-                {{ apply_form.confamendexplain }}
+                {% if apply.status == "WC" %}
+                    {{ apply_form.confamendexplain }}
+                {% else %}
+                    <textarea readonly="readonly" name="confamendexplain" rows="20" cols="80" id="id_confamendexplain">{{ apply.confamendexplain }}</textarea>
+                {% endif %}
             </td>
         </tr>
         <tr>
             <th valign="top">备注事项</th>
             <td>
-                {{ apply_form.remarkexplain }}
+                {% if apply.status == "WC" %}
+                    {{ apply_form.remarkexplain }}
+                {% else %}
+                    <textarea readonly="readonly" name="confamendexplain" rows="20" cols="80" id="id_confamendexplain">{{ apply.remarkexplain }}</textarea>
+                {% endif %}
             </td>
         </tr>
         <tr>
@@ -149,9 +156,26 @@ $(document).ready(function() {
         </tr>
     </tbody>
 </table>
-<input type={% if apply.status == 'WC' %}"button"{% else %}"hidden"{% endif %} name="apply-save"value="保存" />
-<input type={% if apply.status == 'WC' %}"button"{% else %}"hidden"{% endif %} name="commit" value="提交" onclick='location.href=("{% url 'configmanager:applystatuschange' apply.id %}")' />
-<input type="button" name="goback" value="返回" onclick='location.href=("/apply")'/>
+
+<input type={% if apply.status == 'WC' %}"submit"{% else %}"hidden"{% endif %} name="apply-save" value="保存" />
+<input type={% if apply.status == 'WC' %}"submit"{% else %}"hidden"{% endif %} name="apply-commit" value="提交" />
+
+<input type={% if apply.status == 'DA' %}"submit"{% else %}"hidden"{% endif %} name="dev-approval" value="研发经理审核通过" />
+<input type={% if apply.status == 'DA' %}"submit"{% else %}"hidden"{% endif %} name="dev-unapproval" value="研发经理审核不通过" />
+
+<input type={% if apply.status == 'TA' %}"submit"{% else %}"hidden"{% endif %} name="test-approval" value="测试经理审核通过" />
+<input type={% if apply.status == 'TA' %}"submit"{% else %}"hidden"{% endif %} name="test-unapproval" value="测试经理审核不通过" />
+
+<input type={% if apply.status == 'EA' %}"submit"{% else %}"hidden"{% endif %} name="EA-approval" value="运维工程师审核通过" />
+<input type={% if apply.status == 'EA' %}"submit"{% else %}"hidden"{% endif %} name="EA-unapproval" value="运维工程师审核不通过" />
+
+<input type={% if apply.status == 'OA' %}"submit"{% else %}"hidden"{% endif %} name="OA-approval" value="运维经理审核通过" />
+<input type={% if apply.status == 'OA' %}"submit"{% else %}"hidden"{% endif %} name="OA-unapproval" value="运维经理审核不通过" />
+
+<input type={% if apply.status == 'TDA' %}"submit"{% else %}"hidden"{% endif %} name="TDA-approval" value="技术总监审核通过" />
+<input type={% if apply.status == 'TDA' %}"submit"{% else %}"hidden"{% endif %} name="TDA-unapproval" value="技术总监审核不通过" />
+
+<input type="submit" name="goback" value="返回" onclick='location.href=("/apply")'/>
 </form>
 
 {% endblock %}

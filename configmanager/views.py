@@ -50,15 +50,10 @@ def welcome(request):
 def deploymanager(request):
     return render_to_response('configmanager/deploymanager.html')
 
- 
+
 @login_required(login_url='/login/')
 def systemmanager(request):
     return render_to_response('configmanager/systemmanager.html')
-
-
-#@login_required(login_url='/login/')
-#def obj_delete_confirm(request, obj, obj_id):
-#    return render_to_response('configmanager/systemmanager.html')
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -443,44 +438,73 @@ class ApplyChangeView(UpdateView):
             context['deployitem_form'] = DeployitemFormSet(instance=self.object)
         return context   
     
-#    def post(self, request, *args, **kwargs):
-#        self.object = None
-#        form_class = self.get_form_class()
-#        apply_form = self.get_form(form_class)
-#        deployitem_form = DeployitemFormSet(self.request.POST)
-#        if (apply_form.is_valid() and deployitem_form.is_valid()):
-#            return self.form_valid(apply_form, deployitem_form)
-#        else:
-#            return self.form_invalid(apply_form, deployitem_form)
-#
-#    def form_valid(self, apply_form, deployitem_form):
-#        self.object = apply_form.save()
-#        deployitem_form.instance = self.object
-#        deployitem_form.save()
-#        return HttpResponseRedirect(reverse('configmanager:applylist'))
-#
-#    def form_invalid(self, apply_form, deployitem_form):
-#        return self.render_to_response(self.get_context_data(apply_form=apply_form, deployitem_form=deployitem_form))
-#        
-
 
 @login_required(login_url='/login/')
-def apply_save(request, apply_id):
-    if request.POST.has_key('apply-save'):
-        a = get_object_or_404(Apply, pk=apply_id)
-        time_str = request.POST['wishdeploy_time']
-        time = datetime.strptime(time_str, '%Y/%m/%d')
-        a.wishdeploy_time = time.strftime('%Y-%m-%d') 
-        a.confamendexplain = request.POST['confamendexplain']
-        a.remarkexplain = request.POST['remarkexplain']
-        a.save()
-        DeployitemFormSet = inlineformset_factory(Apply, Deployitem, fields=('deployorderby', 'jenkinsversion', 'type', 'deploysite', 'deploy_status'), extra=1, can_delete=True)
-        if request.method == 'POST':
-            formset = DeployitemFormSet(request.POST, request.FILES, instance=a)
-            if formset.is_valid():
-                formset.save()
-                return HttpResponseRedirect(reverse('configmanager:applylist'))
-    return HttpResponseRedirect(reverse('configmanager:applylist'))
+def apply_save(request, obj):
+    time_str = request.POST['wishdeploy_time']
+    time = datetime.strptime(time_str, '%Y/%m/%d')
+    obj.wishdeploy_time = time.strftime('%Y-%m-%d')
+    obj.confamendexplain = request.POST['confamendexplain']
+    obj.remarkexplain = request.POST['remarkexplain']
+    obj.save()
+    DeployitemFormSet = inlineformset_factory(Apply, Deployitem, fields=('deployorderby', 'jenkinsversion', 'type', 'deploysite', 'deploy_status'), can_delete=True)
+    if request.method == 'POST':
+        formset = DeployitemFormSet(request.POST, request.FILES, instance=obj)
+        if formset.is_valid():
+            formset.save()
+
+@login_required(login_url='/login/')
+def apply_status_change(request, apply_id):
+    a = get_object_or_404(Apply, pk=apply_id)
+    if a.status == 'WC':
+        if request.POST.has_key('apply-save'):
+            apply_save(request, a)
+        if request.POST.has_key('apply-commit'):
+            a.status = 'DA'
+            apply_save(request, a)
+        return HttpResponseRedirect(reverse('configmanager:applylist'))
+    if a.status == 'DA':
+        if request.POST.has_key('dev-approval'):
+            a.status = 'TA'
+            a.save()
+        if request.POST.has_key('dev-unapproval'):
+            a.status = 'WC'
+            a.save()
+        return HttpResponseRedirect(reverse('configmanager:applylist'))
+    if a.status == 'TA':
+        if request.POST.has_key('test-approval'):
+            a.status = 'EA'
+            a.save()
+        if request.POST.has_key('test-unapproval'):
+            a.status = 'WC'
+            a.save()
+        return HttpResponseRedirect(reverse('configmanager:applylist'))
+    if a.status == 'EA':
+        if request.POST.has_key('EA-approval'):
+            a.status = 'OA'
+            a.save()
+        if request.POST.has_key('EA-unapproval'):
+            a.status = 'WC'
+            a.save()
+        return HttpResponseRedirect(reverse('configmanager:applylist'))
+    if a.status == 'OA':
+        if request.POST.has_key('OA-approval'):
+            a.status = 'TDA'
+            a.save()
+        if request.POST.has_key('OA-unapproval'):
+            a.status = 'WC'
+            a.save()
+        return HttpResponseRedirect(reverse('configmanager:applylist'))
+    if a.status == 'TDA':
+        if request.POST.has_key('TDA-approval'):
+            a.status = 'WD'
+            a.save()
+        if request.POST.has_key('TDA-unapproval'):
+            a.status = 'WC'
+            a.save()
+        return HttpResponseRedirect(reverse('configmanager:applylist'))
+    else:
+        return HttpResponseRedirect(reverse('configmanager:applylist'))
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -541,12 +565,3 @@ def apply_delete(request, apply_id):
     a.delete()
     return HttpResponseRedirect(reverse('configmanager:applylist'))
     
-
-@login_required(login_url='/login/')
-def apply_status_change(request, apply_id):
-    a = get_object_or_404(Apply, pk=apply_id)
-    if a.status == 'WC':
-        a.status = 'DA'
-        a.save()
-    return HttpResponseRedirect(reverse('configmanager:applylist'))
-

@@ -63,7 +63,7 @@
             {% endif %}
         </td>
         <td>
-            &nbsp;<a href={%  url 'configmanager:applychange' apply.id %}>修改</a>&nbsp;
+            &nbsp;<a href={%  url 'configmanager:applychange' apply.id %}><span {% if apply.status != "WC" %}style="display:none"{% endif %}>修改</span></a>&nbsp;
             &nbsp;<a href={%  url 'configmanager:applydelete' apply.id %}>删除</a>&nbsp;
 
         </td>

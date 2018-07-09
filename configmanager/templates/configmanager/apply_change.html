@@ -159,6 +159,7 @@ $(document).ready(function() {
 
 <input type={% if apply.status == 'WC' %}"submit"{% else %}"hidden"{% endif %} name="apply-save" value="保存" />
 <input type={% if apply.status == 'WC' %}"submit"{% else %}"hidden"{% endif %} name="apply-commit" value="提交" />
+<input type={% if apply.status == 'WC' %}"submit"{% else %}"hidden"{% endif %} name="apply-cancel" value="取消" />
 
 <input type={% if apply.status == 'DA' %}"submit"{% else %}"hidden"{% endif %} name="dev-approval" value="研发经理审核通过" />
 <input type={% if apply.status == 'DA' %}"submit"{% else %}"hidden"{% endif %} name="dev-unapproval" value="研发经理审核不通过" />
@@ -174,6 +175,9 @@ $(document).ready(function() {
 
 <input type={% if apply.status == 'TDA' %}"submit"{% else %}"hidden"{% endif %} name="TDA-approval" value="技术总监审核通过" />
 <input type={% if apply.status == 'TDA' %}"submit"{% else %}"hidden"{% endif %} name="TDA-unapproval" value="技术总监审核不通过" />
+
+<input type={% if apply.status == 'WD' %}"submit"{% else %}"hidden"{% endif %} name="deploy-finish" value="已发布" />
+<input type={% if apply.status == 'WD' %}"submit"{% else %}"hidden"{% endif %} name="goto-deploy" value="现在去发布" />
 
 <input type="submit" name="goback" value="返回" onclick='location.href=("/apply")'/>
 </form>

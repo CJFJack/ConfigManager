@@ -462,6 +462,9 @@ def apply_status_change(request, apply_id):
         if request.POST.has_key('apply-commit'):
             a.status = 'DA'
             apply_save(request, a)
+        if request.POST.has_key('apply-cancel'):
+            a.status = 'C'
+            a.save()
         return HttpResponseRedirect(reverse('configmanager:applylist'))
     if a.status == 'DA':
         if request.POST.has_key('dev-approval'):
@@ -503,6 +506,15 @@ def apply_status_change(request, apply_id):
             a.status = 'WC'
             a.save()
         return HttpResponseRedirect(reverse('configmanager:applylist'))
+    if a.status == 'WD':
+        if request.POST.has_key('deploy-finish'):
+            a.status = 'D'
+            a.deploy_user = request.user.username
+            a.deploy_time = datetime.now()
+            a.save()
+            return HttpResponseRedirect(reverse('configmanager:applylist'))
+        if request.POST.has_key('goto-deploy'):
+            return HttpResponseRedirect(reverse('configmanager:gotodeploy'))
     else:
         return HttpResponseRedirect(reverse('configmanager:applylist'))
 

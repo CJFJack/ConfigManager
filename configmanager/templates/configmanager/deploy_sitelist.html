@@ -1,0 +1,69 @@
+{% extends 'configmanager/__base__.html' %}
+{% block title %}发布站点列表 | {% endblock %}
+{% block content %}
+<h2>发布管理 > 发布站点列表</h2>
+{% if apply %}
+<table border="1">
+    <th>发布优先级</th>
+    <th>Jenkins版本号</th>
+    <th>站点名称</th>
+    <th>发布注意事项</th>
+    <th>配置文件</th>
+    <th>所属ECS 配置状态 操作</th>
+    <th>所属ECS SLB状态 健康状态 操作</th>
+    <th>健康检查</th>
+    <th>配置修改人</th>
+    <th>修改日期</th>
+    {% for site in apply.deployitem_set.all %}
+    <tr>
+        <td>{{ site.deployorderby }}</td>
+        <td>{{ site.jenkinsversion }}</td>
+        <td>
+            <a href="{% url 'configmanager:sitechange' site.id %}" target="_blank">{{ site.deploysite.fullname }}</a>
+        </td>
+        <td>{{ site.deploysite.deployattention }}</td>
+        <td align="right">
+            {% for configfile in site.deploysite.configfile_set.all %}
+                <p>
+                    {{ configfile.filename }}&nbsp;
+                    <a href="{% url 'configmanager:configchange' configfile.id %}">修改</a>&nbsp;
+                    <a href="{% url 'configmanager:confighistory' configfile.id %}">历史记录</a>&nbsp;
+                </p>
+            {% endfor %}
+        </td>
+        <td align="right">
+            {% for r in site.deploysite.release_set.all %}
+                <p>
+                    {{ r.ECS }}&nbsp;
+                    {% if r.status == "N" %}
+                        待生效&nbsp;<a href="{% url 'configmanager:configdeploy' r.id %}" >发布</a>&nbsp;
+                    {% endif %}
+                    {% if r.status == "Y" %}
+                        已生效&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% endif %}
+                </p>
+            {% endfor %}
+        </td>
+        <td>
+            {% for ecs in site.deploysite.ECSlists.all %}
+                <p>{{ ecs }}</p>
+            {% endfor %}
+        </td>
+        <td></td>
+        <td>
+            {% for config in site.deploysite.configfile_set.all %} 
+                <p>{{ config.modified_user }}</p>
+            {% endfor %}
+        </td>
+        <td>
+            {% for config in site.deploysite.configfile_set.all %} 
+                <p>{{ config.modified_time }}</p>
+            {% endfor %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>No deploysite are available.</p>
+{% endif %}
+{% endblock %}

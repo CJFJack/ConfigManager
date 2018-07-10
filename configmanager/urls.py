@@ -38,5 +38,5 @@ urlpatterns = [
     url(r'^apply/(?P<pk>[0-9]+)/change/$', views.ApplyChangeView.as_view(), name='applychange'),
     url(r'^apply/(?P<apply_id>[0-9]+)/statuschange/$', views.apply_status_change, name='applystatuschange'),
     url(r'^apply/(?P<apply_id>[0-9]+)/delete/$', views.apply_delete, name='applydelete'),
-    url(r'^deploy/(?P<apply_id>[0-9]+)/form/$', views.manager_deployitem, name='managerdeployitem'),
+    url(r'^apply/(?P<pk>[0-9]+)/deploysitelist/$', views.DeploySiteView.as_view(), name='deploysitelist'),
 ]

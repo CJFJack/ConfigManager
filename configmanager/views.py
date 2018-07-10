@@ -131,9 +131,9 @@ class SiteListView(generic.ListView):
         return Site.objects.order_by('fullname')
 
     def get_context_data(self, **kwargs):
-         context = super(SiteListView, self).get_context_data(**kwargs)
-         context['configfile'] = Site.configfile_set
-         return context            
+        context = super(SiteListView, self).get_context_data(**kwargs)
+        context['configfile'] = Site.configfile_set
+        return context            
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -257,7 +257,7 @@ def site_save(request, site_id):
         return HttpResponseRedirect(reverse('configmanager:sitelist'))
 
     if request.POST.has_key('site-goback'):
-        return HttpResponseRedirect(reverse('configmanager:sitelist'))
+        return HttpResponseRedirect(reverse('configmanager:sitelist')) 
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -382,10 +382,7 @@ def config_deploy(request, release_id):
         with open(file_name, 'w') as f:
             myfile = File(f)
             myfile.write(c.content)
-    if 'undeployconfig' in request.META['HTTP_REFERER']:
-        return HttpResponseRedirect(reverse('configmanager:undeployconfiglist'))
-    else:
-        return HttpResponseRedirect(reverse('configmanager:configlist'))
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
 @login_required(login_url='/login/')
@@ -514,7 +511,7 @@ def apply_status_change(request, apply_id):
             a.save()
             return HttpResponseRedirect(reverse('configmanager:applylist'))
         if request.POST.has_key('goto-deploy'):
-            return HttpResponseRedirect(reverse('configmanager:gotodeploy'))
+            return HttpResponseRedirect(reverse('configmanager:deploysitelist', args=(a.id,)))
     else:
         return HttpResponseRedirect(reverse('configmanager:applylist'))
 
@@ -557,23 +554,14 @@ class ApplyAdd(CreateView):
 
 
 @login_required(login_url='/login/')
-def manager_deployitem(request, apply_id):
-    apply = Apply.objects.get(pk=apply_id)
-    DeployitemFormSet = inlineformset_factory(Apply, Deployitem, fields=('deployorderby', 'jenkinsversion', 'type', 'deploysite', 'deploy_status'), extra=1, can_delete=True)
-    if request.method == 'POST':
-        formset = DeployitemFormSet(request.POST, request.FILES, instance=apply)
-        if formset.is_valid():
-            formset.save()
-            # do something.
-            return HttpResponseRedirect(apply.get_absolute_url())
-    else:
-        formset = DeployitemFormSet(instance=apply)
-    return render(request, 'configmanager/manage_deployitem.html', {'formset': formset})
-
-
-@login_required(login_url='/login/')
 def apply_delete(request, apply_id):
     a = get_object_or_404(Apply, pk=apply_id)
     a.delete()
     return HttpResponseRedirect(reverse('configmanager:applylist'))
-    
+
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class DeploySiteView(generic.DetailView):
+    model = Apply
+    template_name = 'configmanager/deploy_sitelist.html'
+

@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^ecs/(?P<ecs_id>[0-9]+)/enable/$', views.ecs_enable, name='ecsenable'),
     url(r'^ecs/(?P<ecs_id>[0-9]+)/disable/$', views.ecs_disable, name='ecsdisable'),
     url(r'^ecs/(?P<ecs_id>[0-9]+)/delete/$', views.ecs_delete, name='ecsdelete'),
+    url(r'^ecs/(?P<ecs_id>[0-9]+)/infoupdatefromacs/$', views.ecs_info_update_from_ACS, name='ecsinfoupdatefromacs'),
     url(r'^ecs/add/$', views.ECSAddView.as_view(), name='ecsadd'),
     url(r'^ecs/addmethod/$', views.ecs_add, name='ecsaddmethod'),
     url(r'^site/$', views.SiteListView.as_view(), name='sitelist'),

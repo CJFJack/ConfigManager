@@ -24,6 +24,7 @@ class ECS(models.Model):
     )
     modified_user = models.CharField(max_length=20)
     modified_time = models.DateTimeField(auto_now=True)
+    recently_cpu = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
 
     def __unicode__(self):
         return self.name

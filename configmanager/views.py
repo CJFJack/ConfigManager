@@ -24,6 +24,7 @@ from django.views.generic import TemplateView
 from django.forms import inlineformset_factory
 from django.views.generic.edit import UpdateView
 from django.views.generic.edit import CreateView
+from .acs_ecs_api import query_ecs_api
 
 
 app_name = 'configmanager'
@@ -121,6 +122,11 @@ def ecs_add(request):
     ecs.save()                                                                                                                            
     return HttpResponseRedirect(reverse('configmanager:ecslist'))   
 
+
+@login_required(login_url='/login/') 
+def ecs_info_update_from_ACS(request, ecs_id):
+    ecs = get_object_or_404(ECS, pk=ecs_id)
+    instanceid = ecs.instanceid    
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -564,4 +570,5 @@ def apply_delete(request, apply_id):
 class DeploySiteView(generic.DetailView):
     model = Apply
     template_name = 'configmanager/deploy_sitelist.html'
+
 

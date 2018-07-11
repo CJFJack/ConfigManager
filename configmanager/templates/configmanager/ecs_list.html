@@ -13,6 +13,7 @@
     <th>修改人</th>
     <th>修改日期</th>
     <th>操作</th>
+    <th>5分钟内CPU使用率<th>
     {% for ecs in ECS_list %}
     <tr>
         <td><a href="{% url 'configmanager:ecschange' ecs.id %}">{{ ecs.name }}</a></td>
@@ -30,7 +31,9 @@
             &nbsp;<a href="{% url 'configmanager:ecsdelete' ecs.id %}">删除</a>&nbsp;
             &nbsp;<a href="{% url 'configmanager:ecsenable' ecs.id %}">启用</a>&nbsp;
             &nbsp;<a href="{% url 'configmanager:ecsdisable' ecs.id %}">禁用</a>&nbsp;
+            &nbsp;<a href="{% url 'configmanager:ecsinfoupdatefromacs' ecs.id %}">刷新监控数据</a>&nbsp;
         </td>
+        <td>{{ ecs.recently_cpu }}<td>
     </tr>
     {% endfor %}
     </ul>

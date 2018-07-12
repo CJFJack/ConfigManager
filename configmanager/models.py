@@ -25,7 +25,18 @@ class ECS(models.Model):
     modified_user = models.CharField(max_length=20)
     modified_time = models.DateTimeField(auto_now=True)
     recently_cpu = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-
+    recently_memory = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    recently_diskusage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    regionId = models.CharField(max_length=20, null=True, blank=True)
+    expiredtime = models.DateTimeField(null=True, blank=True)
+    memory = models.CharField(max_length=10, null=True, blank=True)
+    ostype = models.CharField(max_length=20, null=True, blank=True)
+    instancestatus = models.CharField(max_length=20, null=True, blank=True)
+    networktype = models.CharField(max_length=20, null=True, blank=True)
+    cpu = models.CharField(max_length=5, null=True, blank=True)
+    publicipaddress = models.CharField(max_length=30, null=True, blank=True)
+    osname = models.CharField(max_length=200, null=True, blank=True)
+    
     def __unicode__(self):
         return self.name
 

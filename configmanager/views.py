@@ -24,7 +24,8 @@ from django.views.generic import TemplateView
 from django.forms import inlineformset_factory
 from django.views.generic.edit import UpdateView
 from django.views.generic.edit import CreateView
-from .acs_ecs_api import query_ecs_api
+from .acs_ecs_monitor import query_ecs_api
+from .acs_ecs_info import query_ecs_info
 
 
 app_name = 'configmanager'
@@ -124,11 +125,65 @@ def ecs_add(request):
 
 
 @login_required(login_url='/login/') 
-def ecs_info_update_from_ACS(request, ecs_id):
+def update_ecs_monitor(request, ecs_id):
     ecs = get_object_or_404(ECS, pk=ecs_id)
-    instanceid = ecs.instanceid    
+    instanceid = ecs.instanceid.encode('utf-8')    
+    try:
+        recently_cpu=query_ecs_api(instanceid=instanceid, metric="cpu_total")
+        recently_mem=query_ecs_api(instanceid=instanceid, metric="memory_usedutilization")
+        recently_diskusage=query_ecs_api(instanceid=instanceid, metric="diskusage_utilization")
+    except:
+        pass
+    else:
+        ecs.recently_memory = recently_mem['Average']
+        ecs.recently_cpu = recently_cpu['Average']
+        ecs.recently_diskusage = recently_diskusage['Average']
+        ecs.save()
+
+    return HttpResponseRedirect(reverse('configmanager:ecslist'))
 
 
+@login_required(login_url='/login/')
+def update_allecs_monitor(request):
+    for ecs in ECS.objects.all():
+        update_ecs_monitor(request, ecs.id)
+    return HttpResponseRedirect(reverse('configmanager:ecslist'))
+
+
+@login_required(login_url='/login/')                                                                                                      
+def update_ecs_info(request, ecs_id): 
+    ecs = get_object_or_404(ECS, pk=ecs_id)
+    instanceid = ecs.instanceid.encode('utf-8')
+    try:
+        result=query_ecs_info(instanceids=[instanceid])
+    except:
+        pass
+    else:
+        print result
+        ecs.instancestatus = result['Status']
+        ecs.IP = result['InnerIpAddress']
+        ecs.publicipaddress = result['PublicIpAddress']
+        ecs.regionId = result['RegionId']
+        ecs.osname = result['OSName']
+        ecs.expiredtime = result['ExpiredTime']
+        ecs.memory = result['Memory']/1024
+        ecs.ostype = result['OSType']
+        ecs.networktype = result['NetworkType']
+        ecs.name = result['InstanceName']
+        ecs.cpu = result['Cpu']
+        ecs.save()
+
+    return HttpResponseRedirect(reverse('configmanager:ecslist'))
+
+
+@login_required(login_url='/login/')
+def update_allecs_info(request):
+    for ecs in ECS.objects.all():
+        update_ecs_info(request, ecs.id)
+    return HttpResponseRedirect(reverse('configmanager:ecslist'))
+
+
+    
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class SiteListView(generic.ListView):
     template_name = 'configmanager/site_list.html'

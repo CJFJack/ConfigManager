@@ -25,14 +25,16 @@ def query_ecs_api(instanceid, metric):
     # 发起请求
     response = clt.do_action(request)
     # json转dict
-    dict=json.loads(response)
-    data=dict['Datapoints'].encode('utf-8')
+    ecsdict=json.loads(response)
+    #print ecsdict
+    #print ecsdict['Datapoints']
+    data=ecsdict['Datapoints'].encode('utf-8')
     ecs_info=json.loads(data)[0]
     return ecs_info
 
 # 调用函数
 if __name__=='__main__':
-    result=query_ecs_api(instanceid="AY1407121019172066ee", metric="cpu_total")
+    result=query_ecs_api(instanceid="AY1407121019172066ee", metric="memory_usedutilization")
     print result
 
 

@@ -35,7 +35,7 @@
                         待生效&nbsp;<a href="{% url 'configmanager:configdeploy' r.id %}" >发布</a>&nbsp;
                     {% endif %}
                     {% if r.status == "Y" %}
-                        已生效&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        已生效&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     {% endif %}
                 </p>
             {% endfor %}
@@ -45,7 +45,7 @@
                 <p>{{ ecs }}</p>
             {% endfor %}
         </td>
-        <td></td>
+        <td><a href="">刷新</a></td>
         <td>
             {% for config in site.configfile_set.all %} 
                 <p>{{ config.modified_user }}</p>

@@ -329,3 +329,16 @@ class ConfigmanagerHistoricalconfigfile(models.Model):
     
     def __unicode__(self):
         return self.filename
+
+
+class SLB(models.Model):
+    instanceid = models.CharField(max_length=50)
+    name = models.CharField(max_length=30)
+    status = models.CharField(max_length=10)
+    ip = models.CharField(max_length=30)
+    networktype = models.CharField(max_length=10)
+    createdate = models.DateTimeField()
+    
+    def __unicode__(self):
+        return self.name
+   

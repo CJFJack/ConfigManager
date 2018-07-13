@@ -21,9 +21,11 @@
             <th>修改站点</th>
             <td>
                 <span><input type="checkbox" name="{{ configfile.site }}" value="{{ configfile.site }}"  checked />{{ configfile.site }}</span>
-                {% for rs in configfile.site.get_relation_sites %}
-                    <span><input type="checkbox" name="{{ rs }}" value="{{ rs }}" {% if "log" not in configfile.filename %}checked{% endif %} />{{ rs }}</span>
-                {% endfor %}
+                {% if configfile.site.get_relation_sites %}
+                    {% for rs in configfile.site.get_relation_sites %}
+                        <span><input type="checkbox" name="{{ rs }}" value="{{ rs }}" {% if "log" not in configfile.filename %}checked{% endif %} />{{ rs }}</span>
+                    {% endfor %}
+                {% endif %}
             </td>
         </tr>
         <tr>

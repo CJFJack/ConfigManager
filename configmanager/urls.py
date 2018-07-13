@@ -43,4 +43,7 @@ urlpatterns = [
     url(r'^apply/(?P<apply_id>[0-9]+)/statuschange/$', views.apply_status_change, name='applystatuschange'),
     url(r'^apply/(?P<apply_id>[0-9]+)/delete/$', views.apply_delete, name='applydelete'),
     url(r'^apply/(?P<pk>[0-9]+)/deploysitelist/$', views.DeploySiteView.as_view(), name='deploysitelist'),
+    url(r'^slb/$', views.SLBListView.as_view(), name='slblist'),
+    url(r'^slb/allinfoupdate$', views.all_slb_info_update, name='allslbinfoupdate'),
+    url(r'^slb/(?P<pk>[0-9]+)/detail/$', views.SLBDetailView.as_view(), name='slbdetail'),
 ]

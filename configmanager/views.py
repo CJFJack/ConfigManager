@@ -14,7 +14,7 @@ import os
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
-from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem
+from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem, SLB
 from .forms import ApplyForm, DeployitemFormSet
 from django.http import HttpResponse
 from django.views import generic
@@ -26,6 +26,7 @@ from django.views.generic.edit import UpdateView
 from django.views.generic.edit import CreateView
 from .acs_ecs_monitor import query_ecs_api
 from .acs_ecs_info import query_ecs_info
+from .acs_slb_info import query_slb_info
 
 
 app_name = 'configmanager'
@@ -626,4 +627,26 @@ class DeploySiteView(generic.DetailView):
     model = Apply
     template_name = 'configmanager/deploy_sitelist.html'
 
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class SLBListView(generic.ListView):
+    template_name = 'configmanager/slb_list.html'
+    context_object_name = 'slb_list'
+    def get_queryset(self):
+        return SLB.objects.order_by('name')
+
+
+@login_required(login_url='/login/')
+def all_slb_info_update(request):
+    for slb in query_slb_info(regionid='cn-hangzhou'):
+        if not SLB.objects.filter(instanceid=slb['LoadBalancerId']):
+            s = SLB(instanceid=slb['LoadBalancerId'], name=slb['LoadBalancerName'], status=slb['LoadBalancerStatus'], ip=slb['Address'], networktype=slb['AddressType'], createdate=slb['CreateTime'])
+            s.save()
+    return HttpResponseRedirect(reverse('configmanager:slblist'))
+            
+        
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class SLBDetailView(generic.DetailView):
+    model = SLB
+    template_name = 'configmanager/slb_detail.html'    
 

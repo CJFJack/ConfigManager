@@ -29,6 +29,7 @@
         </td>
         <td align="right">
             {% for r in site.release_set.all %}
+                {% if r.ECS.name in site.get_ECSlists_list %}
                 <p>
                     {{ r.ECS }}&nbsp;
                     {% if r.status == "N" %}
@@ -38,6 +39,7 @@
                         已生效&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     {% endif %}
                 </p>
+                {% endif %}
             {% endfor %}
         </td>
         <td>

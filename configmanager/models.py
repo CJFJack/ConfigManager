@@ -63,6 +63,12 @@ class Site(models.Model):
         choices=status_CHOICES,
         default=ENABLE,
     )
+    
+    def get_ECSlists_list(self):
+        list = []
+        for e in self.ECSlists.all():
+            list.append(e.name)
+        return list
 
     def exist_or_not_in_siterace(self):
         try:
@@ -336,9 +342,27 @@ class SLB(models.Model):
     name = models.CharField(max_length=30)
     status = models.CharField(max_length=10)
     ip = models.CharField(max_length=30)
-    networktype = models.CharField(max_length=10)
+    networktype = models.CharField(max_length=10, null=True, blank=True)
+    addresstype = models.CharField(max_length=10)
     createdate = models.DateTimeField()
     
     def __unicode__(self):
         return self.name
    
+
+class SLBsite(models.Model):
+    SLB = models.ForeignKey(SLB, on_delete=models.CASCADE)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+
+    def __unicode__(self):
+        return self.site.fullname
+
+
+class SLBhealthstatus(models.Model):
+    SLB = models.ForeignKey(SLB, on_delete=models.CASCADE)
+    ECS = models.ForeignKey(ECS, on_delete=models.CASCADE)
+    SLBstatus = models.CharField(max_length=10, null=True, blank=True)
+    healthstatus = models.CharField(max_length=10, null=True, blank=True)
+    
+    def __unicode__(self):
+        return self.healthstatus

@@ -14,10 +14,11 @@
     <th>实例别名</th>
     <th>实例状态</th>
     <th>实例IP</th>
-    <th>实例类型</th>
+    <th>IP地址类型</th>
+    <th>网络类型</th>
     <th>创建时间</th>
     <th>站点列表</th>
-    <th>ECS名称 SLB状态 健康状态 操作</th>
+    <th>ECS名称&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SLB状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;健康状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操作</th>
     <th>健康状态</th>
     {% for slb in slb_list %}
     <tr>
@@ -25,11 +26,22 @@
         <td>{{ slb.name }}</td>
         <td>{{ slb.status }}</td>
         <td>{{ slb.ip }}</td>
-        <td>{{ slb.networktype }}</td>
+        <td>{% if slb.addresstype == "internet" %}公网{% endif %}{% if slb.addresstype == "intranet" %}私网{% endif %}</td>
+        <td>{% if slb.networktype == "classic" %}经典网络{% endif %}{% if slb.networktype == "vpc" %}专有网络{% endif %}</td>
         <td>{{ slb.createdate }}</td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td>
+            {% for site in slb.slbsite_set.all %}
+                <p>{{ site }}</p>
+            {% endfor %}
+        </td>
+        <td align="right">
+            {% for ecs in slb.slbhealthstatus_set.all %}
+                <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>{% if ecs.SLBstatus == "added" %}已添加{% else %}已移除{% endif %}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>{% if ecs.healthstatus == "normal" %}正常{% elif ecs.healthstatus == "abnormal" %}异常{% else %}正在检查{% endif %}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+            {% endfor %}
+        </td>
+        <td><a href="{% url 'configmanager:slbhealthupdate' slb.id %}">刷新</a></td>
     </tr>
     {% endfor %}
     </ul>

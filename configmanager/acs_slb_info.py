@@ -25,6 +25,10 @@ def query_slb_info(regionid):
             LoadBalancerName = slb['LoadBalancerName']
         except:
             LoadBalancerName = ''
+        try:
+            NetworkType = slb['NetworkType']
+        except:
+            NetworkType = ''
         LoadBalancerStatus = slb['LoadBalancerStatus']
         Address = slb['Address']
         AddressType = slb['AddressType']
@@ -36,6 +40,7 @@ def query_slb_info(regionid):
         slbdict['Address'] = Address
         slbdict['AddressType'] = AddressType
         slbdict['CreateTime'] = CreateTime
+        slbdict['NetworkType'] = NetworkType
         slblist.append(slbdict)
     return slblist
 

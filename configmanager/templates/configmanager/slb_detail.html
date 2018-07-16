@@ -4,9 +4,37 @@
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
+<script type="text/html" id="item-template">
+<tr id="slbsite-set-__prefix__">
+    <td>{{ slbsite_form.empty_form.site }}</td>
+    <td>{{ slbsite_form.empty_form.DELETE }}</td>
+    <td>{{ slbsite_form.empty_form.id }}</td>
+    {# <!-- or for crispy forms --> {% crispy slbsite_form.empty_form item_forms.form.helper %} #}
+</tr>
+</script>
+
+<script>
+$(document).ready(function() {
+    $('.add-item').click(function(ev) {
+        ev.preventDefault();
+        var count = $('#id-slbsite-tbody').children().length;
+        var tmplMarkup = $('#item-template').html();
+        var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
+        $('tbody#id-slbsite-tbody').append(compiledTmpl);
+
+        //update form count
+        $('#id_item_items-TOTAL_FORMS').attr('value', count+1);
+    });
+});
+</script>
+
 <h2>SLB管理 > 修改SLB</h2>
-<form action="" method="post">
+<form action="{% url 'configmanager:slbrelasite' slb.id %}" method="post">
 {% csrf_token %}
+{{ slb_form.management_form }}                                                                                                          
+{{ slbsite_form.management_form }}   
+<input type="hidden" name="slbsite_set-TOTAL_FORMS" id="id_item_items-TOTAL_FORMS" value="{{ slbsite_form.total_form_count }}">  
 <table>
     <tbody>
     <tr>
@@ -37,11 +65,40 @@
     </tr>
     <tr>
         <th align="left">选择站点</th>
-        <td></td>
+        <td>
+             <table id="table_id_slbsite">
+                 <thead>
+                     <tr>
+                         {% for form in slbsite_form %}
+                             {% if forloop.first %}
+                                 {% for field in form %}
+                                     {% if field.label != "Id" and field.label != "SLB" %}
+                                        <th>{{ field.label }}</th>
+                                     {% endif %}
+                                 {% endfor %}
+                             {% endif %}
+                         {% endfor %}
+                     </tr>
+                 </thead>
+                 <tbody id="id-slbsite-tbody">
+                     {% for form in slbsite_form %}
+                         <tr id="slbsite-set-{{ forloop.counter0 }}">
+                             <td>{{ form.site }}</td>
+                             <td>{{ form.DELETE }}</td>
+                             <td>{{ form.id }}</td>
+                             {# <!-- or for crispy forms --> {% crispy slbsite_form %} #}                                           
+                         </tr>                                                                                                         
+                     {% endfor %}                                                                                                      
+                 </tbody>                                                                                                              
+                 <tfoot>                                                                                                               
+                     <tr class="add-row"><td colspan="7"><a href="#" class="add-item" >添加另一个 关联站点</a></td></tr>               
+                 </tfoot>                                                                                                              
+             </table>  
+        </td>
     </tr>
    </tbody>
 </table>
-<input type="submit" name="site-save" value="保存" />
-<input type="submit" name="site-goback" value="返回" />
+<input type="submit" name="slb-rela-site" value="保存" />
+<input type="submit" name="slb-goback" value="返回" />
 </form>
 {% endblock %}

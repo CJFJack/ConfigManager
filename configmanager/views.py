@@ -14,8 +14,8 @@ import os
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
-from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem, SLB
-from .forms import ApplyForm, DeployitemFormSet
+from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem, SLB, SLBsite, SLBhealthstatus
+from .forms import ApplyForm, DeployitemFormSet, SLBForm, SLBsiteFormSet
 from django.http import HttpResponse
 from django.views import generic
 from django.contrib.auth.decorators import login_required
@@ -27,6 +27,7 @@ from django.views.generic.edit import CreateView
 from .acs_ecs_monitor import query_ecs_api
 from .acs_ecs_info import query_ecs_info
 from .acs_slb_info import query_slb_info
+from .acs_slb_health import query_slb_health
 
 
 app_name = 'configmanager'
@@ -506,11 +507,11 @@ def apply_save(request, obj):
     obj.confamendexplain = request.POST['confamendexplain']
     obj.remarkexplain = request.POST['remarkexplain']
     obj.save()
-    DeployitemFormSet = inlineformset_factory(Apply, Deployitem, fields=('deployorderby', 'jenkinsversion', 'type', 'deploysite', 'deploy_status'), can_delete=True)
     if request.method == 'POST':
         formset = DeployitemFormSet(request.POST, request.FILES, instance=obj)
         if formset.is_valid():
             formset.save()
+
 
 @login_required(login_url='/login/')
 def apply_status_change(request, apply_id):
@@ -640,13 +641,75 @@ class SLBListView(generic.ListView):
 def all_slb_info_update(request):
     for slb in query_slb_info(regionid='cn-hangzhou'):
         if not SLB.objects.filter(instanceid=slb['LoadBalancerId']):
-            s = SLB(instanceid=slb['LoadBalancerId'], name=slb['LoadBalancerName'], status=slb['LoadBalancerStatus'], ip=slb['Address'], networktype=slb['AddressType'], createdate=slb['CreateTime'])
+            s = SLB(instanceid=slb['LoadBalancerId'], name=slb['LoadBalancerName'], status=slb['LoadBalancerStatus'], ip=slb['Address'], addresstype=slb['AddressType'], createdate=slb['CreateTime'], networktype=slb['NetworkType'])
+            s.save()
+        else:
+            s = SLB.objects.get(instanceid=slb['LoadBalancerId'])
+            s.instanceid=slb['LoadBalancerId']
+            s.name=slb['LoadBalancerName']
+            s.status=slb['LoadBalancerStatus']
+            s.ip=slb['Address']
+            s.addresstype=slb['AddressType']
+            s.createdate=slb['CreateTime']
+            s.networktype=slb['NetworkType']
             s.save()
     return HttpResponseRedirect(reverse('configmanager:slblist'))
             
         
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
-class SLBDetailView(generic.DetailView):
+class SLBDetailView(UpdateView):
     model = SLB
+    form_class = SLBForm
     template_name = 'configmanager/slb_detail.html'    
+
+    def get_context_data(self, **kwargs):
+        context = super(SLBDetailView, self).get_context_data(**kwargs)
+        if self.request.POST:
+            context['slb_form'] = SLBForm(self.request.POST, instance=self.object)
+            context['slbsite_form'] = SLBsiteFormSet(self.request.POST)
+        else:
+            context['slb_form'] = SLBForm(instance=self.object)
+            context['slbsite_form'] = SLBsiteFormSet(instance=self.object)
+        return context  
+
+
+@login_required(login_url='/login/')
+def slb_rela_site(request, slb_id):
+    slb = get_object_or_404(SLB, pk=slb_id)
+    if request.method == 'POST':
+        if request.POST.has_key('slb-rela-site'):
+            formset = SLBsiteFormSet(request.POST, request.FILES, instance=slb)
+            if formset.is_valid():
+                formset.save()
+        return HttpResponseRedirect(reverse('configmanager:slblist'))
+
+
+@login_required(login_url='/login/')
+def slb_health_update(request, slb_id):
+    slb = get_object_or_404(SLB, pk=slb_id)
+    result=query_slb_health(LoadBalancerId=slb.instanceid)
+    for sh in SLBhealthstatus.objects.filter(SLB_id=slb.id):
+        sh.SLBstatus = 'removed'
+        sh.save()
+    for r in result:
+        print r
+        ecs = get_object_or_404(ECS, instanceid=r['ServerId'])
+        if not SLBhealthstatus.objects.filter(SLB_id=slb.id, ECS_id=ecs.id):
+            sh = SLBhealthstatus(SLB_id=slb.id, ECS_id=ecs.id, SLBstatus='added', healthstatus=r['ServerHealthStatus'])
+            sh.save()
+            print "N"
+        else:
+            print "Y"
+            sh = SLBhealthstatus.objects.get(SLB_id=slb.id, ECS_id=ecs.id)
+            sh.SLB_id=slb.id
+            sh.ECS_id=ecs.id
+            sh.SLBstatus='added'
+            sh.healthstatus=r['ServerHealthStatus']
+            sh.save()
+    return HttpResponseRedirect(reverse('configmanager:slblist'))
+
+
+
+
+
 

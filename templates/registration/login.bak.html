@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>运维管理平台</title>
+</head>
+<body>
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+{% extends "admin/base.html" %}
+
+<h1>运维管理平台</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">登录</button>
+  </form>

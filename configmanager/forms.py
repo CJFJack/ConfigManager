@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.forms import ModelForm, Textarea, DateField
-from .models import Apply, Deployitem
+from .models import Apply, Deployitem, SLB, SLBsite, SLBhealthstatus
 from django.forms.models import inlineformset_factory
 from django.contrib.admin import widgets
 
@@ -16,4 +16,11 @@ class ApplyForm(ModelForm):
         }
 
 
+class SLBForm(ModelForm):
+    class Meta:
+        model = SLB
+        exclude = '__all__'
+
+
 DeployitemFormSet = inlineformset_factory(Apply, Deployitem, fields=('deployorderby', 'jenkinsversion', 'deploysite', 'type', 'deploy_status'), extra=1, can_delete=True) 
+SLBsiteFormSet = inlineformset_factory(SLB, SLBsite, fields=('site',), extra=1, can_delete=True)

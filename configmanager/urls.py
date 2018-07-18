@@ -48,4 +48,7 @@ urlpatterns = [
     url(r'^slb/(?P<pk>[0-9]+)/detail/$', views.SLBDetailView.as_view(), name='slbdetail'),
     url(r'^slb/(?P<slb_id>[0-9]+)/slbrelasite/$', views.slb_rela_site, name='slbrelasite'),
     url(r'^slb/(?P<slb_id>[0-9]+)/slbhealthupdate/$', views.slb_health_update, name='slbhealthupdate'),
+    url(r'^slb/allslbhealthupdate/$', views.all_slb_health_update, name='allslbhealthupdate'),
+    url(r'^slb/(?P<slb_id>[0-9]+)/removebackendserver/(?P<server_id>[0-9]+)/$', views.remove_backend_server, name='removebackendserver'),
+    url(r'^slb/(?P<slb_id>[0-9]+)/addbackendserver/(?P<server_id>[0-9]+)/$', views.add_backend_server, name='addbackendserver'),
 ]

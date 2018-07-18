@@ -7,7 +7,7 @@ from time import time
 from datetime import datetime
 from re import split
 from django.core.files import File
-import os
+import os, json
 
 # Create your views here.
 
@@ -28,6 +28,8 @@ from .acs_ecs_monitor import query_ecs_api
 from .acs_ecs_info import query_ecs_info
 from .acs_slb_info import query_slb_info
 from .acs_slb_health import query_slb_health
+from .acs_slb_backendserver_remove import remove_backendserver
+from .acs_slb_backendserver_add import add_backendserver
 
 
 app_name = 'configmanager'
@@ -374,7 +376,7 @@ def site_delete(request, site_id):
 class ConfigListView(generic.ListView):
     model = Site
     template_name = 'configmanager/config_list.html'
-
+    
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class UndeployConfigListView(generic.ListView):
@@ -429,7 +431,6 @@ def config_save(request, configfile_id):
 
 @login_required(login_url='/login/')
 def config_deploy(request, release_id):
-    print request.META['HTTP_REFERER']
     '''更新Release表信息'''
     r = Release.objects.get(pk=release_id)
     r.status = 'Y'
@@ -639,6 +640,7 @@ class SLBListView(generic.ListView):
 
 @login_required(login_url='/login/')
 def all_slb_info_update(request):
+    slb_list = []
     for slb in query_slb_info(regionid='cn-hangzhou'):
         if not SLB.objects.filter(instanceid=slb['LoadBalancerId']):
             s = SLB(instanceid=slb['LoadBalancerId'], name=slb['LoadBalancerName'], status=slb['LoadBalancerStatus'], ip=slb['Address'], addresstype=slb['AddressType'], createdate=slb['CreateTime'], networktype=slb['NetworkType'])
@@ -653,6 +655,11 @@ def all_slb_info_update(request):
             s.createdate=slb['CreateTime']
             s.networktype=slb['NetworkType']
             s.save()
+        slb_list.append(slb['LoadBalancerId'])    
+        print slb_list
+    for current_slb in SLB.objects.all():
+        if current_slb.instanceid not in slb_list:
+            current_slb.delete()
     return HttpResponseRedirect(reverse('configmanager:slblist'))
             
         
@@ -685,30 +692,69 @@ def slb_rela_site(request, slb_id):
 
 
 @login_required(login_url='/login/')
-def slb_health_update(request, slb_id):
+def slb_health_update(request, slb_id, redirect='yes'):
     slb = get_object_or_404(SLB, pk=slb_id)
-    result=query_slb_health(LoadBalancerId=slb.instanceid)
+    result = query_slb_health(LoadBalancerId=slb.instanceid)
     for sh in SLBhealthstatus.objects.filter(SLB_id=slb.id):
         sh.SLBstatus = 'removed'
         sh.save()
     for r in result:
-        print r
-        ecs = get_object_or_404(ECS, instanceid=r['ServerId'])
-        if not SLBhealthstatus.objects.filter(SLB_id=slb.id, ECS_id=ecs.id):
-            sh = SLBhealthstatus(SLB_id=slb.id, ECS_id=ecs.id, SLBstatus='added', healthstatus=r['ServerHealthStatus'])
-            sh.save()
-            print "N"
+        try:
+            ecs = get_object_or_404(ECS, instanceid=r['ServerId'])
+        except:
+            pass
         else:
-            print "Y"
-            sh = SLBhealthstatus.objects.get(SLB_id=slb.id, ECS_id=ecs.id)
-            sh.SLB_id=slb.id
-            sh.ECS_id=ecs.id
-            sh.SLBstatus='added'
-            sh.healthstatus=r['ServerHealthStatus']
-            sh.save()
+            if not SLBhealthstatus.objects.filter(SLB_id=slb.id, ECS_id=ecs.id):
+                sh = SLBhealthstatus(SLB_id=slb.id, ECS_id=ecs.id, SLBstatus='added', healthstatus=r['ServerHealthStatus'])
+                sh.save()
+            else:
+                sh = SLBhealthstatus.objects.get(SLB_id=slb.id, ECS_id=ecs.id)
+                sh.SLB_id=slb.id
+                sh.ECS_id=ecs.id
+                sh.SLBstatus='added'
+                sh.healthstatus=r['ServerHealthStatus']
+                sh.save()
+    if redirect == 'yes':
+        return HttpResponseRedirect(reverse('configmanager:slblist'))
+
+
+@login_required(login_url='/login/')
+def all_slb_health_update(request):
+    for slb in SLB.objects.all():
+        slb_health_update(request, slb_id=slb.id, redirect='no')
     return HttpResponseRedirect(reverse('configmanager:slblist'))
 
 
+@login_required(login_url='/login/')
+def remove_backend_server(request, slb_id, server_id):
+    slb = get_object_or_404(SLB, pk=slb_id)
+    slbinstanceId = slb.instanceid
+    ecs = ECS.objects.get(pk=server_id)
+    backendservers = []
+    backendservers.append(ecs.instanceid)
+    backendservers = json.dumps(backendservers)
+    r = remove_backendserver(LoadBalancerId=slbinstanceId, BackendServers=backendservers)
+    print r
+    slb_health_update(request, slb_id=slb.id)
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    
+
+@login_required(login_url='/login/')
+def add_backend_server(request, slb_id, server_id):
+    slb = get_object_or_404(SLB, pk=slb_id)
+    slbinstanceId = slb.instanceid
+    ecs = ECS.objects.get(pk=server_id)
+    serverdict = {}
+    serverdict['tset'] = '100'
+    serverlist = []
+    serverdict['ServerId'] = str(ecs.instanceid)
+    serverdict['Weight'] = str(100)
+    serverlist.append(serverdict)
+    backendservers = json.dumps(serverlist)
+    result = add_backendserver(LoadBalancerId=slbinstanceId, BackendServers=backendservers)
+    print result
+    slb_health_update(request, slb_id=slb.id)
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
 

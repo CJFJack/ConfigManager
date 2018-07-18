@@ -42,12 +42,25 @@
                 {% endif %}
             {% endfor %}
         </td>
-        <td>
-            {% for ecs in site.ECSlists.all %}
-                <p>{{ ecs }}</p>
+        <td align="right">
+            {% for ecs in site.get_one_slb.slbhealthstatus_set.all %}
+                <p>
+                    <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span>{% if ecs.SLBstatus == "added" %}已添加{% else %}<font color="red">已移除</font>{% endif %}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span>
+                        {% if ecs.healthstatus == "normal" %}正常&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% elif ecs.healthstatus == "abnormal" %}<font color="red">异常</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% else %}<font color="red">正在检查</font>&nbsp;
+                        {% endif %}
+                    </span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span>
+                        {% if ecs.SLBstatus == "added" %}<a href="{% url 'configmanager:removebackendserver' slb_id=site.get_one_slb.id server_id=ecs.ECS_id %}">移除</a>{% endif %}
+                        {% if ecs.SLBstatus == "removed" %}<a href="{% url 'configmanager:addbackendserver' slb_id=site.get_one_slb.id server_id=ecs.ECS_id %}">添加</a>{% endif %}
+                    </span>
+                <p/>
             {% endfor %}
         </td>
-        <td><a href="">刷新</a></td>
+        <td><a href="{% url 'configmanager:slbhealthupdate' site.get_one_slb.id %}">刷新</a></td>
         <td>
             {% for config in site.configfile_set.all %} 
                 <p>{{ config.modified_user }}</p>

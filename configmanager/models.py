@@ -151,6 +151,13 @@ class Site(models.Model):
                 continue
         return result
 
+    def get_one_slb(self):
+        '''
+        得到其中一个关联的slb对象
+        '''
+        for slb in self.slbsite_set.all():
+            return slb.SLB
+
     def __unicode__(self):
         return self.fullname
 

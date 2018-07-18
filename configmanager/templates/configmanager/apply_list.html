@@ -62,7 +62,7 @@
                 {{ apply.deploy_time }}
             {% endif %}
         </td>
-        <td>
+        <td align="right">
             &nbsp;<a href={%  url 'configmanager:applychange' apply.id %}><span {% if apply.status != "WC" %}style="display:none"{% endif %}>修改</span></a>&nbsp;
             &nbsp;<a href={%  url 'configmanager:deploysitelist' apply.id %}><span {% if apply.status != "WD" %}style="display:none"{% endif %}>现在去发布</span></a>&nbsp;
             &nbsp;<a href={%  url 'configmanager:applydelete' apply.id %}>删除</a>&nbsp;

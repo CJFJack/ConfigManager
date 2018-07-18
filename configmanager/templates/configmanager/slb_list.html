@@ -6,6 +6,9 @@
         <li>
             <a href="{% url 'configmanager:allslbinfoupdate' %}"  class="link">同步SLB基本信息</a>
         </li>
+        <li>
+            <a href="{% url 'configmanager:allslbhealthupdate' %}"  class="link">刷新所有SLB健康信息</a>
+        </li>
     </ul>
 {% if slb_list %}
     <ul>
@@ -36,9 +39,18 @@
         </td>
         <td align="right">
             {% for ecs in slb.slbhealthstatus_set.all %}
-                <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <span>{% if ecs.SLBstatus == "added" %}已添加{% else %}已移除{% endif %}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <span>{% if ecs.healthstatus == "normal" %}正常{% elif ecs.healthstatus == "abnormal" %}异常{% else %}正在检查{% endif %}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+                <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>{% if ecs.SLBstatus == "added" %}已添加{% else %}<font color="red">已移除</font>{% endif %}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>
+                    {% if ecs.healthstatus == "normal" %}正常&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% elif ecs.healthstatus == "abnormal" %}<font color="red">异常</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% else %}<font color="red">正在检查</font>&nbsp;
+                    {% endif %}
+                </span>&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>
+                    {% if ecs.SLBstatus == "added" %}<a href="{% url 'configmanager:removebackendserver' slb_id=slb.id server_id=ecs.ECS_id %}">移除</a>{% endif %}
+                    {% if ecs.SLBstatus == "removed" %}<a href="{% url 'configmanager:addbackendserver' slb_id=slb.id server_id=ecs.ECS_id %}">添加</a>{% endif %}
+                </span><br/>
             {% endfor %}
         </td>
         <td><a href="{% url 'configmanager:slbhealthupdate' slb.id %}">刷新</a></td>

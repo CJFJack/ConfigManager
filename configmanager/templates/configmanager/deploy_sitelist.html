@@ -12,6 +12,7 @@
     <th>所属ECS 配置状态 操作</th>
     <th>所属ECS SLB状态 健康状态 操作</th>
     <th>健康检查</th>
+    <th>所属ECS 发布状态 操作</th>
     <th>配置修改人</th>
     <th>修改日期</th>
     {% for site in apply.deployitem_set.all %}
@@ -19,7 +20,7 @@
         <td>{{ site.deployorderby }}</td>
         <td>{{ site.jenkinsversion }}</td>
         <td>
-            <a href="{% url 'configmanager:sitechange' site.id %}" target="_blank">{{ site.deploysite.fullname }}</a>
+            <a href="{% url 'configmanager:sitechange' site.deploysite.id %}" target="_blank">{{ site.deploysite.fullname }}</a>
         </td>
         <td>{{ site.deploysite.deployattention }}</td>
         <td align="right">
@@ -36,20 +37,57 @@
                 <p>
                     {{ r.ECS }}&nbsp;
                     {% if r.status == "N" %}
-                        待生效&nbsp;<a href="{% url 'configmanager:configdeploy' r.id %}" >发布</a>&nbsp;
+                        <font color="red">待生效</font>&nbsp;
                     {% endif %}
                     {% if r.status == "Y" %}
-                        已生效&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        已生效&nbsp;
                     {% endif %}
+                    <a href="">浏览测试页</a>
                 </p>
             {% endfor %}
         </td>
-        <td>
-            {% for ecs in site.deploysite.ECSlists.all %}
-                <p>{{ ecs }}</p>
+        <td align="right">                                                                                    
+            {% for ecs in site.deploysite.get_one_slb.slbhealthstatus_set.all %}                                         
+                <p>                                                                                           
+                    <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;                                        
+                    <span>{% if ecs.SLBstatus == "added" %}已添加{% else %}<font color="red">已移除</font>{% endif %}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span>                                                                                    
+                        {% if ecs.healthstatus == "normal" %}正常&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;     
+                        {% elif ecs.healthstatus == "abnormal" %}<font color="red">异常</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% else %}<font color="red">正在检查</font>&nbsp;                                     
+                        {% endif %}                                                                           
+                    </span>&nbsp;&nbsp;&nbsp;&nbsp;                                                           
+                    <span>                                                                                    
+                        {% if ecs.SLBstatus == "added" %}<a href="{% url 'configmanager:removebackendserver' slb_id=site.deploysite.get_one_slb_id server_id=ecs.ECS_id %}">移除</a>{% endif %}
+                        {% if ecs.SLBstatus == "removed" %}<a href="{% url 'configmanager:addbackendserver' slb_id=site.deploysite.get_one_slb_id server_id=ecs.ECS_id %}">添加</a>{% endif %}
+                    </span>                                                                                   
+                <p/>                                                                                          
+            {% endfor %}                                                                                      
+        </td> 
+        <td><a href="{% url 'configmanager:slbhealthupdate' site.deploysite.get_one_slb_id %}">刷新</a></td> 
+        <td align="right">
+            {% for d in site.deploysite.deployecs_set.all %}
+                {% if d.applyproject_id == apply.id %}
+                <p>
+                    <span>{{ d.ECS }}</span>
+                    <span>{% if d.ECSdeploystatus == "N" %}<font color="red">待发布</font>{% else %}已发布{% endif %}</span>
+                    <span>
+                        {% if d.ECSdeploystatus == "N" %}
+                            {% for r in d.site.release_set.all %}
+                                {% if r.ECS.id == d.ECS.id %}
+                                    {% if r.status == "N" %}
+                                        <a href="{% url 'configmanager:applyconfigdeploy' deployecs_id=d.id release_id=r.id %}">发布</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    {% else %}
+                                        <a href="{% url 'configmanager:applyconfigdeploy' deployecs_id=d.id release_id=r.id %}">标记为已发布</a>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </span>
+                </p>
+                {% endif %}
             {% endfor %}
         </td>
-        <td></td>
         <td>
             {% for config in site.deploysite.configfile_set.all %} 
                 <p>{{ config.modified_user }}</p>

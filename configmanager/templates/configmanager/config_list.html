@@ -33,7 +33,7 @@
                 <p>
                     {{ r.ECS }}&nbsp;
                     {% if r.status == "N" %}
-                        待生效&nbsp;<a href="{% url 'configmanager:configdeploy' r.id %}" >发布</a>&nbsp;
+                        <font color="red">待生效</font>&nbsp;<a href="{% url 'configmanager:configdeploy' r.id %}" >发布</a>&nbsp;
                     {% endif %}
                     {% if r.status == "Y" %}
                         已生效&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -48,9 +48,13 @@
                     <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
                     <span>{% if ecs.SLBstatus == "added" %}已添加{% else %}<font color="red">已移除</font>{% endif %}</span>&nbsp;&nbsp;&nbsp;&nbsp;
                     <span>
-                        {% if ecs.healthstatus == "normal" %}正常&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        {% elif ecs.healthstatus == "abnormal" %}<font color="red">异常</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        {% else %}<font color="red">正在检查</font>&nbsp;
+                        {% if ecs.SLBstatus == "added" %}
+                            {% if ecs.healthstatus == "normal" %}正常&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            {% elif ecs.healthstatus == "abnormal" %}<font color="red">异常</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            {% else %}<font color="red">正在检查</font>&nbsp;
+                            {% endif %}
+                        {% else %}
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         {% endif %}
                     </span>&nbsp;&nbsp;&nbsp;&nbsp;
                     <span>
@@ -60,7 +64,7 @@
                 <p/>
             {% endfor %}
         </td>
-        <td><a href="{% url 'configmanager:slbhealthupdate' site.get_one_slb.id %}">刷新</a></td>
+        <td><a href="{% url 'configmanager:slbhealthupdate' site.get_one_slb_id %}">刷新</a></td>
         <td>
             {% for config in site.configfile_set.all %} 
                 <p>{{ config.modified_user }}</p>

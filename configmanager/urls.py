@@ -37,6 +37,7 @@ urlpatterns = [
     url(r'^config/(?P<configfile_id>[0-9]+)/history/$', views.config_history, name='confighistory'),
     url(r'^config/(?P<pk>[0-9]+)/historydetail/$', views.ConfigHistoryDetailView.as_view(), name='confighistorydetail'),
     url(r'^config/(?P<confighistorydetail_id>[0-9]+)/rollback/$', views.config_rollback, name='configrollback'),
+    url(r'^config/(?P<deployecs_id>[0-9]+)/deploy/(?P<release_id>[0-9]+)/$', views.apply_config_deploy, name='applyconfigdeploy'),
     url(r'^apply/$', views.ApplyListView.as_view(), name='applylist'),
     url(r'^apply/add$', views.ApplyAdd.as_view(), name='applyadd'),
     url(r'^apply/(?P<pk>[0-9]+)/change/$', views.ApplyChangeView.as_view(), name='applychange'),

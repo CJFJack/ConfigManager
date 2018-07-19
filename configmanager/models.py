@@ -158,6 +158,17 @@ class Site(models.Model):
         for slb in self.slbsite_set.all():
             return slb.SLB
 
+    def get_one_slb_id(self):
+        '''
+        得到其中一个关联的slb对象
+        '''
+        if self.slbsite_set.all():
+            for slb in self.slbsite_set.all():
+                if slb:
+                    return slb.SLB.id
+        else:
+            return int(0)
+
     def __unicode__(self):
         return self.fullname
 
@@ -287,6 +298,16 @@ class Deployitem(models.Model):
     
     def __unicode__(self):
         return self.deploy_status
+    
+
+class DeployECS(models.Model):
+    applyproject = models.ForeignKey(Apply, on_delete=models.CASCADE)
+    ECS = models.ForeignKey(ECS, on_delete=models.CASCADE)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    ECSdeploystatus = models.CharField(max_length=1, default='N')
+    
+    def __unicode__(self):
+        return self.ECS
 
 
 class Siterace(models.Model):

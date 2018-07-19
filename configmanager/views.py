@@ -14,7 +14,7 @@ import os, json
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
-from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem, SLB, SLBsite, SLBhealthstatus
+from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem, SLB, SLBsite, SLBhealthstatus, DeployECS
 from .forms import ApplyForm, DeployitemFormSet, SLBForm, SLBsiteFormSet
 from django.http import HttpResponse
 from django.views import generic
@@ -450,6 +450,19 @@ def config_deploy(request, release_id):
 
 
 @login_required(login_url='/login/')
+def apply_config_deploy(request, deployecs_id, release_id):
+    d = get_object_or_404(DeployECS, pk=deployecs_id)
+    d.ECSdeploystatus = 'Y'
+    d.save()
+    r = get_object_or_404(Release, pk=release_id)
+    if r.status == 'Y':
+        pass
+    else:
+        config_deploy(request, release_id)
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+
+@login_required(login_url='/login/')
 def config_history(request, configfile_id):
     confighistory_list = ConfigmanagerHistoricalconfigfile.objects.filter(id=configfile_id).order_by('-modified_time')
     template_name = 'configmanager/config_history.html'
@@ -573,10 +586,8 @@ def apply_status_change(request, apply_id):
             a.deploy_user = request.user.username
             a.deploy_time = datetime.now()
             a.save()
-            return HttpResponseRedirect(reverse('configmanager:applylist'))
         if request.POST.has_key('goto-deploy'):
             return HttpResponseRedirect(reverse('configmanager:deploysitelist', args=(a.id,)))
-    else:
         return HttpResponseRedirect(reverse('configmanager:applylist'))
 
 
@@ -609,9 +620,15 @@ class ApplyAdd(CreateView):
         apply_form.instance.apply_user = self.request.user
         self.object = apply_form.save()
         deployitem_form.instance = self.object
+        print apply_form.instance.id
+        for form in deployitem_form:
+            site_id = form.cleaned_data['deploysite'].id
+            for ecs in form.cleaned_data['deploysite'].ECSlists.all():
+                ecs_id = ecs.id
+                d = DeployECS(applyproject_id=apply_form.instance.id, ECS_id=ecs_id, site_id=site_id)
+                d.save()
         deployitem_form.save()
         return HttpResponseRedirect(reverse('configmanager:applylist'))
-
     def form_invalid(self, apply_form, deployitem_form):
         return self.render_to_response(
             self.get_context_data(apply_form=apply_form, deployitem_form=deployitem_form))
@@ -693,29 +710,33 @@ def slb_rela_site(request, slb_id):
 
 @login_required(login_url='/login/')
 def slb_health_update(request, slb_id, redirect='yes'):
-    slb = get_object_or_404(SLB, pk=slb_id)
-    result = query_slb_health(LoadBalancerId=slb.instanceid)
-    for sh in SLBhealthstatus.objects.filter(SLB_id=slb.id):
-        sh.SLBstatus = 'removed'
-        sh.save()
-    for r in result:
-        try:
-            ecs = get_object_or_404(ECS, instanceid=r['ServerId'])
-        except:
-            pass
-        else:
-            if not SLBhealthstatus.objects.filter(SLB_id=slb.id, ECS_id=ecs.id):
-                sh = SLBhealthstatus(SLB_id=slb.id, ECS_id=ecs.id, SLBstatus='added', healthstatus=r['ServerHealthStatus'])
-                sh.save()
+    try:
+        slb = get_object_or_404(SLB, pk=slb_id)
+    except:
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        result = query_slb_health(LoadBalancerId=slb.instanceid)
+        for sh in SLBhealthstatus.objects.filter(SLB_id=slb.id):
+            sh.SLBstatus = 'removed'
+            sh.save()
+        for r in result:
+            try:
+                ecs = get_object_or_404(ECS, instanceid=r['ServerId'])
+            except:
+                pass
             else:
-                sh = SLBhealthstatus.objects.get(SLB_id=slb.id, ECS_id=ecs.id)
-                sh.SLB_id=slb.id
-                sh.ECS_id=ecs.id
-                sh.SLBstatus='added'
-                sh.healthstatus=r['ServerHealthStatus']
-                sh.save()
+                if not SLBhealthstatus.objects.filter(SLB_id=slb.id, ECS_id=ecs.id):
+                    sh = SLBhealthstatus(SLB_id=slb.id, ECS_id=ecs.id, SLBstatus='added', healthstatus=r['ServerHealthStatus'])
+                    sh.save()
+                else:
+                    sh = SLBhealthstatus.objects.get(SLB_id=slb.id, ECS_id=ecs.id)
+                    sh.SLB_id=slb.id
+                    sh.ECS_id=ecs.id
+                    sh.SLBstatus='added'
+                    sh.healthstatus=r['ServerHealthStatus']
+                    sh.save()
     if redirect == 'yes':
-        return HttpResponseRedirect(reverse('configmanager:slblist'))
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
 @login_required(login_url='/login/')

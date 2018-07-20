@@ -30,6 +30,7 @@ from .acs_slb_info import query_slb_info
 from .acs_slb_health import query_slb_health
 from .acs_slb_backendserver_remove import remove_backendserver
 from .acs_slb_backendserver_add import add_backendserver
+from .acs_all_ecs_info import query_all_ecs
 
 
 app_name = 'configmanager'
@@ -177,6 +178,26 @@ def update_ecs_info(request, ecs_id):
         ecs.cpu = result['Cpu']
         ecs.save()
 
+    return HttpResponseRedirect(reverse('configmanager:ecslist'))
+
+
+@login_required(login_url='/login/')
+def sync_all_ecs_info(request):
+    ecs_aliyun = query_all_ecs(RegionId='cn-hangzhou')
+    ecs_local = []
+    '''获取本地所有ecs实例id的list'''
+    for ecs in ECS.objects.all():
+        ecs_local.append(ecs.instanceid)
+    '''增加本地没有的ecs'''
+    for ecsinstanceid in ecs_aliyun:
+        if ecsinstanceid not in ecs_local:
+            ecs = ECS(instanceid=ecsinstanceid)
+            ecs.save()
+    '''删除阿里云没有的本地ecs'''
+    for ecsinstanceid in ecs_local:
+        if ecsinstanceid not in ecs_aliyun:
+            ecs = ECS(instanceid=ecsinstanceid)
+            ecs.delete()
     return HttpResponseRedirect(reverse('configmanager:ecslist'))
 
 
@@ -589,6 +610,7 @@ def apply_status_change(request, apply_id):
         if request.POST.has_key('goto-deploy'):
             return HttpResponseRedirect(reverse('configmanager:deploysitelist', args=(a.id,)))
         return HttpResponseRedirect(reverse('configmanager:applylist'))
+    return HttpResponseRedirect(reverse('configmanager:applylist'))
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -602,7 +624,6 @@ class ApplyAdd(CreateView):
         form_class = self.get_form_class()
         form = self.get_form(form_class)
         deployitem_form = DeployitemFormSet()
-        print deployitem_form
         return self.render_to_response(
             self.get_context_data(form=form, deployitem_form=deployitem_form))
 
@@ -620,7 +641,6 @@ class ApplyAdd(CreateView):
         apply_form.instance.apply_user = self.request.user
         self.object = apply_form.save()
         deployitem_form.instance = self.object
-        print apply_form.instance.id
         for form in deployitem_form:
             site_id = form.cleaned_data['deploysite'].id
             for ecs in form.cleaned_data['deploysite'].ECSlists.all():
@@ -740,6 +760,15 @@ def slb_health_update(request, slb_id, redirect='yes'):
 
 
 @login_required(login_url='/login/')
+def more_slb_health_update(request, site_id):
+    s = get_object_or_404(Site, pk=site_id)
+    slb_id_list = s.get_slb_id_list()
+    for slbid in slb_id_list:
+        slb_health_update(request, slb_id=slbid, redirect='no')
+    return HttpResponseRedirect(reverse('configmanager:configlist'))
+
+
+@login_required(login_url='/login/')
 def all_slb_health_update(request):
     for slb in SLB.objects.all():
         slb_health_update(request, slb_id=slb.id, redirect='no')
@@ -747,7 +776,7 @@ def all_slb_health_update(request):
 
 
 @login_required(login_url='/login/')
-def remove_backend_server(request, slb_id, server_id):
+def remove_backend_server(request, slb_id, server_id, redirect='yes'):
     slb = get_object_or_404(SLB, pk=slb_id)
     slbinstanceId = slb.instanceid
     ecs = ECS.objects.get(pk=server_id)
@@ -756,17 +785,26 @@ def remove_backend_server(request, slb_id, server_id):
     backendservers = json.dumps(backendservers)
     r = remove_backendserver(LoadBalancerId=slbinstanceId, BackendServers=backendservers)
     print r
-    slb_health_update(request, slb_id=slb.id)
+    if redirect == 'yes':
+        slb_health_update(request, slb_id=slb.id)
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+
+@login_required(login_url='/login/')
+def site_remove_backend_server(request, site_id, server_id):
+    s = get_object_or_404(Site, pk=site_id)
+    for slb in s.slbsite_set.all():
+        remove_backend_server(request, slb_id=slb.SLB.id, server_id=server_id, redirect='no')
+        slb_health_update(request, slb_id=slb.SLB.id)
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
     
 
 @login_required(login_url='/login/')
-def add_backend_server(request, slb_id, server_id):
+def add_backend_server(request, slb_id, server_id, redirect='yes'):
     slb = get_object_or_404(SLB, pk=slb_id)
     slbinstanceId = slb.instanceid
     ecs = ECS.objects.get(pk=server_id)
     serverdict = {}
-    serverdict['tset'] = '100'
     serverlist = []
     serverdict['ServerId'] = str(ecs.instanceid)
     serverdict['Weight'] = str(100)
@@ -774,7 +812,17 @@ def add_backend_server(request, slb_id, server_id):
     backendservers = json.dumps(serverlist)
     result = add_backendserver(LoadBalancerId=slbinstanceId, BackendServers=backendservers)
     print result
-    slb_health_update(request, slb_id=slb.id)
+    if redirect == 'yes':
+        slb_health_update(request, slb_id=slb.id)
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+
+@login_required(login_url='/login/')
+def site_add_backend_server(request, site_id, server_id):
+    s = get_object_or_404(Site, pk=site_id)
+    for slb in s.slbsite_set.all():
+        add_backend_server(request, slb_id=slb.SLB.id, server_id=server_id, redirect='no')
+        slb_health_update(request, slb_id=slb.SLB.id)
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 

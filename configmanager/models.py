@@ -158,16 +158,18 @@ class Site(models.Model):
         for slb in self.slbsite_set.all():
             return slb.SLB
 
-    def get_one_slb_id(self):
+    def get_slb_id_list(self):
         '''
-        得到其中一个关联的slb对象
+        得到其中一个关联的slb的list对象
         '''
+        slb_id_list = []
         if self.slbsite_set.all():
             for slb in self.slbsite_set.all():
                 if slb:
-                    return slb.SLB.id
+                    slb_id_list.append(slb.SLB.id)
+            return slb_id_list
         else:
-            return int(0)
+            return [0,]
 
     def __unicode__(self):
         return self.fullname

@@ -6,10 +6,13 @@
 {% if ECS_list %}
     <ul class="object-tools">
         <li>
-            <a href="{% url 'configmanager:updateallmonitor' %}"  class="link">刷新所有ECS监控数据</a>
+            <a href="{% url 'configmanager:syncallecsinfo' %}"  class="link">同步所有ECS</a>
         </li>
         <li>
             <a href="{% url 'configmanager:updateallinfo' %}"  class="link">刷新所有ECS基础信息</a>
+        </li>
+        <li>
+            <a href="{% url 'configmanager:updateallmonitor' %}"  class="link">刷新所有ECS监控数据</a>
         </li>
     </ul>
     <ul>

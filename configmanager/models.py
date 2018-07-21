@@ -16,7 +16,7 @@ class ECS(models.Model):
     )
     name = models.CharField(max_length=30)
     instanceid = models.CharField(max_length=30)
-    IP = models.CharField(max_length=20)
+    IP = models.GenericIPAddressField(protocol='IPv4')
     status = models.CharField(
         max_length=1,
         choices=status_CHOICES,
@@ -34,7 +34,7 @@ class ECS(models.Model):
     instancestatus = models.CharField(max_length=20, null=True, blank=True)
     networktype = models.CharField(max_length=20, null=True, blank=True)
     cpu = models.CharField(max_length=5, null=True, blank=True)
-    publicipaddress = models.CharField(max_length=30, null=True, blank=True)
+    publicipaddress = models.GenericIPAddressField(protocol='IPv4')
     osname = models.CharField(max_length=200, null=True, blank=True)
     
     def __unicode__(self):
@@ -267,6 +267,13 @@ class Apply(models.Model):
         return self.applyproject
 
 
+class ApplyOperateLog(models.Model):
+    applyproject = models.ForeignKey(Apply, on_delete=models.CASCADE)
+    type = models.CharField(max_length=10)
+    OperatorName = models.CharField(max_length=20)
+    OperationTime = models.DateTimeField()
+
+
 class Deployitem(models.Model):
     TRUNK = 'T'
     BRANCH = 'B'
@@ -371,7 +378,7 @@ class SLB(models.Model):
     instanceid = models.CharField(max_length=50)
     name = models.CharField(max_length=30)
     status = models.CharField(max_length=10)
-    ip = models.CharField(max_length=30)
+    ip = models.GenericIPAddressField(protocol='IPv4')
     networktype = models.CharField(max_length=10, null=True, blank=True)
     addresstype = models.CharField(max_length=10)
     createdate = models.DateTimeField()

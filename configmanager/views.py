@@ -554,52 +554,65 @@ def apply_status_change(request, apply_id):
     if a.status == 'WC':
         if request.POST.has_key('apply-save'):
             apply_save(request, a)
+            a.applyoperatelog_set.create(type='保存', OperatorName=request.user.username, OperationTime=datetime.now())
         if request.POST.has_key('apply-commit'):
             a.status = 'DA'
             apply_save(request, a)
+            a.applyoperatelog_set.create(type='保存并提交', OperatorName=request.user.username, OperationTime=datetime.now())
         if request.POST.has_key('apply-cancel'):
             a.status = 'C'
             a.save()
+            a.applyoperatelog_set.create(type='取消', OperatorName=request.user.username, OperationTime=datetime.now())
         return HttpResponseRedirect(reverse('configmanager:applylist'))
     if a.status == 'DA':
         if request.POST.has_key('dev-approval'):
             a.status = 'TA'
             a.save()
+            a.applyoperatelog_set.create(type='研发经理审核通过', OperatorName=request.user.username, OperationTime=datetime.now())
         if request.POST.has_key('dev-unapproval'):
             a.status = 'WC'
             a.save()
+            a.applyoperatelog_set.create(type='研发经理审核不通过', OperatorName=request.user.username, OperationTime=datetime.now())
         return HttpResponseRedirect(reverse('configmanager:applylist'))
     if a.status == 'TA':
         if request.POST.has_key('test-approval'):
             a.status = 'EA'
             a.save()
+            a.applyoperatelog_set.create(type='测试经理审核通过', OperatorName=request.user.username, OperationTime=datetime.now())
         if request.POST.has_key('test-unapproval'):
             a.status = 'WC'
             a.save()
+            a.applyoperatelog_set.create(type='测试经理审核不通过', OperatorName=request.user.username, OperationTime=datetime.now())
         return HttpResponseRedirect(reverse('configmanager:applylist'))
     if a.status == 'EA':
         if request.POST.has_key('EA-approval'):
             a.status = 'OA'
             a.save()
+            a.applyoperatelog_set.create(type='运维工程师审核通过', OperatorName=request.user.username, OperationTime=datetime.now())
         if request.POST.has_key('EA-unapproval'):
             a.status = 'WC'
             a.save()
+            a.applyoperatelog_set.create(type='运维工程师审核不通过', OperatorName=request.user.username, OperationTime=datetime.now())
         return HttpResponseRedirect(reverse('configmanager:applylist'))
     if a.status == 'OA':
         if request.POST.has_key('OA-approval'):
             a.status = 'TDA'
             a.save()
+            a.applyoperatelog_set.create(type='运维经理审核通过', OperatorName=request.user.username, OperationTime=datetime.now())
         if request.POST.has_key('OA-unapproval'):
             a.status = 'WC'
             a.save()
+            a.applyoperatelog_set.create(type='运维经理审核不通过', OperatorName=request.user.username, OperationTime=datetime.now())
         return HttpResponseRedirect(reverse('configmanager:applylist'))
     if a.status == 'TDA':
         if request.POST.has_key('TDA-approval'):
             a.status = 'WD'
             a.save()
+            a.applyoperatelog_set.create(type='技术总监审核通过', OperatorName=request.user.username, OperationTime=datetime.now())
         if request.POST.has_key('TDA-unapproval'):
             a.status = 'WC'
             a.save()
+            a.applyoperatelog_set.create(type='技术总监审核不通过', OperatorName=request.user.username, OperationTime=datetime.now())
         return HttpResponseRedirect(reverse('configmanager:applylist'))
     if a.status == 'WD':
         if request.POST.has_key('deploy-finish'):
@@ -607,6 +620,7 @@ def apply_status_change(request, apply_id):
             a.deploy_user = request.user.username
             a.deploy_time = datetime.now()
             a.save()
+            a.applyoperatelog_set.create(type='已发布', OperatorName=request.user.username, OperationTime=datetime.now())
         if request.POST.has_key('goto-deploy'):
             return HttpResponseRedirect(reverse('configmanager:deploysitelist', args=(a.id,)))
         return HttpResponseRedirect(reverse('configmanager:applylist'))

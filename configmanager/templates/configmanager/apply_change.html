@@ -35,6 +35,22 @@ $(document).ready(function() {
 });
 </script>
 
+<script type="text/javascript">
+var pageObject = {
+ //展开操作日志
+ showOperateLog: function (obj) {
+     if ($.trim($(obj).text()) == "展开操作日志") {
+         $("#divOperateLog").show();
+         $(obj).text("收起操作日志");
+     }
+     else {
+         $("#divOperateLog").hide();
+         $(obj).text("展开操作日志");
+     }
+ }
+}
+</script>
+
 
 <form action="{% url 'configmanager:applystatuschange' apply.id %}" method="post">
 {% csrf_token %}
@@ -150,15 +166,35 @@ $(document).ready(function() {
             </td>
         </tr>
         <tr>
-            <th>展开操作日志</th>
+            <th><a href="javascript:void(0)" onclick="pageObject.showOperateLog(this);">展开操作日志</a></th>
             <td>
+                <div style="display:none;" id="divOperateLog">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>操作类型</th>
+                                <th>操作人</th>
+                                <th>操作时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in apply.applyoperatelog_set.all %}
+                                <tr>
+                                    <td>{{ log.type }}</td>
+                                    <td>{{ log.OperatorName }}</td>
+                                    <td>{{ log.OperationTime }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </td>
         </tr>
     </tbody>
 </table>
 
 <input type={% if apply.status == 'WC' %}"submit"{% else %}"hidden"{% endif %} name="apply-save" value="保存" />
-<input type={% if apply.status == 'WC' %}"submit"{% else %}"hidden"{% endif %} name="apply-commit" value="提交" />
+<input type={% if apply.status == 'WC' %}"submit"{% else %}"hidden"{% endif %} name="apply-commit" value="保存并提交" />
 <input type={% if apply.status == 'WC' %}"submit"{% else %}"hidden"{% endif %} name="apply-cancel" value="取消" />
 
 <input type={% if apply.status == 'DA' %}"submit"{% else %}"hidden"{% endif %} name="dev-approval" value="研发经理审核通过" />

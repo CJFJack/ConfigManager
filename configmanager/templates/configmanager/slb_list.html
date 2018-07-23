@@ -1,6 +1,33 @@
 {% extends 'configmanager/__base__.html' %}
 {% block title %}SLB列表 | {% endblock %}
 {% block content %}
+
+<script>
+$.ajaxSetup({
+    data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+});
+
+$(function(){
+    $('#healthrefresh').click(function(){
+        $.ajax({
+                url:$("#slbid").text()+"/slbhealthupdate/",
+                type:"post",
+                beforeSend:function() {  
+                    $("#myspin").text("");
+                    var target = $("#myspin").get(0);
+                    spinner.spin(target);
+                },
+                success:function(result) {            
+                    setTimeout(function() {
+                        spinner.spin();
+                    },300);
+                }
+            });
+    });
+});
+
+</script>
+
 <h2>SLB管理 > SLB列表</h2>
     <ul class="object-tools">
         <li>
@@ -11,7 +38,7 @@
         </li>
     </ul>
 {% if slb_list %}
-    <ul>
+    <div id="myspin">
     <table border="1">
     <th>ECS名称&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SLB状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;健康状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操作</th>
     <th>健康状态</th>
@@ -45,7 +72,10 @@
                 </span><br/>
             {% endfor %}
         </td>
-        <td><a href="{% url 'configmanager:slbhealthupdate' slb.id %}">刷新</a></td>
+        <!--<td><a href="{% url 'configmanager:slbhealthupdate' slb.id %}">刷新</a></td>
+        <td><a href="javascript:void(0);" id="healthrefresh" >刷新</a></td>-->
+        <p style="display:none" id="slbid">{{ slb.id }}</p>
+        <td><button id="healthrefresh" type="button">Change Content</button></td>
         <td><a href="{% url 'configmanager:slbdetail' slb.id %}">{{ slb.instanceid }}</td>
         <td>{{ slb.name }}</td>
         <td>{{ slb.status }}</td>
@@ -60,7 +90,8 @@
         </td>
     </tr>
     {% endfor %}
-    </ul>
+    </table>
+    </div>
 {% else %}
     <p>No SLB are available.</p>
 {% endif %}

@@ -7,6 +7,7 @@ from time import time
 from datetime import datetime
 from re import split
 from django.core.files import File
+from django.contrib.auth.decorators import user_passes_test
 import os, json
 
 # Create your views here.
@@ -43,19 +44,20 @@ def index(request):
 
 @login_required(login_url='/login/')
 def nav_top(request):
-    return render_to_response('configmanager/nav_top.html')
+    context = {}
+    return render(request, 'configmanager/nav_top.html', context)
 
 
 @login_required(login_url='/login/')
 def welcome(request):
-    print request.user.username
     context = {}
     return render(request, 'configmanager/welcome.html', context)
 
 
 @login_required(login_url='/login/')
 def deploymanager(request):
-    return render_to_response('configmanager/deploymanager.html')
+    context = {}
+    return render(request, 'configmanager/deploymanager.html', context) 
 
 
 @login_required(login_url='/login/')

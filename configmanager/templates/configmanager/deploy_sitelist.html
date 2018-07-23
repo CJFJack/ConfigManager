@@ -58,13 +58,13 @@
                         {% endif %}                                                                           
                     </span>&nbsp;&nbsp;&nbsp;&nbsp;                                                           
                     <span>                                                                                    
-                        {% if ecs.SLBstatus == "added" %}<a href="{% url 'configmanager:removebackendserver' slb_id=site.deploysite.get_one_slb_id server_id=ecs.ECS_id %}">移除</a>{% endif %}
-                        {% if ecs.SLBstatus == "removed" %}<a href="{% url 'configmanager:addbackendserver' slb_id=site.deploysite.get_one_slb_id server_id=ecs.ECS_id %}">添加</a>{% endif %}
+                        {% if ecs.SLBstatus == "added" %}<a href="{% url 'configmanager:siteremovebackendserver' site_id=site.id server_id=ecs.ECS_id %}">移除</a>{% endif %}
+                        {% if ecs.SLBstatus == "removed" %}<a href="{% url 'configmanager:siteaddbackendserver' site_id=site.id server_id=ecs.ECS_id %}">添加</a>{% endif %}
                     </span>                                                                                   
                 <p/>                                                                                          
             {% endfor %}                                                                                      
         </td> 
-        <td><a href="{% url 'configmanager:slbhealthupdate' site.deploysite.get_one_slb_id %}">刷新</a></td> 
+        <td><a href="{% url 'configmanager:moreslbhealthupdate' site.id %}">刷新</a></td> 
         <td align="right">
             {% for d in site.deploysite.deployecs_set.all %}
                 {% if d.applyproject_id == apply.id %}

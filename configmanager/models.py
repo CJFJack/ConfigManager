@@ -316,7 +316,7 @@ class DeployECS(models.Model):
     ECSdeploystatus = models.CharField(max_length=1, default='N')
     
     def __unicode__(self):
-        return self.ECS
+        return self.ECS.name
 
 
 class Siterace(models.Model):

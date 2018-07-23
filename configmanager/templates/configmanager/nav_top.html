@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 {% extends 'configmanager/__base__.html' %}
 {% block content %}
+{% load systemmanager %}
     <h1>运维管理平台</h1>
     <a href="{% url 'configmanager:welcome' %}" target="nav_left">首页</a>
     <a href="{% url 'configmanager:deploymanager' %}" target="nav_left">发布管理</a>
-    <a href="{% url 'configmanager:systemmanager' %}" target="nav_left">系统管理</a>
+    {% if request.user|has_group:"admin" or request.user|has_group:"运维工程师" or request.user|has_group:"运维经理" %}
+        <a href="{% url 'configmanager:systemmanager' %}" target="nav_left">系统管理</a>
+    {% endif %}
     <a href="{% url 'logout' %}" target="_top">退出</a>
 {% endblock %}

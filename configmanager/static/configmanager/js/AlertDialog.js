@@ -12,10 +12,10 @@ function ShowLoading(message) {
         CloseLoading();
     }
     if (message == null || $.trim(message) == "") {
-        message = '正在处理中.....请稍候';
+        message = 'hanling';
     }
 
-    LoadingDialog = art.dialog({
+    LoadingDialog = Art.dialog({
         lock: true,
         background: '#C4BDBD', // 背景色
         opacity: 0.87,	// 透明度

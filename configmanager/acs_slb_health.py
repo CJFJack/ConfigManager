@@ -18,13 +18,23 @@ def query_slb_health(LoadBalancerId):
     
     # 发起请求
     response = clt.do_action(request)
-    BackendServers = json.loads(response)['BackendServers']
-    BackendServer = BackendServers['BackendServer']
-    return BackendServer
+    if 'Message' in response:
+        return json.loads(response)
+    else:
+        try:
+            json.loads(response)['BackendServers']
+        except:
+            return {'success', 'False'}
+        else:
+            BackendServers = json.loads(response)['BackendServers']
+            BackendServer = BackendServers['BackendServer']
+            return BackendServer
 
 
 
 if __name__=='__main__':
-    result = query_slb_health(LoadBalancerId='155a56d1c0a-cn-hangzhou-dg-a01')
-    for r in result:
-        print r['ServerId'], r['ServerHealthStatus']
+    result = query_slb_health(LoadBalancerId='155a56d1c0a-cn-hangzhou-dg-a011')
+    print result
+
+
+

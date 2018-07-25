@@ -749,30 +749,38 @@ def slb_health_update(request, slb_id, redirect='yes'):
     try:
         slb = get_object_or_404(SLB, pk=slb_id)
     except:
-        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+        return render_to_response(request.META['HTTP_REFERER'], {'success':'false'})
     else:
-        result = query_slb_health(LoadBalancerId=slb.instanceid)
-        for sh in SLBhealthstatus.objects.filter(SLB_id=slb.id):
-            sh.SLBstatus = 'removed'
-            sh.save()
-        for r in result:
-            try:
-                ecs = get_object_or_404(ECS, instanceid=r['ServerId'])
-            except:
-                pass
+        try:
+            result = query_slb_health(LoadBalancerId=slb.instanceid)
+            print result
+        except:
+            return HttpResponse(json.dumps({'success':False, 'message':''}), content_type="application/json")
+        else:    
+            if 'Message' in result:
+                return HttpResponse(json.dumps({'success':False, 'message':result['Message']}), content_type="application/json")
             else:
-                if not SLBhealthstatus.objects.filter(SLB_id=slb.id, ECS_id=ecs.id):
-                    sh = SLBhealthstatus(SLB_id=slb.id, ECS_id=ecs.id, SLBstatus='added', healthstatus=r['ServerHealthStatus'])
+                for sh in SLBhealthstatus.objects.filter(SLB_id=slb.id):
+                    sh.SLBstatus = 'removed'
                     sh.save()
-                else:
-                    sh = SLBhealthstatus.objects.get(SLB_id=slb.id, ECS_id=ecs.id)
-                    sh.SLB_id=slb.id
-                    sh.ECS_id=ecs.id
-                    sh.SLBstatus='added'
-                    sh.healthstatus=r['ServerHealthStatus']
-                    sh.save()
-    if redirect == 'yes':
-        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+                for r in result:
+                    try:
+                        ecs = get_object_or_404(ECS, instanceid=r['ServerId'])
+                    except:
+                        pass
+                    else:
+                        if not SLBhealthstatus.objects.filter(SLB_id=slb.id, ECS_id=ecs.id):
+                            sh = SLBhealthstatus(SLB_id=slb.id, ECS_id=ecs.id, SLBstatus='added', healthstatus=r['ServerHealthStatus'])
+                            sh.save()
+                        else:
+                            sh = SLBhealthstatus.objects.get(SLB_id=slb.id, ECS_id=ecs.id)
+                            sh.SLB_id=slb.id
+                            sh.ECS_id=ecs.id
+                            sh.SLBstatus='added'
+                            sh.healthstatus=r['ServerHealthStatus']
+                            sh.save()
+                if redirect == 'yes':
+                    return HttpResponse(json.dumps({'success':'true'}), content_type="application/json")
 
 
 @login_required(login_url='/login/')

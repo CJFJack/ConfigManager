@@ -7,40 +7,45 @@ $.ajaxSetup({
     data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
 });
 
-$(function(){
-    $('#healthrefresh').click(function(){
-        $.ajax({
-                url:$("#slbid").text()+"/slbhealthupdate/",
-                type:"post",
-                beforeSend:function() {  
-                    $("#myspin").text("");
-                    var target = $("#myspin").get(0);
-                    spinner.spin(target);
-                },
-                success:function(result) {            
-                    setTimeout(function() {
-                        spinner.spin();
-                    },300);
-                }
-            });
+
+function HealthRefresh(slbid) {
+    var postUrl = "/slb/"+slbid+"/slbhealthupdate/";
+
+    target = $("#myspin").get(0);                                                                                 
+    var bgDiv = document.getElementById("bgDiv");                                                                 
+    bgDiv.style.width = document.body.offsetwidth + "px";                                                         
+    bgDiv.style.height = document.body.scrollHeight + "px";                                                                    
+    bgDiv.style.display = "block";                                                                                
+    spinner.spin(target);  
+
+    $.post(postUrl, function (data) {
+        spinner.spin();                                                                                           
+        bgDiv.style.display = "none";  
+        if (data.success) {
+        } else {
+            alert("操作失败！"+data.message);
+        }
     });
-});
+}
 
 </script>
 
-<h2>SLB管理 > SLB列表</h2>
-    <ul class="object-tools">
-        <li>
-            <a href="{% url 'configmanager:allslbinfoupdate' %}"  class="link">同步SLB基本信息</a>
-        </li>
-        <li>
-            <a href="{% url 'configmanager:allslbhealthupdate' %}"  class="link">刷新所有SLB健康信息</a>
-        </li>
-    </ul>
+
 {% if slb_list %}
-    <div id="myspin">
+<div id="bgDiv"></div>
+<div id="myspin">
+<h2>SLB管理 > SLB列表</h2>
+<ul class="object-tools">
+    <li>
+        <a href="{% url 'configmanager:allslbinfoupdate' %}"  class="link">同步SLB基本信息</a>
+    </li>
+    <li>
+        <a href="{% url 'configmanager:allslbhealthupdate' %}"  class="link">刷新所有SLB健康信息</a>
+    </li>
+</ul>
+
     <table border="1">
-    <th>ECS名称&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SLB状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;健康状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操作</th>
+    <th align="right">ECS名称&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SLB状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;健康状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操作</th>
     <th>健康状态</th>
     <th>实例ID</th>
     <th>实例别名</th>
@@ -63,19 +68,17 @@ $(function(){
                         {% else %}<font color="red">正在检查</font>&nbsp;
                         {% endif %}
                     {% else %}
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     {% endif %}
-                </span>&nbsp;&nbsp;&nbsp;&nbsp;
+                </span>&nbsp;&nbsp;&nbsp;
                 <span>
                     {% if ecs.SLBstatus == "added" %}<a href="{% url 'configmanager:removebackendserver' slb_id=slb.id server_id=ecs.ECS_id %}">移除</a>{% endif %}
                     {% if ecs.SLBstatus == "removed" %}<a href="{% url 'configmanager:addbackendserver' slb_id=slb.id server_id=ecs.ECS_id %}">添加</a>{% endif %}
                 </span><br/>
             {% endfor %}
         </td>
-        <!--<td><a href="{% url 'configmanager:slbhealthupdate' slb.id %}">刷新</a></td>
-        <td><a href="javascript:void(0);" id="healthrefresh" >刷新</a></td>-->
-        <p style="display:none" id="slbid">{{ slb.id }}</p>
-        <td><button id="healthrefresh" type="button">Change Content</button></td>
+        <p style="display:none" id="{{ slb.id }}">{{ slb.id }}</p>
+        <td><a href="javascript:void(0);" id="healthrefresh{{ slb.id }}" onclick="HealthRefresh({{ slb.id }})">刷新</a></td>
         <td><a href="{% url 'configmanager:slbdetail' slb.id %}">{{ slb.instanceid }}</td>
         <td>{{ slb.name }}</td>
         <td>{{ slb.status }}</td>
@@ -91,8 +94,8 @@ $(function(){
     </tr>
     {% endfor %}
     </table>
-    </div>
 {% else %}
     <p>No SLB are available.</p>
 {% endif %}
+</div>
 {% endblock %}

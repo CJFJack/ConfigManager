@@ -1,6 +1,8 @@
 {% extends 'configmanager/__base__.html' %}
 {% block title %}修改配置 | {% endblock %}
 {% block content %}
+<div id="bgDiv"></div>
+<div id="myspin">
 <h2>配置管理 > 修改配置</h2>
 {% if site_list %}
 <table border="1">
@@ -42,7 +44,7 @@
                 {% endif %}
             {% endfor %}
         </td>
-        <td align="right">
+        <td align="right" id=td_{{ site.id }}>
             {% for ecs in site.get_one_slb.slbhealthstatus_set.all %}
                 <p>
                     <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -58,13 +60,13 @@
                         {% endif %}
                     </span>&nbsp;&nbsp;&nbsp;&nbsp;
                     <span>
-                        {% if ecs.SLBstatus == "added" %}<a href="{% url 'configmanager:siteremovebackendserver' site_id=site.id server_id=ecs.ECS_id %}">移除</a>{% endif %}
-                        {% if ecs.SLBstatus == "removed" %}<a href="{% url 'configmanager:siteaddbackendserver' site_id=site.id server_id=ecs.ECS_id %}">添加</a>{% endif %}
+                        {% if ecs.SLBstatus == "added" %}<a href="javascript:void(0)" onclick="SiteRemoveBackendServer({{ site.id }}, {{ ecs.ECS_id }})">移除</a>{% endif %}
+                        {% if ecs.SLBstatus == "removed" %}<a href="javascript:void(0)" onclick="SiteAddBackendServer({{ site.id }}, {{ ecs.ECS_id }})")>添加</a>{% endif %}
                     </span>
                 <p/>
             {% endfor %}
         </td>
-        <td><a href="{% url 'configmanager:moreslbhealthupdate' site.id %}">刷新</a></td>
+        <td><a href="javascript:void(0);" onclick="MoreHealthRefresh({{ site.id }})">刷新</a></td>
         <td>
             {% for config in site.configfile_set.all %} 
                 <p>{{ config.modified_user }}</p>
@@ -81,4 +83,93 @@
 {% else %}
     <p>No ECS are available.</p>
 {% endif %}
+</div>
+
+
+<script>
+$.ajaxSetup({
+    data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+});
+
+//局部刷新
+function PartialRefresh(siteid) {
+    var postUrl = "/config/"+siteid+"/partrefresh/"
+    $.post(postUrl, function(data) {
+        $('#td_'+siteid).html(data)
+    });
+}
+
+
+//刷新SLB健康状态
+function MoreHealthRefresh(siteid) {
+    var postUrl = "/slb/"+siteid+"/moreslbhealthupdate/";
+
+    target = $("#myspin").get(0);                                                                                 
+    var bgDiv = document.getElementById("bgDiv");                                                                 
+    bgDiv.style.display = "block";                                                                                
+    spinner.spin(target);  
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            PartialRefresh(siteid);
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();                                                                                           
+            bgDiv.style.display = "none";  
+        },800);
+    });
+}
+
+
+
+//移除站点所属SLB后端服务器
+function SiteRemoveBackendServer(siteid, serverid) {
+    var postUrl = "/slb/"+siteid+"/siteremovebackendserver/"+serverid+"/";
+
+    target = $("#myspin").get(0);                                                                                 
+    var bgDiv = document.getElementById("bgDiv");                                                                 
+    bgDiv.style.display = "block";                                                                                
+    spinner.spin(target);  
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            PartialRefresh(siteid);
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();                                                                                           
+            bgDiv.style.display = "none";  
+        },300);
+    });
+}
+
+
+//添加站点所属SLB后端服务器
+function SiteAddBackendServer(siteid, serverid) {
+    var postUrl = "/slb/"+siteid+"/siteaddbackendserver/"+serverid+"/";
+
+    target = $("#myspin").get(0);                                                                                 
+    var bgDiv = document.getElementById("bgDiv");                                                                 
+    bgDiv.style.display = "block";                                                                                
+    spinner.spin(target);  
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            PartialRefresh(siteid);
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();                                                                                           
+            bgDiv.style.display = "none";  
+        },300);
+    });
+}
+
+</script>
+
+
 {% endblock %}

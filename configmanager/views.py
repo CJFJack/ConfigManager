@@ -799,11 +799,15 @@ def slb_health_update(request, slb_id):
 
 @login_required(login_url='/login/')
 def more_slb_health_update(request, site_id):
-    s = get_object_or_404(Site, pk=site_id)
-    slb_id_list = s.get_slb_id_list()
-    for slbid in slb_id_list:
-        slb_health_update(request, slb_id=slbid)
-    return HttpResponseRedirect(reverse('configmanager:configlist'))
+    try:
+        s = get_object_or_404(Site, pk=site_id)
+    except:
+        return HttpResponse(json.dumps({'success':False, 'message':'没有此站点，请重新刷新页面'}), content_type="application/json")
+    else:
+        slb_id_list = s.get_slb_id_list()
+        for slbid in slb_id_list:
+            slb_health_update(request, slb_id=slbid)
+        return HttpResponse(json.dumps({'success':True}), content_type="application/json")
 
 
 @login_required(login_url='/login/')
@@ -836,11 +840,15 @@ def remove_backend_server(request, slb_id, server_id):
 
 @login_required(login_url='/login/')
 def site_remove_backend_server(request, site_id, server_id):
-    s = get_object_or_404(Site, pk=site_id)
-    for slb in s.slbsite_set.all():
-        remove_backend_server(request, slb_id=slb.SLB.id, server_id=server_id)
+    try:
+        s = get_object_or_404(Site, pk=site_id)
+    except:
+        return HttpResponse(json.dumps({'success':False, 'message':'该站点不存在，请重新刷新页面'}), content_type="application/json")
+    else:
+        for slb in s.slbsite_set.all():
+            remove_backend_server(request, slb_id=slb.SLB.id, server_id=server_id)
         slb_health_update(request, slb_id=slb.SLB.id)
-    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+        return HttpResponse(json.dumps({'success':True}), content_type="application/json")
     
 
 @login_required(login_url='/login/')
@@ -868,11 +876,15 @@ def add_backend_server(request, slb_id, server_id):
 
 @login_required(login_url='/login/')
 def site_add_backend_server(request, site_id, server_id):
-    s = get_object_or_404(Site, pk=site_id)
-    for slb in s.slbsite_set.all():
-        add_backend_server(request, slb_id=slb.SLB.id, server_id=server_id)
+    try:
+        s = get_object_or_404(Site, pk=site_id)
+    except:
+        return HttpResponse(json.dumps({'success':False, 'message':'该站点不存在，请重新刷新页面'}), content_type="application/json")
+    else:
+        for slb in s.slbsite_set.all():
+            add_backend_server(request, slb_id=slb.SLB.id, server_id=server_id)
         slb_health_update(request, slb_id=slb.SLB.id)
-    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+        return HttpResponse(json.dumps({'success':True}), content_type="application/json")
 
 
 @login_required(login_url='/login/') 
@@ -880,6 +892,15 @@ def slb_part_refresh(request, slb_id):
     slb = SLB.objects.get(pk=slb_id)
     template = 'configmanager/slb_health_template.html'
     return render(request, template, {"slb":slb})
+
+
+@login_required(login_url='/login/')
+def config_part_refresh(request, site_id):
+    site = Site.objects.get(pk=site_id)
+    print site
+    template = 'configmanager/config_slb_template.html'
+    return render(request, template, {"site":site})
+
 
 
 

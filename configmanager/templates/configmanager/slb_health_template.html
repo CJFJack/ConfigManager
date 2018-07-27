@@ -1,0 +1,16 @@
+            {% for ecs in slb.slbhealthstatus_set.all %}
+                <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>{% if ecs.SLBstatus == "added" %}已添加{% else %}<font color="red">已移除</font>{% endif %}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                {% if ecs.SLBstatus == "added" %}
+                    {% if ecs.healthstatus == "normal" %}<span>正常</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% elif ecs.healthstatus == "abnormal" %}<span><font color="red">异常</font></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% else %}<span><font color="red">正在检查</font></span>&nbsp;
+                    {% endif %}
+                {% else %}
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                {% endif %}
+                <span>
+                    {% if ecs.SLBstatus == "added" %}<a href="javascript:void(0);" id="removebackendserver{{ slb.id }}" onclick="RemoveBackendServer({{ slb.id }},{{ ecs.ECS_id }})">移除</a>{% endif %}
+                    {% if ecs.SLBstatus == "removed" %}<a href="javascript:void(0);" id="addbackendserver{{ slb.id }}" onclick="AddBackendServer({{ slb.id }},{{ ecs.ECS_id }})">添加</a>{% endif %}
+                </span><br/>
+            {% endfor %}

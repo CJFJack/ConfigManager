@@ -2,34 +2,6 @@
 {% block title %}SLB列表 | {% endblock %}
 {% block content %}
 
-<script>
-$.ajaxSetup({
-    data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
-});
-
-
-function HealthRefresh(slbid) {
-    var postUrl = "/slb/"+slbid+"/slbhealthupdate/";
-
-    target = $("#myspin").get(0);                                                                                 
-    var bgDiv = document.getElementById("bgDiv");                                                                 
-    bgDiv.style.width = document.body.offsetwidth + "px";                                                         
-    bgDiv.style.height = document.body.scrollHeight + "px";                                                                    
-    bgDiv.style.display = "block";                                                                                
-    spinner.spin(target);  
-
-    $.post(postUrl, function (data) {
-        spinner.spin();                                                                                           
-        bgDiv.style.display = "none";  
-        if (data.success) {
-        } else {
-            alert("操作失败！"+data.message);
-        }
-    });
-}
-
-</script>
-
 
 {% if slb_list %}
 <div id="bgDiv"></div>
@@ -37,10 +9,10 @@ function HealthRefresh(slbid) {
 <h2>SLB管理 > SLB列表</h2>
 <ul class="object-tools">
     <li>
-        <a href="{% url 'configmanager:allslbinfoupdate' %}"  class="link">同步SLB基本信息</a>
+        <a href="javascript:void(0);" onclick="AllSLBinfoUpdate()"  class="link">同步SLB基本信息</a>
     </li>
     <li>
-        <a href="{% url 'configmanager:allslbhealthupdate' %}"  class="link">刷新所有SLB健康信息</a>
+        <a href="javascript:void(0);" onclick="AllSLBHealthUpdate()" class="link">刷新所有SLB健康信息</a>
     </li>
 </ul>
 
@@ -57,23 +29,21 @@ function HealthRefresh(slbid) {
     <th>站点列表</th>
     {% for slb in slb_list %}
     <tr>
-        <td align="right">
+        <td align="right" id="td_{{ slb.id }}">
             {% for ecs in slb.slbhealthstatus_set.all %}
                 <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
                 <span>{% if ecs.SLBstatus == "added" %}已添加{% else %}<font color="red">已移除</font>{% endif %}</span>&nbsp;&nbsp;&nbsp;&nbsp;
-                <span>
-                    {% if ecs.SLBstatus == "added" %}
-                        {% if ecs.healthstatus == "normal" %}正常&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        {% elif ecs.healthstatus == "abnormal" %}<font color="red">异常</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        {% else %}<font color="red">正在检查</font>&nbsp;
-                        {% endif %}
-                    {% else %}
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                {% if ecs.SLBstatus == "added" %}
+                    {% if ecs.healthstatus == "normal" %}<span>正常</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% elif ecs.healthstatus == "abnormal" %}<span><font color="red">异常</font></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% else %}<span><font color="red">正在检查</font></span>&nbsp;
                     {% endif %}
-                </span>&nbsp;&nbsp;&nbsp;
+                {% else %}
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                {% endif %}
                 <span>
-                    {% if ecs.SLBstatus == "added" %}<a href="{% url 'configmanager:removebackendserver' slb_id=slb.id server_id=ecs.ECS_id %}">移除</a>{% endif %}
-                    {% if ecs.SLBstatus == "removed" %}<a href="{% url 'configmanager:addbackendserver' slb_id=slb.id server_id=ecs.ECS_id %}">添加</a>{% endif %}
+                    {% if ecs.SLBstatus == "added" %}<a href="javascript:void(0);" id="removebackendserver{{ slb.id }}" onclick="RemoveBackendServer({{ slb.id }},{{ ecs.ECS_id }})">移除</a>{% endif %}
+                    {% if ecs.SLBstatus == "removed" %}<a href="javascript:void(0);" id="addbackendserver{{ slb.id }}" onclick="AddBackendServer({{ slb.id }},{{ ecs.ECS_id }})">添加</a>{% endif %}
                 </span><br/>
             {% endfor %}
         </td>
@@ -98,4 +68,143 @@ function HealthRefresh(slbid) {
     <p>No SLB are available.</p>
 {% endif %}
 </div>
+
+
+
+<script>
+$.ajaxSetup({
+    data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+});
+
+//局部刷新
+function PartialRefresh(slbid) {
+    var postUrl = "/slb/"+slbid+"/partrefresh/"
+    $.post(postUrl, function(data) {
+        $('#td_'+slbid).html(data)
+    });
+}
+
+
+//刷新SLB健康状态
+function HealthRefresh(slbid) {
+    var postUrl = "/slb/"+slbid+"/slbhealthupdate/";
+
+    target = $("#myspin").get(0);                                                                                 
+    var bgDiv = document.getElementById("bgDiv");                                                                 
+    bgDiv.style.display = "block";                                                                                
+    spinner.spin(target);  
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            PartialRefresh(slbid);
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();                                                                                           
+            bgDiv.style.display = "none";  
+        },800);
+    });
+}
+
+
+//移除SLB后端服务器
+function RemoveBackendServer(slbid, serverid) {
+    var postUrl = "/slb/"+slbid+"/removebackendserver/"+serverid+"/";
+
+    target = $("#myspin").get(0);                                                                                 
+    var bgDiv = document.getElementById("bgDiv");                                                                 
+    bgDiv.style.display = "block";                                                                                
+    spinner.spin(target);  
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            PartialRefresh(slbid)
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();                                                                                           
+            bgDiv.style.display = "none";  
+        },300);
+    });
+}
+
+
+//添加SLb后端服务器
+function AddBackendServer(slbid, serverid) {                                                                                           
+    var postUrl = "/slb/"+slbid+"/addbackendserver/"+serverid+"/";                                                                     
+                                                                                                                                          
+    target = $("#myspin").get(0);                                                                                                         
+    var bgDiv = document.getElementById("bgDiv");                                                                                         
+    bgDiv.style.display = "block";                                                                                                        
+    spinner.spin(target);                                                                                                                 
+                                                                                                                                          
+    $.post(postUrl, function (data) {                                                                                                     
+        if (data.success) {                                                                                                               
+            PartialRefresh(slbid)
+        } else {                                                                                                                          
+            alert("操作失败！"+data.message);                                                                                             
+        }                                                                                                                                 
+        setTimeout(function () {                                                                                                          
+            spinner.spin();                                                                                                               
+            bgDiv.style.display = "none";                                                                                                 
+        },300);                                                                                                                          
+    });                                                                                                                                   
+} 
+
+
+//同步SLB基本信息
+function AllSLBinfoUpdate() {                                                                                           
+    var postUrl = "/slb/allinfoupdate/";
+                                                                                                                                          
+    target = $("#myspin").get(0);                                                                                                         
+    var bgDiv = document.getElementById("bgDiv");                                                                                         
+    bgDiv.style.display = "block";                                                                                                        
+    spinner.spin(target);                                                                                                                 
+                                                                                                                                          
+    $.post(postUrl, function (data) {                                                                                                     
+        if (data.success) {                                                                                                               
+            alert("操作i成功！");
+            window.location.href="/slb/"
+        } else {                                                                                                                          
+            alert("操作失败！"+data.message);                                                                                             
+        }                                                                                                                                 
+        setTimeout(function () {                                                                                                          
+            spinner.spin();                                                                                                               
+            bgDiv.style.display = "none";                                                                                                 
+        },300);                                                                                                                          
+    });                                                                                                                                   
+}
+
+
+//刷新所有SLB健康信息
+function AllSLBHealthUpdate() {                                                                                           
+    var postUrl = "/slb/allslbhealthupdate/";
+                                                                                                                                          
+    target = $("#myspin").get(0);                                                                                                         
+    var bgDiv = document.getElementById("bgDiv");                                                                                         
+    bgDiv.style.display = "block";                                                                                                        
+    spinner.spin(target);                                                                                                                 
+                                                                                                                                          
+    $.post(postUrl, function (data) {                                                                                                     
+        if (data.success) {                                                                                                               
+            alert("操作i成功！");
+            window.location.href="/slb/"
+        } else {                                                                                                                          
+            alert("操作失败！"+data.message);                                                                                             
+        }                                                                                                                                 
+        setTimeout(function () {                                                                                                          
+            spinner.spin();                                                                                                               
+            bgDiv.style.display = "none";                                                                                                 
+        },300);                                                                                                                          
+    });                                                                                                                                   
+}
+
+
+
+</script>
+
+
+
 {% endblock %}

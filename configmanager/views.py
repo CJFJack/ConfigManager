@@ -694,26 +694,35 @@ class SLBListView(generic.ListView):
 @login_required(login_url='/login/')
 def all_slb_info_update(request):
     slb_list = []
-    for slb in query_slb_info(regionid='cn-hangzhou'):
-        if not SLB.objects.filter(instanceid=slb['LoadBalancerId']):
-            s = SLB(instanceid=slb['LoadBalancerId'], name=slb['LoadBalancerName'], status=slb['LoadBalancerStatus'], ip=slb['Address'], addresstype=slb['AddressType'], createdate=slb['CreateTime'], networktype=slb['NetworkType'])
-            s.save()
+    try:
+        result = query_slb_info(regionid='cn-hangzhou')
+    except:
+        return HttpResponse(json.dumps({'success':False, 'message':'网络超时，调用阿里云接口失败'}), content_type="application/json") 
+    else:
+        if 'Message' in result:
+            return HttpResponse(json.dumps({'success':False, 'message':result['Message']}), content_type="application/json")
         else:
-            s = SLB.objects.get(instanceid=slb['LoadBalancerId'])
-            s.instanceid=slb['LoadBalancerId']
-            s.name=slb['LoadBalancerName']
-            s.status=slb['LoadBalancerStatus']
-            s.ip=slb['Address']
-            s.addresstype=slb['AddressType']
-            s.createdate=slb['CreateTime']
-            s.networktype=slb['NetworkType']
-            s.save()
-        slb_list.append(slb['LoadBalancerId'])    
-        print slb_list
-    for current_slb in SLB.objects.all():
-        if current_slb.instanceid not in slb_list:
-            current_slb.delete()
-    return HttpResponseRedirect(reverse('configmanager:slblist'))
+            for slb in result:
+                '''新增或更新现有SLB'''
+                if not SLB.objects.filter(instanceid=slb['LoadBalancerId']):
+                    s = SLB(instanceid=slb['LoadBalancerId'], name=slb['LoadBalancerName'], status=slb['LoadBalancerStatus'], ip=slb['Address'], addresstype=slb['AddressType'], createdate=slb['CreateTime'], networktype=slb['NetworkType'])
+                    s.save()
+                else:
+                    s = SLB.objects.get(instanceid=slb['LoadBalancerId'])
+                    s.instanceid=slb['LoadBalancerId']
+                    s.name=slb['LoadBalancerName']
+                    s.status=slb['LoadBalancerStatus']
+                    s.ip=slb['Address']
+                    s.addresstype=slb['AddressType']
+                    s.createdate=slb['CreateTime']
+                    s.networktype=slb['NetworkType']
+                    s.save()
+                slb_list.append(slb['LoadBalancerId'])    
+            for current_slb in SLB.objects.all():
+                '''删除阿里云没有的SLB'''
+                if current_slb.instanceid not in slb_list:
+                    current_slb.delete()
+            return HttpResponse(json.dumps({'success':True}), content_type="application/json")
             
         
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -745,30 +754,36 @@ def slb_rela_site(request, slb_id):
 
 
 @login_required(login_url='/login/')
-def slb_health_update(request, slb_id, redirect='yes'):
+def slb_health_update(request, slb_id):
     try:
+        '''判断SLB实例是否存在'''
         slb = get_object_or_404(SLB, pk=slb_id)
     except:
-        return render_to_response(request.META['HTTP_REFERER'], {'success':'false'})
+        return render_to_response(request.META['HTTP_REFERER'], {'success':False})
     else:
         try:
+            '''判断调用阿里云接口是否成功'''
             result = query_slb_health(LoadBalancerId=slb.instanceid)
-            print result
         except:
-            return HttpResponse(json.dumps({'success':False, 'message':''}), content_type="application/json")
-        else:    
+            return HttpResponse(json.dumps({'success':False, 'message':'网络超时，调用阿里云接口失败'}), content_type="application/json")
+        else: 
             if 'Message' in result:
+                '''判断调用阿里云是否返回报错信息'''
                 return HttpResponse(json.dumps({'success':False, 'message':result['Message']}), content_type="application/json")
             else:
+                '''无报错则开始处理返回数据'''
                 for sh in SLBhealthstatus.objects.filter(SLB_id=slb.id):
+                    '''先将该SLB下所属ECS状态更新为已移除'''
                     sh.SLBstatus = 'removed'
                     sh.save()
                 for r in result:
                     try:
+                        '''判断数据库中是否存在ECS，没有则需要先到ECS页面同步ECS信息'''
                         ecs = get_object_or_404(ECS, instanceid=r['ServerId'])
                     except:
-                        pass
+                        return HttpResponse(json.dumps({'success':False, 'message':'ECS不存在，请到ECS页面进行同步后再刷新SLB信息'}), content_type="application/json")
                     else:
+                        '''判断数据库中该SLB是否有对应的后端服务器记录，没有则增加，有则更新'''
                         if not SLBhealthstatus.objects.filter(SLB_id=slb.id, ECS_id=ecs.id):
                             sh = SLBhealthstatus(SLB_id=slb.id, ECS_id=ecs.id, SLBstatus='added', healthstatus=r['ServerHealthStatus'])
                             sh.save()
@@ -779,8 +794,7 @@ def slb_health_update(request, slb_id, redirect='yes'):
                             sh.SLBstatus='added'
                             sh.healthstatus=r['ServerHealthStatus']
                             sh.save()
-                if redirect == 'yes':
-                    return HttpResponse(json.dumps({'success':'true'}), content_type="application/json")
+                return HttpResponse(json.dumps({'success':True}), content_type="application/json")
 
 
 @login_required(login_url='/login/')
@@ -788,43 +802,49 @@ def more_slb_health_update(request, site_id):
     s = get_object_or_404(Site, pk=site_id)
     slb_id_list = s.get_slb_id_list()
     for slbid in slb_id_list:
-        slb_health_update(request, slb_id=slbid, redirect='no')
+        slb_health_update(request, slb_id=slbid)
     return HttpResponseRedirect(reverse('configmanager:configlist'))
 
 
 @login_required(login_url='/login/')
 def all_slb_health_update(request):
     for slb in SLB.objects.all():
-        slb_health_update(request, slb_id=slb.id, redirect='no')
-    return HttpResponseRedirect(reverse('configmanager:slblist'))
+        slb_health_update(request, slb_id=slb.id)
+    return HttpResponse(json.dumps({'success':True}), content_type="application/json")
+    
 
 
 @login_required(login_url='/login/')
-def remove_backend_server(request, slb_id, server_id, redirect='yes'):
+def remove_backend_server(request, slb_id, server_id):
     slb = get_object_or_404(SLB, pk=slb_id)
     slbinstanceId = slb.instanceid
     ecs = ECS.objects.get(pk=server_id)
     backendservers = []
     backendservers.append(ecs.instanceid)
     backendservers = json.dumps(backendservers)
-    r = remove_backendserver(LoadBalancerId=slbinstanceId, BackendServers=backendservers)
-    print r
-    if redirect == 'yes':
-        slb_health_update(request, slb_id=slb.id)
-        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    try:
+        r = remove_backendserver(LoadBalancerId=slbinstanceId, BackendServers=backendservers)
+    except:
+        return HttpResponse(json.dumps({'success':False, 'message':'网络超时，调用阿里云接口失败'}), content_type="application/json")
+    else:
+        if 'Message' in r:
+            return HttpResponse(json.dumps({'success':False, 'message':r['Message']}), content_type="application/json") 
+        else:
+            slb_health_update(request, slb.id)
+            return HttpResponse(json.dumps({'success':True}), content_type="application/json")
 
 
 @login_required(login_url='/login/')
 def site_remove_backend_server(request, site_id, server_id):
     s = get_object_or_404(Site, pk=site_id)
     for slb in s.slbsite_set.all():
-        remove_backend_server(request, slb_id=slb.SLB.id, server_id=server_id, redirect='no')
+        remove_backend_server(request, slb_id=slb.SLB.id, server_id=server_id)
         slb_health_update(request, slb_id=slb.SLB.id)
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
     
 
 @login_required(login_url='/login/')
-def add_backend_server(request, slb_id, server_id, redirect='yes'):
+def add_backend_server(request, slb_id, server_id):
     slb = get_object_or_404(SLB, pk=slb_id)
     slbinstanceId = slb.instanceid
     ecs = ECS.objects.get(pk=server_id)
@@ -834,21 +854,32 @@ def add_backend_server(request, slb_id, server_id, redirect='yes'):
     serverdict['Weight'] = str(100)
     serverlist.append(serverdict)
     backendservers = json.dumps(serverlist)
-    result = add_backendserver(LoadBalancerId=slbinstanceId, BackendServers=backendservers)
-    print result
-    if redirect == 'yes':
-        slb_health_update(request, slb_id=slb.id)
-        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    try:
+        result = add_backendserver(LoadBalancerId=slbinstanceId, BackendServers=backendservers)
+    except:
+        return HttpResponse(json.dumps({'success':False, 'message':'网络超时，调用阿里云接口失败'}), content_type="application/json")
+    else:
+        if 'Message' in result:
+            return HttpResponse(json.dumps({'success':False, 'message':result['Message']}), content_type="application/json")
+        else:                                                                                                                             
+            slb_health_update(request, slb.id)
+            return HttpResponse(json.dumps({'success':True}), content_type="application/json") 
 
 
 @login_required(login_url='/login/')
 def site_add_backend_server(request, site_id, server_id):
     s = get_object_or_404(Site, pk=site_id)
     for slb in s.slbsite_set.all():
-        add_backend_server(request, slb_id=slb.SLB.id, server_id=server_id, redirect='no')
+        add_backend_server(request, slb_id=slb.SLB.id, server_id=server_id)
         slb_health_update(request, slb_id=slb.SLB.id)
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
+
+@login_required(login_url='/login/') 
+def slb_part_refresh(request, slb_id):
+    slb = SLB.objects.get(pk=slb_id)
+    template = 'configmanager/slb_health_template.html'
+    return render(request, template, {"slb":slb})
 
 
 

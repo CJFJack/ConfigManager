@@ -46,7 +46,7 @@ urlpatterns = [
     url(r'^apply/(?P<apply_id>[0-9]+)/delete/$', views.apply_delete, name='applydelete'),
     url(r'^apply/(?P<pk>[0-9]+)/deploysitelist/$', views.DeploySiteView.as_view(), name='deploysitelist'),
     url(r'^slb/$', views.SLBListView.as_view(), name='slblist'),
-    url(r'^slb/allinfoupdate$', views.all_slb_info_update, name='allslbinfoupdate'),
+    url(r'^slb/allinfoupdate/$', views.all_slb_info_update, name='allslbinfoupdate'),
     url(r'^slb/(?P<pk>[0-9]+)/detail/$', views.SLBDetailView.as_view(), name='slbdetail'),
     url(r'^slb/(?P<slb_id>[0-9]+)/slbrelasite/$', views.slb_rela_site, name='slbrelasite'),
     url(r'^slb/(?P<slb_id>[0-9]+)/slbhealthupdate/$', views.slb_health_update, name='slbhealthupdate'),
@@ -56,4 +56,5 @@ urlpatterns = [
     url(r'^slb/(?P<slb_id>[0-9]+)/addbackendserver/(?P<server_id>[0-9]+)/$', views.add_backend_server, name='addbackendserver'),
     url(r'^slb/(?P<site_id>[0-9]+)/siteremovebackendserver/(?P<server_id>[0-9]+)/$', views.site_remove_backend_server, name='siteremovebackendserver'),
     url(r'^slb/(?P<site_id>[0-9]+)/siteaddbackendserver/(?P<server_id>[0-9]+)/$', views.site_add_backend_server, name='siteaddbackendserver'),
+    url(r'^slb/(?P<slb_id>[0-9]+)/partrefresh/$', views.slb_part_refresh, name='slbpartrefresh'),
 ]

@@ -13,6 +13,8 @@
 
 </head>
 <body>
+
+
 <link rel="stylesheet" type="text/css" href="/static/admin/css/base.css" />
 <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css" />
 <link rel="stylesheet" type="text/css" href="/static/admin/css/dashboard.css" />
@@ -53,14 +55,17 @@ var opts = {
             className: 'spinner', // spinner css 样式名称
             zIndex: 2e9, // spinner的z轴 (默认是2000000000)
             top: '50%', // spinner 相对父容器Top定位 单位 px
-            left: '50%'// spinner 相对父容器Left定位 单位 px             
+            left: '50%', // spinner 相对父容器Left定位 单位 px             
+            position: 'fixed',
         };
 var spinner = new Spinner(opts);
 </script>
+
 
     <!-- content -->                                                                                                              
     {% block content %}                                                                                                           
     {% endblock %}                                                                                                                
     <!-- // content --> 
+
 </body>
 </html>

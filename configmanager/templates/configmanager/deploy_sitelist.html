@@ -1,6 +1,9 @@
 {% extends 'configmanager/__base__.html' %}
 {% block title %}发布站点列表 | {% endblock %}
 {% block content %}
+
+<div id="bgDiv"></div>
+<div id="myspin">
 <h2>发布管理 > 发布站点列表</h2>
 {% if apply %}
 <table border="1">
@@ -46,25 +49,28 @@
                 </p>
             {% endfor %}
         </td>
-        <td align="right">                                                                                    
+        <td id="td_{{ site.id }}" align="right">                                                                                    
             {% for ecs in site.deploysite.get_one_slb.slbhealthstatus_set.all %}                                         
                 <p>                                                                                           
                     <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;                                        
                     <span>{% if ecs.SLBstatus == "added" %}已添加{% else %}<font color="red">已移除</font>{% endif %}</span>&nbsp;&nbsp;&nbsp;&nbsp;
                     <span>                                                                                    
-                        {% if ecs.healthstatus == "normal" %}正常&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;     
-                        {% elif ecs.healthstatus == "abnormal" %}<font color="red">异常</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        {% else %}<font color="red">正在检查</font>&nbsp;                                     
-                        {% endif %}                                                                           
+                        {% if ecs.SLBstatus == "added" %}
+                            {% if ecs.healthstatus == "normal" %}正常&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;     
+                            {% elif ecs.healthstatus == "abnormal" %}<font color="red">异常</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            {% else %}<font color="red">正在检查</font>&nbsp;                                     
+                            {% endif %}                                                                           
+                        {% else %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {% endif %}
                     </span>&nbsp;&nbsp;&nbsp;&nbsp;                                                           
                     <span>                                                                                    
-                        {% if ecs.SLBstatus == "added" %}<a href="{% url 'configmanager:siteremovebackendserver' site_id=site.id server_id=ecs.ECS_id %}">移除</a>{% endif %}
-                        {% if ecs.SLBstatus == "removed" %}<a href="{% url 'configmanager:siteaddbackendserver' site_id=site.id server_id=ecs.ECS_id %}">添加</a>{% endif %}
+                        {% if ecs.SLBstatus == "added" %}<a href="javascript:void(0)" onclick="SiteRemoveBackendServer({{ site.deploysite.id }}, {{ site.id }}, {{ ecs.ECS.id }})">移除</a>{% endif %}
+                        {% if ecs.SLBstatus == "removed" %}<a href="javascript:void(0)" onclick="SiteAddBackendServer({{ site.deploysite.id }}, {{ site.id }}, {{ ecs.ECS.id }})">添加</a>{% endif %}
                     </span>                                                                                   
                 <p/>                                                                                          
             {% endfor %}                                                                                      
         </td> 
-        <td><a href="{% url 'configmanager:moreslbhealthupdate' site.id %}">刷新</a></td> 
+        <td><a href="javascript:void(0)" onclick="MoreHealthRefresh({{ site.deploysite.id }}, {{ site.id }})">刷新</a></td> 
         <td align="right">
             {% for d in site.deploysite.deployecs_set.all %}
                 {% if d.applyproject_id == apply.id %}
@@ -104,4 +110,91 @@
 {% else %}
     <p>No deploysite are available.</p>
 {% endif %}
+</div>
+
+<script>
+$.ajaxSetup({
+    data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+});
+
+//局部刷新
+function PartialRefresh(siteid) {
+    var postUrl = "/apply/"+siteid+"/partrefresh/"
+    $.post(postUrl, function(data) {
+        $('#td_'+siteid).html(data)
+    });
+}
+
+
+//刷新SLB健康状态
+function MoreHealthRefresh(siteid, deploysiteid) {
+    var postUrl = "/slb/"+siteid+"/moreslbhealthupdate/";
+
+    target = $("#myspin").get(0);                                                                                 
+    var bgDiv = document.getElementById("bgDiv");                                                                 
+    bgDiv.style.display = "block";                                                                                
+    spinner.spin(target);  
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            PartialRefresh(deploysiteid);
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();                                                                                           
+            bgDiv.style.display = "none";  
+        },800);
+    });
+}
+
+
+
+//移除站点所属SLB后端服务器
+function SiteRemoveBackendServer(siteid, deploysiteid, serverid) {
+    var postUrl = "/slb/"+siteid+"/siteremovebackendserver/"+serverid+"/";
+
+    target = $("#myspin").get(0);                                                                                 
+    var bgDiv = document.getElementById("bgDiv");                                                                 
+    bgDiv.style.display = "block";                                                                                
+    spinner.spin(target);  
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            PartialRefresh(deploysiteid);
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();                                                                                           
+            bgDiv.style.display = "none";  
+        },300);
+    });
+}
+
+
+//添加站点所属SLB后端服务器
+function SiteAddBackendServer(siteid, deploysiteid, serverid) {
+    var postUrl = "/slb/"+siteid+"/siteaddbackendserver/"+serverid+"/";
+
+    target = $("#myspin").get(0);                                                                                 
+    var bgDiv = document.getElementById("bgDiv");                                                                 
+    bgDiv.style.display = "block";                                                                                
+    spinner.spin(target);  
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            PartialRefresh(deploysiteid);
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();                                                                                           
+            bgDiv.style.display = "none";  
+        },300);
+    });
+}
+
+</script>
+
 {% endblock %}

@@ -897,10 +897,14 @@ def slb_part_refresh(request, slb_id):
 @login_required(login_url='/login/')
 def config_part_refresh(request, site_id):
     site = Site.objects.get(pk=site_id)
-    print site
     template = 'configmanager/config_slb_template.html'
     return render(request, template, {"site":site})
 
 
+@login_required(login_url='/login/')
+def apply_part_refresh(request,site_id):
+    site = Deployitem.objects.get(pk=site_id)
+    template = 'configmanager/deploysite_template.html'
+    return render(request, template, {"site":site})
 
 

@@ -10,16 +10,8 @@
 <form action="{% url 'configmanager:ecssave' ecs.id %}" method="post">
 {% csrf_token %}
     <div>
-        <span>站点名称：</span>
-        <input type="text" name="name" value={{ ecs.name }} id="id_name"  maxlength="30">
-    </div>
-    <div>
         <label>实例ID：</label>
-        <input type="text" name="instanceid" value={{ ecs.instanceid }} id="id_instanceid"  maxlength="30">
-    </div>
-    <div>
-        <label>IP地址：</label>
-        <input type="text" name="IP" value={{ ecs.IP }} id="id_ipadd"  maxlength="30">
+        <span>{{ ecs.instanceid }}</span>
     </div>
     <div>
         <label>状态：</label>

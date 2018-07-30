@@ -12,7 +12,7 @@
     {% endif %}
     <div><h2>发布管理</h2></div>
     <div>
-        <a href=''>待发布申请</a>
+        <a href="{% url 'configmanager:undeployapplylist' %}" target="nav_right">待发布申请</a>
     </div>
     <div>
         <a href="{% url 'configmanager:applylist' %}" target="nav_right">发布申请列表</a>

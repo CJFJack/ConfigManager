@@ -14,9 +14,9 @@ class ECS(models.Model):
         (ENABLE, 'enable'),
         (DISABLE, 'disable'),
     )
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30, null=True, blank=True)
     instanceid = models.CharField(max_length=30)
-    IP = models.GenericIPAddressField(protocol='IPv4')
+    IP = models.GenericIPAddressField(protocol='IPv4', null=True, blank=True)
     status = models.CharField(
         max_length=1,
         choices=status_CHOICES,
@@ -34,7 +34,7 @@ class ECS(models.Model):
     instancestatus = models.CharField(max_length=20, null=True, blank=True)
     networktype = models.CharField(max_length=20, null=True, blank=True)
     cpu = models.CharField(max_length=5, null=True, blank=True)
-    publicipaddress = models.GenericIPAddressField(protocol='IPv4')
+    publicipaddress = models.GenericIPAddressField(protocol='IPv4', null=True, blank=True)
     osname = models.CharField(max_length=200, null=True, blank=True)
     
     def __unicode__(self):

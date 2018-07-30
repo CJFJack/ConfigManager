@@ -88,9 +88,7 @@ class ECSAddView(generic.ListView):
 @login_required(login_url='/login/')
 def ecs_save(request, ecs_id):
     ecs = get_object_or_404(ECS, pk=ecs_id)
-    ecs.name = request.POST['name']
     ecs.instanceid = request.POST['instanceid']
-    ecs.IP = request.POST['IP']
     ecs.status = request.POST['status']
     ecs.modified_user = request.user.username
     ecs.save()
@@ -122,13 +120,12 @@ def ecs_delete(request, ecs_id):
 
 @login_required(login_url='/login/')
 def ecs_add(request):
-    name = request.POST['name']                                                                                                       
-    instanceid = request.POST['instanceid']                                                                                           
-    IP = request.POST['IP']                                                                                                           
-    status = request.POST['status']                                                                                                   
-    ecs = ECS(name=name, instanceid=instanceid, IP=IP, status=status, modified_user=request.user.username)
-    ecs.save()                                                                                                                            
+    if request.POST.has_key('ecs-add'):
+        instanceid = request.POST['instanceid']                                                                                           
+        ecs = ECS(instanceid=instanceid)
+        ecs.save()                                                                                                                            
     return HttpResponseRedirect(reverse('configmanager:ecslist'))   
+        
 
 
 @login_required(login_url='/login/') 
@@ -198,7 +195,7 @@ def sync_all_ecs_info(request):
     '''删除阿里云没有的本地ecs'''
     for ecsinstanceid in ecs_local:
         if ecsinstanceid not in ecs_aliyun:
-            ecs = ECS(instanceid=ecsinstanceid)
+            ecs = get_object_or_404(ECS, instanceid=ecsinstanceid)
             ecs.delete()
     return HttpResponseRedirect(reverse('configmanager:ecslist'))
 
@@ -517,6 +514,14 @@ def config_rollback(request, confighistorydetail_id):
 class ApplyListView(generic.ListView):
     model = Apply
     template_name = 'configmanager/Apply_list.html'
+
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class UndeployApplyListView(generic.ListView):
+    template_name = 'configmanager/undeploy_apply_list.html'
+    context_object_name = 'apply_list'
+    def get_queryset(self):
+        return Apply.objects.filter(status='WD')
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')

@@ -1,4 +1,15 @@
 # ConfigManager
+### 运行环境
+    AWS-ec2 Redhat 7.4
+    Python 2.7.5
+    Django 1.11.13
+    Jinja2 2.7.2 
+    aliyun-python-sdk-cms            6.0.10     
+    aliyun-python-sdk-core           2.8.5      
+    aliyun-python-sdk-ecs            4.9.3      
+    aliyun-python-sdk-slb            3.2.6      
+    aliyuncli                        2.1.9 
+    
 ### 1. 首页
 
     展示登录用户欢迎语

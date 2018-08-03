@@ -3,11 +3,12 @@
 {% block content %}
 
 
-{% if slb_list %}
+
+
 <div id="bgDiv"></div>
 <div id="myspin">
 <h2>SLB管理 > SLB列表</h2>
-<ul class="object-tools">
+    <ul class="object-tools">
     <li>
         <a href="javascript:void(0);" onclick="AllSLBinfoUpdate()"  class="link">同步SLB基本信息</a>
     </li>
@@ -15,7 +16,7 @@
         <a href="javascript:void(0);" onclick="AllSLBHealthUpdate()" class="link">刷新所有SLB健康信息</a>
     </li>
 </ul>
-
+{% if slb_list %}
     <table border="1">
     <th align="right">ECS名称&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SLB状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;健康状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操作</th>
     <th>健康状态</th>

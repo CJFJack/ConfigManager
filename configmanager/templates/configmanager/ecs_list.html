@@ -3,7 +3,6 @@
 {% block goback %}{% url 'configmanager:index' %}{% endblock %}
 {% block content %}
 <h2>ECS管理 > ECS列表</h2>
-{% if ECS_list %}
     <ul class="object-tools">
         <li>
             <a href="{% url 'configmanager:syncallecsinfo' %}"  class="link">同步所有ECS</a>
@@ -16,6 +15,7 @@
         </li>
     </ul>
     <ul>
+{% if ECS_list %}
     <table border="1">
     <th>区域</th>
     <th>网络类型</th>

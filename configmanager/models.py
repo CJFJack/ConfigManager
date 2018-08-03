@@ -14,7 +14,7 @@ class ECS(models.Model):
         (ENABLE, 'enable'),
         (DISABLE, 'disable'),
     )
-    name = models.CharField(max_length=30, null=True, blank=True)
+    name = models.CharField(max_length=100, null=True, blank=True)
     instanceid = models.CharField(max_length=30)
     IP = models.GenericIPAddressField(protocol='IPv4', null=True, blank=True)
     status = models.CharField(

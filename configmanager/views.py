@@ -39,7 +39,8 @@ app_name = 'configmanager'
 
 @login_required(login_url='/login/')
 def index(request):
-    return render_to_response('configmanager/index.html')
+    context = {}
+    return render(request, 'configmanager/index.html', context)
 
 
 @login_required(login_url='/login/')

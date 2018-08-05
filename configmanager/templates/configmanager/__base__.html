@@ -1,44 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
+
     <title>{% block title %}{% endblock %}运维管理平台</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" type="text/css" href="/static/configmanager/css/td.css" />
     <link rel="stylesheet" type="text/css" href="/static/configmanager/css/bgDiv.css" />
 
+    <!--引用jquery cdn和bootstratp css、js-->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
     {% block head %}{% endblock %}
-    
-    <script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery/jquery-1.4.min.js"></script>
+
 
 </head>
 <body>
 
-
-<link rel="stylesheet" type="text/css" href="/static/admin/css/base.css" />
-<link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css" />
-<link rel="stylesheet" type="text/css" href="/static/admin/css/dashboard.css" />
-<link rel="stylesheet" type="text/css" href="/static/admin/css/changelists.css" />
-
-
 <script src="https://cdn.bootcss.com/spin.js/2.3.2/spin.min.js"></script>
-
-<script type="text/javascript" src="/admin/jsi18n/"></script>
-<script type="text/javascript" src="/static/admin/js/core.js"></script>
-<script type="text/javascript" src="/static/admin/js/vendor/jquery/jquery.js"></script>
-<script type="text/javascript" src="/static/admin/js/jquery.init.js"></script>
-<script type="text/javascript" src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
-<script type="text/javascript" src="/static/admin/js/actions.js"></script>
-<script type="text/javascript" src="/static/admin/js/urlify.js"></script>
-<script type="text/javascript" src="/static/admin/js/prepopulate.js"></script>
-<script type="text/javascript" src="/static/admin/js/vendor/xregexp/xregexp.js"></script>
-<script type="text/javascript" src="/static/admin/js/SelectBox.js"></script>
-<script type="text/javascript" src="/static/admin/js/SelectFilter2.js"></script>
-<script type="text/javascript" src="/static/admin/js/calendar.js"></script>
-<script type="text/javascript" src="/static/admin/js/admin/DateTimeShortcuts.js"></script>
-<script type="text/javascript" src="/static/admin/js/inlines.js"></script>
-
 <script>
+
 var opts = {
             lines: 13, // 花瓣数目
             length: 20, // 花瓣长度
@@ -61,6 +46,55 @@ var opts = {
 var spinner = new Spinner(opts);
 </script>
 
+<nav class="navbar navbar-default navbar-static-top" role="navigation">
+    <div class="container-fluid">
+    <div class="navbar-header">
+        <a class="navbar-brand" href="{% url 'configmanager:index' %}">运维管理平台</a>
+    </div>
+    <div>
+        <ul class="nav navbar-nav">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    系统管理
+                    <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                    <li role="presentation" class="dropdown-header">ECS管理</li>
+                    <li><a href="{% url 'configmanager:ecslist' %}">ECS列表</a></li>
+                    <li role="presentation" class="divider"></li>
+                    <li role="presentation" class="dropdown-header">站点管理</li>
+                    <li><a href="{% url 'configmanager:sitelist' %}">站点列表</a></li>
+                    <li><a href="{% url 'configmanager:siteadd' %}">添加站点</a></li>
+                    <li role="presentation" class="divider"></li>
+                    <li role="presentation" class="dropdown-header">SLB管理</li>
+                    <li><a href="{% url 'configmanager:slblist' %}">SLB列表</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    发布管理
+                    <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                    <li role="presentation" class="dropdown-header">配置管理</li>
+                    <li><a href="{% url 'configmanager:configlist' %}">配置修改</a></li>
+                    <li><a href="{% url 'configmanager:undeployconfiglist' %}">待生效配置</a></li>
+                    <li role="presentation" class="divider"></li>
+                    <li role="presentation" class="dropdown-header">发布申请</li>
+                    <li><a href="{% url 'configmanager:undeployapplylist' %}">待发布申请</a></li>
+                    <li><a href="{% url 'configmanager:applylist' %}">发布申请列表</a></li>
+                    <li><a href="{% url 'configmanager:applyadd' %}">创建发布申请</a></li>
+                </ul>
+            </li>
+
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="{% url 'logout' %}">退出</a></li>
+        </ul>
+        <p class="navbar-text navbar-right">{{ request.user.username }} 用户登录</p>
+    </div>
+    </div>
+</nav>
 
     <!-- content -->                                                                                                              
     {% block content %}                                                                                                           

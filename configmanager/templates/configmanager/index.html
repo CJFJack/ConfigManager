@@ -1,11 +1,3 @@
 <!DOCTYPE html>
 {% extends 'configmanager/__base__.html' %}
-{% block head %}
-<frameset rows="10%,90%">
-    <frame src="{% url 'configmanager:nav_top' %}">
-    <frameset cols="8%,92%">
-        <frame src="{% url 'configmanager:welcome' %}" name="nav_left">
-        <frame src="" name="nav_right">
-    </frameset>
-</frameset>
-{% endblock %}
+

@@ -11,6 +11,8 @@
     aliyun-python-sdk-slb            3.2.6      
     aliyuncli                        2.1.9 
     
+    pip install django WMI aliyun-python-sdk-cms aliyun-python-sdk-core aliyun-python-sdk-ecs aliyun-python-sdk-slb aliyuncli django-cors-headers django-simple-history pywin32 xlwt
+    
 ### 1. 首页
 
     展示登录用户欢迎语

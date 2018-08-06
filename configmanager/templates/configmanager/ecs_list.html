@@ -4,13 +4,14 @@
 {% block content %}
 
 
-<div class="container-fluid" id="body-div">
+<div id="bgDiv"></div>
+<div class="container-fluid" id="myspin">
 
     <div class="btn-toolbar" role="toolbar">
         <div class="btn-group">
-            <a href="{% url 'configmanager:syncallecsinfo' %}" type="button" class="btn btn-default btn-info">同步所有ECS</a>
-            <a href="{% url 'configmanager:updateallinfo' %}" type="button" class="btn btn-default btn-info">刷新所有ECS基础信息</a>
-            <a href="{% url 'configmanager:updateallmonitor' %}" type="button"  class="btn btn-default btn-info">刷新所有ECS监控数据</a>
+            <a href="javascript:void(0);" onclick="SyncAllECS()" type="button" class="btn btn-default btn-info">同步所有ECS</a>
+            <a href="javascript:void(0);" onclick="UpdateAllECSInfo()" type="button" class="btn btn-default btn-info">刷新所有ECS基础信息</a>
+            <a href="javascript:void(0);" onclick="UpdateAllECSHealth()" type="button" class="btn btn-default btn-info">刷新所有ECS监控数据</a>
          </div>
     </div>
     <br>
@@ -39,10 +40,10 @@
             </thead>
             <tbody>
                 {% for ecs in ECS_list %}
-                <tr>
+                <tr id="tr_{{ ecs.id }}" {% if ecs.status == 'N'%}class="active"{% elif 80 < ecs.recently_cpu or 80 < ecs.recently_memory or 80 < ecs.recently_diskusage %}class="danger"{% elif 70 < ecs.recently_cpu or 70 < ecs.recently_memory or 70 < ecs.recently_diskusage %}class="warning"{% endif %}>
                     <td>{{ ecs.regionId }}</td>
                     <td>{{ ecs.networktype }}</td>
-                    <td><a href="{% url 'configmanager:ecschange' ecs.id %}">{{ ecs.name }}</a></td>
+                    <td>{{ ecs.name }}</td>
                     <td>{{ ecs.instanceid }}</td>
                     <td>{{ ecs.ostype }}</td>
                     <td>{{ ecs.osname }}</td>
@@ -62,13 +63,13 @@
                         &nbsp;<a href="{% url 'configmanager:ecschange' ecs.id %}">修改</a>&nbsp;
                         &nbsp;<a href="{% url 'configmanager:ecsdelete' ecs.id %}">删除</a>&nbsp;
                         &nbsp;<a href="{% url 'configmanager:ecsenable' ecs.id %}">启用</a>&nbsp;
-                        &nbsp;<a href="{% url 'configmanager:ecsdisable' ecs.id %}">禁用</a>&nbsp;
+                        &nbsp;<a href="javascript:void(0)" onclick="ECSdisable({{ ecs.id }})">禁用</a>&nbsp;
                         &nbsp;<a href="{% url 'configmanager:updatemonitor' ecs.id %}">刷新监控数据</a>&nbsp;
                         &nbsp;<a href="{% url 'configmanager:updateinfo' ecs.id %}">刷新基础信息</a>&nbsp;
                     </td>
-                    <td><font {% if ecs.recently_cpu > 70 %}color="red"{% endif %}>{{ ecs.recently_cpu }}%</font></td>
-                    <td><font {% if ecs.recently_memory > 70 %}color="red"{% endif %}>{{ ecs.recently_memory }}%</font></td>
-                    <td><font {% if ecs.recently_diskusage > 70 %}color="red"{% endif %}>{{ ecs.recently_diskusage }}%</font></td>
+                    <td>{{ ecs.recently_cpu }}</td>
+                    <td>{{ ecs.recently_memory }}</td>
+                    <td>{{ ecs.recently_diskusage }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -78,4 +79,113 @@
     {% endif %}
     </div>
 </div>
+
+<script>
+$.ajaxSetup({
+    data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+});
+
+//局部刷新
+function PartialRefresh(ecsid) {
+    var postUrl = "/ecs/"+ecsid+"/partrefresh/"
+    $.post(postUrl, function(data) {
+        $('#tr_'+ecsid).html(data)
+    });
+}
+
+//同步所有ECS
+function SyncAllECS() {
+    var postUrl = "/ecs/syncallecsinfo/";
+
+    target = $("#myspin").get(0);
+    var bgDiv = document.getElementById("bgDiv");
+    bgDiv.style.display = "block";
+    spinner.spin(target);
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            window.location.href="/ecs/";
+            alert("操作成功！");
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();
+            bgDiv.style.display = "none";
+        },300);
+    });
+}
+
+//刷新所有ECS基础信息
+function UpdateAllECSInfo() {
+    var postUrl = "/ecs/updateallinfo/";
+
+    target = $("#myspin").get(0);
+    var bgDiv = document.getElementById("bgDiv");
+    bgDiv.style.display = "block";
+    spinner.spin(target);
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            window.location.href="/ecs/";
+            alert("操作成功！");
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();
+            bgDiv.style.display = "none";
+        },300);
+    });
+}
+
+//刷新所有ECS监控信息
+function UpdateAllECSHealth() {
+    var postUrl = "/ecs/updateallmonitor/";
+
+    target = $("#myspin").get(0);
+    var bgDiv = document.getElementById("bgDiv");
+    bgDiv.style.display = "block";
+    spinner.spin(target);
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            window.location.href="/ecs/";
+            alert("操作成功！");
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();
+            bgDiv.style.display = "none";
+        },300);
+    });
+}
+
+//禁用ECS
+function ECSdisable(ecsid) {
+    var postUrl = "/ecs/"+ecsid+"/disable/";
+
+    target = $("#myspin").get(0);
+    var bgDiv = document.getElementById("bgDiv");
+    bgDiv.style.display = "block";
+    spinner.spin(target);
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            PartialRefresh(ecsid);
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();
+            bgDiv.style.display = "none";
+        },300);
+    });
+}
+
+
+</script>
+
+
 {% endblock %}

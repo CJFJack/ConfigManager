@@ -34,7 +34,7 @@ def query_ecs_api(instanceid, metric):
 
 # 调用函数
 if __name__=='__main__':
-    result=query_ecs_api(instanceid="AY1407121019172066ee", metric="memory_usedutilization")
+    result=query_ecs_api(instanceid="i-bp11iujuip9pks1n1ue4", metric="memory_usedutilization")
     print result
 
 

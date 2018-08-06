@@ -109,7 +109,7 @@ def ecs_disable(request, ecs_id):
     ecs = get_object_or_404(ECS, pk=ecs_id)
     ecs.status = 'N'
     ecs.save()
-    return HttpResponseRedirect(reverse('configmanager:ecslist'))
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
 @login_required(login_url='/login/')
@@ -132,7 +132,8 @@ def ecs_add(request):
 @login_required(login_url='/login/') 
 def update_ecs_monitor(request, ecs_id):
     ecs = get_object_or_404(ECS, pk=ecs_id)
-    instanceid = ecs.instanceid.encode('utf-8')    
+    instanceid = ecs.instanceid.encode('utf-8')
+    print instanceid
     try:
         recently_cpu=query_ecs_api(instanceid=instanceid, metric="cpu_total")
         recently_mem=query_ecs_api(instanceid=instanceid, metric="memory_usedutilization")
@@ -152,7 +153,7 @@ def update_ecs_monitor(request, ecs_id):
 def update_allecs_monitor(request):
     for ecs in ECS.objects.all():
         update_ecs_monitor(request, ecs.id)
-    return HttpResponseRedirect(reverse('configmanager:ecslist'))
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
 @login_required(login_url='/login/')                                                                                                      
@@ -198,14 +199,14 @@ def sync_all_ecs_info(request):
         if ecsinstanceid not in ecs_aliyun:
             ecs = get_object_or_404(ECS, instanceid=ecsinstanceid)
             ecs.delete()
-    return HttpResponseRedirect(reverse('configmanager:ecslist'))
+    return HttpResponse(json.dumps({'success':True}), content_type="application/json")
 
 
 @login_required(login_url='/login/')
 def update_allecs_info(request):
     for ecs in ECS.objects.all():
         update_ecs_info(request, ecs.id)
-    return HttpResponseRedirect(reverse('configmanager:ecslist'))
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
     
@@ -912,5 +913,12 @@ def apply_part_refresh(request,site_id):
     site = Deployitem.objects.get(pk=site_id)
     template = 'configmanager/deploysite_template.html'
     return render(request, template, {"site":site})
+
+
+@login_required(login_url='/login/')
+def ecs_part_refresh(request,ecs_id):
+    ecs = get_object_or_404(ECS, pk=ecs_id)
+    template = 'configmanager/ecslist_template.html'
+    return render(request, template, {"ecs":ecs})
 
 

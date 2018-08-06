@@ -3,8 +3,6 @@
 {% block content %}
 
 
-
-
 <div id="bgDiv"></div>
 <div id="myspin">
 <h2>SLB管理 > SLB列表</h2>
@@ -48,7 +46,7 @@
                 </span><br/>
             {% endfor %}
         </td>
-        <p style="display:none" id="{{ slb.id }}">{{ slb.id }}</p>
+        <p id="{{ slb.id }}">{{ slb.id }}</p>
         <td><a href="javascript:void(0);" id="healthrefresh{{ slb.id }}" onclick="HealthRefresh({{ slb.id }})">刷新</a></td>
         <td><a href="{% url 'configmanager:slbdetail' slb.id %}">{{ slb.instanceid }}</td>
         <td>{{ slb.name }}</td>

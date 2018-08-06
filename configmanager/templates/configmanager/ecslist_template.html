@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<td>{{ ecs.regionId }}</td>
+<td>{{ ecs.networktype }}</td>
+<td>{{ ecs.name }}</td>
+<td>{{ ecs.instanceid }}</td>
+<td>{{ ecs.ostype }}</td>
+<td>{{ ecs.osname }}</td>
+<td>{{ ecs.IP }}</td>
+<td>{{ ecs.publicipaddress }}</td>
+<td>CPU:{{ ecs.cpu }}核 内存:{{ ecs.memory }}G</td>
+<td>
+    {% if ecs.status == 'Y' %}<span>启用</span>
+    {% else %}<span>禁用</span>
+    {% endif %}
+</td>
+<td>{{ ecs.instancestatus }}</td>
+<td>{{ ecs.expiredtime }}</td>
+<td>{{ ecs.modified_user }}</td>
+<td>{{ ecs.modified_time }}</td>
+<td>
+    &nbsp;<a href="{% url 'configmanager:ecschange' ecs.id %}">修改</a>&nbsp;
+    &nbsp;<a href="{% url 'configmanager:ecsdelete' ecs.id %}">删除</a>&nbsp;
+    &nbsp;<a href="{% url 'configmanager:ecsenable' ecs.id %}">启用</a>&nbsp;
+    &nbsp;<a href="{% url 'configmanager:ecsdisable' ecs.id %}">禁用</a>&nbsp;
+    &nbsp;<a href="{% url 'configmanager:updatemonitor' ecs.id %}">刷新监控数据</a>&nbsp;
+    &nbsp;<a href="{% url 'configmanager:updateinfo' ecs.id %}">刷新基础信息</a>&nbsp;
+</td>
+<td>{{ ecs.recently_cpu }}</td>
+<td>{{ ecs.recently_memory }}</td>
+<td>{{ ecs.recently_diskusage }}</td>

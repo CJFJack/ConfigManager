@@ -4,14 +4,13 @@
 {% block content %}
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-<h2>站点管理 > 添加站点</h2>
 <form action="{% url 'configmanager:siteaddmethod' %}" method="post">
 {% csrf_token %}
 <table>
     <tbody>
     <tr>
         <th>站点名称</th>
-        <td><input type="text" name="fullname" value="" id="id_fullname"  maxlength="30" style="width:200px;"></td>
+        <td><input type="text" name="fullname" value="" id="id_fullname"  maxlength="30"></td>
     </tr>
     <tr>
         <th>站点简称</th>

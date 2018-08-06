@@ -15,15 +15,16 @@
 </td>
 <td>{{ ecs.instancestatus }}</td>
 <td>{{ ecs.expiredtime }}</td>
-<td>{{ ecs.modified_user }}</td>
 <td>{{ ecs.modified_time }}</td>
 <td>
-    &nbsp;<a href="{% url 'configmanager:ecschange' ecs.id %}">修改</a>&nbsp;
-    &nbsp;<a href="{% url 'configmanager:ecsdelete' ecs.id %}">删除</a>&nbsp;
-    &nbsp;<a href="{% url 'configmanager:ecsenable' ecs.id %}">启用</a>&nbsp;
-    &nbsp;<a href="{% url 'configmanager:ecsdisable' ecs.id %}">禁用</a>&nbsp;
-    &nbsp;<a href="{% url 'configmanager:updatemonitor' ecs.id %}">刷新监控数据</a>&nbsp;
-    &nbsp;<a href="{% url 'configmanager:updateinfo' ecs.id %}">刷新基础信息</a>&nbsp;
+    <a href="{% url 'configmanager:ecsdelete' ecs.id %}">删除</a>
+    {% if ecs.status == "Y" %}
+        <a href="javascript:void(0)" onclick="ECSdisable({{ ecs.id }})">禁用</a>
+    {% else %}
+        <a href="javascript:void(0)" onclick="ECSenable({{ ecs.id }})">启用</a>
+    {% endif %}
+    <a href="{% url 'configmanager:updatemonitor' ecs.id %}">刷新监控数据</a>
+    <a href="{% url 'configmanager:updateinfo' ecs.id %}">刷新基础信息</a>
 </td>
 <td>{{ ecs.recently_cpu }}</td>
 <td>{{ ecs.recently_memory }}</td>

@@ -101,7 +101,7 @@ def ecs_enable(request, ecs_id):
     ecs = get_object_or_404(ECS, pk=ecs_id)
     ecs.status = 'Y'
     ecs.save()
-    return HttpResponseRedirect(reverse('configmanager:ecslist'))
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
 @login_required(login_url='/login/')

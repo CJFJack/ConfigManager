@@ -133,7 +133,6 @@ def ecs_add(request):
 def update_ecs_monitor(request, ecs_id):
     ecs = get_object_or_404(ECS, pk=ecs_id)
     instanceid = ecs.instanceid.encode('utf-8')
-    print instanceid
     try:
         recently_cpu=query_ecs_api(instanceid=instanceid, metric="cpu_total")
         recently_mem=query_ecs_api(instanceid=instanceid, metric="memory_usedutilization")
@@ -165,7 +164,6 @@ def update_ecs_info(request, ecs_id):
     except:
         pass
     else:
-        print result
         ecs.instancestatus = result['Status']
         ecs.IP = result['InnerIpAddress']
         ecs.publicipaddress = result['PublicIpAddress']

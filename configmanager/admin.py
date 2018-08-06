@@ -19,13 +19,9 @@ class ECSAdmin(admin.ModelAdmin):
         (None,               {'fields': ['status']}),
     ]
 
-    list_display = ('name', 'instanceid', 'IP', 'status', 'modified_user', 'modified_time') 
+    list_display = ('name', 'instanceid', 'IP', 'status', 'modified_time')
     list_filter = ['status', 'name']
     search_fields = ['name', 'IP']
-
-    def save_model(self, request, obj, form, change):
-        obj.modified_user = request.user.username
-        super(ECSAdmin, self).save_model(request, obj, form, change)
 
 
 class ConfigfileInline(admin.TabularInline):

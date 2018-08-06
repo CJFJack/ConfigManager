@@ -22,7 +22,6 @@ class ECS(models.Model):
         choices=status_CHOICES,
         default=ENABLE,
     )
-    modified_user = models.CharField(max_length=20)
     modified_time = models.DateTimeField(auto_now=True)
     recently_cpu = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     recently_memory = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)

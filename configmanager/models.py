@@ -47,7 +47,7 @@ class Site(models.Model):
         (ENABLE, 'enable'),
         (DISABLE, 'disable'),
     )
-    fullname = models.CharField(max_length=30)
+    fullname = models.CharField(max_length=50)
     shortname = models.CharField(max_length=30)
     configdirname = models.CharField(max_length=50)
     ECSlists = models.ManyToManyField(ECS)

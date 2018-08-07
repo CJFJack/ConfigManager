@@ -145,7 +145,7 @@ def update_ecs_monitor(request, ecs_id):
         ecs.recently_diskusage = recently_diskusage['Average']
         ecs.save()
 
-    return HttpResponseRedirect(reverse('configmanager:ecslist'))
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
 @login_required(login_url='/login/')
@@ -177,7 +177,7 @@ def update_ecs_info(request, ecs_id):
         ecs.cpu = result['Cpu']
         ecs.save()
 
-    return HttpResponseRedirect(reverse('configmanager:ecslist'))
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
 @login_required(login_url='/login/')

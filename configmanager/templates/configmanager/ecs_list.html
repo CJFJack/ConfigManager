@@ -39,7 +39,8 @@
             </thead>
             <tbody>
                 {% for ecs in ECS_list %}
-                <tr id="tr_{{ ecs.id }}" {% if 80 < ecs.recently_cpu or 80 < ecs.recently_memory or 80 < ecs.recently_diskusage %}class="danger"{% elif 70 < ecs.recently_cpu or 70 < ecs.recently_memory or 70 < ecs.recently_diskusage %}class="warning"{% endif %}>
+                <div id="tr_{{ ecs.id }}">
+                <tr {% if 80 < ecs.recently_cpu or 80 < ecs.recently_memory or 80 < ecs.recently_diskusage %}class="danger"{% elif 70 < ecs.recently_cpu or 70 < ecs.recently_memory or 70 < ecs.recently_diskusage %}class="warning"{% endif %}>
                     <td>{{ ecs.regionId }}</td>
                     <td>{{ ecs.networktype }}</td>
                     <td>{{ ecs.name }}</td>
@@ -58,19 +59,20 @@
                     <td>{{ ecs.expiredtime }}</td>
                     <td>{{ ecs.modified_time }}</td>
                     <td>
-                        <a href="{% url 'configmanager:ecsdelete' ecs.id %}">删除</a>
+                        <a type="button" class="btn btn-danger" href="{% url 'configmanager:ecsdelete' ecs.id %}">删除</a>
                         {% if ecs.status == "Y" %}
-                            <a href="javascript:void(0)" onclick="ECSdisable({{ ecs.id }})">禁用</a>
+                            <a type="button" class="btn btn-warning" href="javascript:void(0)" onclick="ECSdisable({{ ecs.id }})">禁用</a>
                         {% else %}
-                            <a href="javascript:void(0)" onclick="ECSenable({{ ecs.id }})">启用</a>
+                            <a type="button" class="btn btn-success" href="javascript:void(0)" onclick="ECSenable({{ ecs.id }})">启用</a>
                         {% endif %}
-                        <a href="{% url 'configmanager:updatemonitor' ecs.id %}">刷新监控数据</a>
-                        <a href="{% url 'configmanager:updateinfo' ecs.id %}">刷新基础信息</a>
+                        <a type="button" class="btn btn-info" href="javascript:void(0)" onclick="UpdateECSMonitor({{ ecs.id }})">刷新监控数据</a>
+                        <a type="button" class="btn btn-info" href="javascript:void(0)" onclick="UpdateECSInfo({{ ecs.id }})">刷新基础信息</a>
                     </td>
                     <td>{{ ecs.recently_cpu }}</td>
                     <td>{{ ecs.recently_memory }}</td>
                     <td>{{ ecs.recently_diskusage }}</td>
                 </tr>
+                </div>
                 {% endfor %}
             </tbody>
         </table>
@@ -187,6 +189,50 @@ function ECSdisable(ecsid) {
 //启用ECS
 function ECSenable(ecsid) {
     var postUrl = "/ecs/"+ecsid+"/enable/";
+
+    target = $("#myspin").get(0);
+    var bgDiv = document.getElementById("bgDiv");
+    bgDiv.style.display = "block";
+    spinner.spin(target);
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            PartialRefresh(ecsid);
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();
+            bgDiv.style.display = "none";
+        },300);
+    });
+}
+
+//刷新ECS监控数据
+function UpdateECSMonitor(ecsid) {
+    var postUrl = "/ecs/"+ecsid+"/updatemonitor/";
+
+    target = $("#myspin").get(0);
+    var bgDiv = document.getElementById("bgDiv");
+    bgDiv.style.display = "block";
+    spinner.spin(target);
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            PartialRefresh(ecsid);
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();
+            bgDiv.style.display = "none";
+        },300);
+    });
+}
+
+//刷新ECS基础数据
+function UpdateECSInfo(ecsid) {
+    var postUrl = "/ecs/"+ecsid+"/updateinfo/";
 
     target = $("#myspin").get(0);
     var bgDiv = document.getElementById("bgDiv");

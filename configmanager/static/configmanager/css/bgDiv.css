@@ -1,9 +1,9 @@
 #bgDiv {
     display: none;
     position: fixed;
-    width:100%;
-    margin : -20px -20px -20px 0px;
-    height:100%;
+    width:200%;
+    margin : -200px -200px -20px 0px;
+    height:200%;
     background-color: #909090;
     filter:progid:DXImageTransform.Microsoft.Alpha(style=3,opacity=25,finishOpacity=75);
     opacity: 0.3;

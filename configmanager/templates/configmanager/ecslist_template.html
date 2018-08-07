@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<tr {% if 80 < ecs.recently_cpu or 80 < ecs.recently_memory or 80 < ecs.recently_diskusage %}class="danger"{% elif 70 < ecs.recently_cpu or 70 < ecs.recently_memory or 70 < ecs.recently_diskusage %}class="warning"{% endif %}>
+
     <td>{{ ecs.regionId }}</td>
     <td>{{ ecs.networktype }}</td>
     <td>{{ ecs.name }}</td>
@@ -17,6 +17,9 @@
     <td>{{ ecs.instancestatus }}</td>
     <td>{{ ecs.expiredtime }}</td>
     <td>{{ ecs.modified_time }}</td>
+    <td>{{ ecs.recently_cpu }}</td>
+    <td>{{ ecs.recently_memory }}</td>
+    <td>{{ ecs.recently_diskusage }}</td>
     <td>
         <a type="button" class="btn btn-danger" href="{% url 'configmanager:ecsdelete' ecs.id %}">删除</a>
         {% if ecs.status == "Y" %}
@@ -24,10 +27,6 @@
         {% else %}
             <a type="button" class="btn btn-success" href="javascript:void(0)" onclick="ECSenable({{ ecs.id }})">启用</a>
         {% endif %}
-        <a type="button" class="btn btn-info" href="javascript:void(0)' onclick="UpdateECSMonitor({{ ecs.id }})" %}">刷新监控数据</a>
-        <a type="button" class="btn btn-info" href="javascript:void(0)' onclick="UpdateECSInfo({{ ecs.id }})" %}">刷新基础信息</a>
+        <a type="button" class="btn btn-info" href="javascript:void(0)" onclick="UpdateECSMonitor({{ ecs.id }})">刷新监控数据</a>
+        <a type="button" class="btn btn-success" href="javascript:void(0)" onclick="UpdateECSInfo({{ ecs.id }})">刷新基础信息</a>
     </td>
-    <td>{{ ecs.recently_cpu }}</td>
-    <td>{{ ecs.recently_memory }}</td>
-    <td>{{ ecs.recently_diskusage }}</td>
-</tr>

@@ -47,60 +47,62 @@ var opts = {
 var spinner = new Spinner(opts);
 </script>
 
-<nav class="navbar navbar-static-top navbar-inverse" role="navigation">
-	<div class="container-fluid">
-	<div class="navbar-header">
-		<button type="button" class="navbar-toggle" data-toggle="collapse"
-				data-target="#example-navbar-collapse">
-			<span class="sr-only">切换导航</span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-		</button>
-		<a class="navbar-brand" href="#">运维管理平台</a>
-	</div>
-	<div class="collapse navbar-collapse" id="example-navbar-collapse">
-		<ul class="nav navbar-nav">
-			<li class="dropdown">
-				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-					系统管理 <b class="caret"></b>
-				</a>
-				<ul class="dropdown-menu">
-					<li role="presentation" class="dropdown-header">ECS管理</li>
-                    <li><a href="{% url 'configmanager:ecslist' %}">ECS列表</a></li>
-                    <li role="presentation" class="divider"></li>
-                    <li role="presentation" class="dropdown-header">站点管理</li>
-                    <li><a href="{% url 'configmanager:sitelist' %}">站点列表</a></li>
-                    <li><a href="{% url 'configmanager:siteadd' %}">添加站点</a></li>
-                    <li role="presentation" class="divider"></li>
-                    <li role="presentation" class="dropdown-header">SLB管理</li>
-                    <li><a href="{% url 'configmanager:slblist' %}">SLB列表</a></li>
-				</ul>
-			</li>
-			<li class="dropdown">
-				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-					发布管理 <b class="caret"></b>
-				</a>
-				<ul class="dropdown-menu">
-					<li role="presentation" class="dropdown-header">配置管理</li>
-                    <li><a href="{% url 'configmanager:configlist' %}">配置修改</a></li>
-                    <li><a href="{% url 'configmanager:undeployconfiglist' %}">待生效配置</a></li>
-                    <li role="presentation" class="divider"></li>
-                    <li role="presentation" class="dropdown-header">发布申请</li>
-                    <li><a href="{% url 'configmanager:undeployapplylist' %}">待发布申请</a></li>
-                    <li><a href="{% url 'configmanager:applylist' %}">发布申请列表</a></li>
-                    <li><a href="{% url 'configmanager:applyadd' %}">创建发布申请</a></li>
-				</ul>
-			</li>
-		</ul>
-	</div>
-	</div>
-</nav>
 
+<div class="container-fluid">
+	<nav class="navbar navbar-static-top navbar-inverse" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">运维管理平台</a>
+			</div>
+			<div class="collapse navbar-collapse" id="example-navbar-collapse">
+				<ul class="nav navbar-nav">
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+							系统管理 <b class="caret"></b>
+						</a>
+						<ul class="dropdown-menu">
+							<li role="presentation" class="dropdown-header">ECS管理</li>
+							<li><a href="{% url 'configmanager:ecslist' %}">ECS列表</a></li>
+							<li role="presentation" class="divider"></li>
+							<li role="presentation" class="dropdown-header">站点管理</li>
+							<li><a href="{% url 'configmanager:sitelist' %}">站点列表</a></li>
+							<li><a href="{% url 'configmanager:siteadd' %}">添加站点</a></li>
+							<li role="presentation" class="divider"></li>
+							<li role="presentation" class="dropdown-header">站点族管理</li>
+							<li><a href="{% url 'configmanager:racelist' %}">站点族列表</a></li>
+							<li role="presentation" class="divider"></li>
+							<li role="presentation" class="dropdown-header">SLB管理</li>
+							<li><a href="{% url 'configmanager:slblist' %}">SLB列表</a></li>
+						</ul>
+					</li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+							发布管理 <b class="caret"></b>
+						</a>
+						<ul class="dropdown-menu">
+							<li role="presentation" class="dropdown-header">配置管理</li>
+							<li><a href="{% url 'configmanager:configlist' %}">配置修改</a></li>
+							<li><a href="{% url 'configmanager:undeployconfiglist' %}">待生效配置</a></li>
+							<li role="presentation" class="divider"></li>
+							<li role="presentation" class="dropdown-header">发布申请</li>
+							<li><a href="{% url 'configmanager:undeployapplylist' %}">待发布申请</a></li>
+							<li><a href="{% url 'configmanager:applylist' %}">发布申请列表</a></li>
+							<li><a href="{% url 'configmanager:applyadd' %}">创建发布申请</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+</div>
+
+<div id="bgDiv"></div>
+
+<div class="container-fluid" id="myspin">
     <!-- content -->                                                                                                              
     {% block content %}                                                                                                           
     {% endblock %}                                                                                                                
     <!-- // content --> 
-
+</div>
 </body>
 </html>

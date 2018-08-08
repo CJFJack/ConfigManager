@@ -236,6 +236,7 @@ class SiteChangeView(generic.DetailView):
         context['ECSs'] = ECSs
         context['Sites'] = Sites
         context['Siteraces'] = Siteraces
+        print context
         return context
 
 
@@ -258,7 +259,8 @@ def add_relation_ecs(request, site):
 
 @login_required(login_url='/login/')
 def add_relation_site(request, site):
-
+    L = []
+    randomraceid=int(round(time() * 1000))
     if not site.exist_or_not_in_siterace():                                                                                              
         for key in request.POST:                                                                                                      
             try:                                                                                                                      
@@ -268,14 +270,10 @@ def add_relation_site(request, site):
             else:                                                                                                                     
                 raceid = relation_s.get_raceid()                                                                                      
                 if raceid != 0:                                                                                                       
-                    site.siterace_set.create(raceid=raceid)                                                                              
-                                                                                                                                      
-    if not site.exist_or_not_in_siterace():                                                                                              
-        raceid=int(round(time() * 1000))                                                                                              
-        site.siterace_set.create(raceid=raceid)                                                                                          
-                                                                                                                                      
-    L = []                                                                                                                            
-    raceid=int(round(time() * 1000))                                                                                                  
+                    site.siterace_set.create(raceid=raceid)
+                else:
+                    site.siterace_set.create(raceid=randomraceid)
+
     if site.exist_or_not_in_siterace():                                                                                                  
         for key in request.POST:                                                                                                      
             try:                                                                                                                      
@@ -390,6 +388,36 @@ def site_delete(request, site_id):
     site = get_object_or_404(Site, pk=site_id)
     site.delete()
     return HttpResponseRedirect(reverse('configmanager:sitelist'))
+
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class RaceListView(generic.ListView):
+    template_name = 'configmanager/race_list.html'
+    context_object_name = 'Race_list'
+
+    def get_queryset(self):
+        return Siterace.objects.order_by('raceid')
+
+
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class RaceEditView(generic.DetailView):
+    model = Siterace
+    template_name = 'configmanager/race_edit.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(RaceEditView, self).get_context_data(**kwargs)
+        site_list = Site.objects.all()
+        context['site_list'] = site_list
+        return context
+
+
+@login_required(login_url='/login/')
+def race_add(request):
+    L = []
+    randomraceid = int(round(time() * 1000))
+    siterace = Siterace(raceid=randomraceid)
+    siterace.save()
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')

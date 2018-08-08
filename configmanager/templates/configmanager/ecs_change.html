@@ -3,7 +3,7 @@
 {% block goback %}{% url 'configmanager:ecslist' %}{% endblock %}
 {% block content %}
 
-<h3>{{ ecs.name }}</h3>
+<h4>{{ ecs.name }}</h4>
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 

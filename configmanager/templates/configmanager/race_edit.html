@@ -1,0 +1,30 @@
+{% extends 'configmanager/__base__.html' %}
+{% block content %}
+
+<form class="form-horizontal" role="form" action="" method="post">
+{% csrf_token %}
+    <div class="form-group">
+        <label for="raceid" class="col-sm-1 control-label">站点族编号</label>
+        <div class="col-sm-5">
+            <p class="form-control-static" id="raceid">{{ siterace.raceid }}</p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">关联站点</label>
+        <div class="checkbox">
+            <label>
+                {% for s in site_list %}
+                    <input type="checkbox" name="{{ s.fullname }}" value="{{ s.fullname }}" />{{ s.fullname }}<br>
+                {% endfor %}
+             </label>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-1 col-sm-12">
+            <button type="submit" class="btn btn-primary" name="save" >添加</button>
+            <button type="submit" class="btn btn-default" name="back" >返回</button>
+        </div>
+    </div>
+</form>
+
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'configmanager/__base__.html' %}
+{% block content %}
+
+<div class="btn-group">
+        <a href="javascript:void(0);" onclick="RaceAdd()" type="button" class="btn btn-default btn-primary">新增站点族</a>
+</div><br>
+{% if Race_list %}
+    <table class="table table-hover table-condensed">
+        <thead>
+            <th>站点族编号</th>
+            <th>关联站点</th>
+            <th>操作</th>
+        </thead>
+        <tbody>
+            {% for race in Race_list %}
+                <tr>
+                    <td>{{ race.raceid }}</td>
+                    <td>{{ race.siteid }}</td>
+                    <td>
+                        <a href="{% url 'configmanager:raceedit' race.id %}" type="button" class="btn btn-info">编辑</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No Race available</p>
+{% endif %}
+
+<script>
+    $.ajaxSetup({
+    data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+    });
+
+    // 新增站点族
+    function RaceAdd() {
+    var postUrl = "/race/add/";
+
+    target = $("#myspin").get(0);
+    var bgDiv = document.getElementById("bgDiv");
+    bgDiv.style.display = "block";
+    spinner.spin(target);
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            window.location.href="/race/";
+            alert("操作成功！");
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();
+            bgDiv.style.display = "none";
+        },300);
+    });
+}
+
+</script>
+{% endblock %}

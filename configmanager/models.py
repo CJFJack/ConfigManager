@@ -40,6 +40,13 @@ class ECS(models.Model):
         return self.name
 
 
+class Siterace(models.Model):
+    raceid = models.BigIntegerField()
+
+    def __unicode__(self):
+        return str(self.raceid)
+
+
 class Site(models.Model):
     ENABLE = 'Y'
     DISABLE = 'N'
@@ -62,6 +69,7 @@ class Site(models.Model):
         choices=status_CHOICES,
         default=ENABLE,
     )
+    siterace = models.ForeignKey(Siterace, on_delete=models.CASCADE, null=True, blank=True)
     
     def get_ECSlists_list(self):
         list = []
@@ -317,14 +325,6 @@ class DeployECS(models.Model):
     def __unicode__(self):
         return self.ECS.name
 
-
-class Siterace(models.Model):
-    raceid = models.BigIntegerField()
-    siteid = models.ForeignKey(Site, on_delete=models.CASCADE)
-    
-    def __unicode__(self):
-        return str(self.raceid)
-    
 
 class Person(models.Model):
     name = models.CharField(max_length=128)

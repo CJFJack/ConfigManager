@@ -34,6 +34,7 @@ urlpatterns = [
     url(r'^race/$', views.RaceListView.as_view(), name='racelist'),
     url(r'^race/add/$', views.race_add, name='raceadd'),
     url(r'^race/(?P<pk>[0-9]+)/change$', views.RaceEditView.as_view(), name='raceedit'),
+    url(r'^race/(?P<race_id>[0-9]+)/siterelations$', views.race_site_relation, name='racesiterelation'),
     url(r'^config/$', views.ConfigListView.as_view(), name='configlist'),
     url(r'^undeployconfig/$', views.UndeployConfigListView.as_view(), name='undeployconfiglist'),
     url(r'^config/(?P<pk>[0-9]+)/change/$', views.ConfigChangeView.as_view(), name='configchange'),

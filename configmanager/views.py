@@ -259,31 +259,13 @@ def add_relation_ecs(request, site):
 
 @login_required(login_url='/login/')
 def add_relation_site(request, site):
-    L = []
-    randomraceid=int(round(time() * 1000))
-    if not site.exist_or_not_in_siterace():                                                                                              
-        for key in request.POST:                                                                                                      
-            try:                                                                                                                      
-                relation_s = Site.objects.get(fullname=key)                                                                           
-            except:                                                                                                                   
-                pass                                                                                                                  
-            else:                                                                                                                     
-                raceid = relation_s.get_raceid()                                                                                      
-                if raceid != 0:                                                                                                       
-                    site.siterace_set.create(raceid=raceid)
-                else:
-                    site.siterace_set.create(raceid=randomraceid)
-
-    if site.exist_or_not_in_siterace():                                                                                                  
-        for key in request.POST:                                                                                                      
-            try:                                                                                                                      
-                relation_s = Site.objects.get(fullname=key)                                                                           
-            except:                                                                                                                   
-                pass                                                                                                                  
-            else:                                                                                                                     
-                if not relation_s.exist_or_not_in_siterace():                                                                         
-                    raceid = site.get_raceid()                                                                                           
-                    relation_s.siterace_set.create(raceid=raceid)
+    try:
+        siterace = get_object_or_404(Siterace, pk=request.POST['optionsRadios'])
+    except:
+        pass
+    else:
+        site.siterace_id = siterace.id
+    site.save()
 
 
 @login_required(login_url='/login/')
@@ -364,7 +346,10 @@ def site_add(request):
         fullname = request.POST['fullname']
         shortname = request.POST['shortname']
         configdirname = request.POST['configdirname']
-        port = request.POST['port']
+        if request.POST['port']:
+            port = request.POST['port']
+        else:
+            port = 0
         testpage = request.POST['testpage']
         status = request.POST['status']
         devcharge = request.POST['devcharge']
@@ -372,9 +357,10 @@ def site_add(request):
         modified_user = request.user.username
         site = Site(fullname=fullname, shortname=shortname, configdirname=configdirname, port=port, testpage=testpage, status=status, devcharge=devcharge, deployattention=deployattention, modified_user=modified_user)
         site.save()
-        '''添加关联ECS、所属站点族'''
-        add_relation_site(request, site)
+        '''添加关联ECS'''
         add_relation_ecs(request, site)
+        '''添加所属站点族'''
+        add_relation_site(request, site)
         '''新增或删除关联配置文件'''
         post_filenames_list = []
         post_filenames = request.POST['configfiles']
@@ -419,6 +405,25 @@ def race_add(request):
     siterace.save()
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
+
+@login_required(login_url='/login/')
+def race_site_relation(request, race_id):
+    if request.POST.has_key('save'):
+        race = Siterace.objects.get(pk=race_id)
+        for site in race.site_set.all():
+            site.siterace_id = 0
+            site.save()
+        race.alias = request.POST['alias']
+        race.save()
+        for key in request.POST:
+            try:
+                site = Site.objects.get(fullname=key)
+            except:
+                pass
+            else:
+                site.siterace_id=race_id
+                site.save()
+    return HttpResponseRedirect(reverse('configmanager:racelist'))
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class ConfigListView(generic.ListView):

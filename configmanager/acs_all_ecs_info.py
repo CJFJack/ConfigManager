@@ -3,10 +3,19 @@
 
 from aliyunsdkcore import client
 from aliyunsdkecs.request.v20140526 import DescribeInstancesRequest
-from aliyunsdkcore.profile import region_provider
-import json
+import json, os
+import ConfigParser
 
-clt = client.AcsClient('LTAI8oND4553ucVr','0zI2YXs2LKKPT57e7P4qVQ4Nzo1BhD','cn-hangzhou')
+config = ConfigParser.RawConfigParser()
+currentdir = os.path.abspath('.')
+configFilePath = os.path.join(currentdir, 'configmanager', 'acs_config', 'acs_config.ini')
+print configFilePath
+config.read(configFilePath)
+AccessKeyId = config.get('acs', 'AccessKeyId')
+AccessKeySecret = config.get('acs', 'AccessKeySecret')
+RegionId = config.get('acs', 'RegionId')
+
+clt = client.AcsClient(AccessKeyId, AccessKeySecret, RegionId)
 
 
 def query_all_ecs(RegionId):
@@ -27,6 +36,6 @@ def query_all_ecs(RegionId):
         list.append(instance['InstanceId'])
     return list
 
-if __name__=='__main__':
-    result = query_all_ecs(RegionId='cn-hangzhou')
-    print result
+# if __name__=='__main__':
+#     result = query_all_ecs(RegionId='cn-hangzhou')
+#     print result

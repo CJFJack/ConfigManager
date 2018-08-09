@@ -41,10 +41,11 @@ class ECS(models.Model):
 
 
 class Siterace(models.Model):
-    raceid = models.BigIntegerField()
+    raceid = models.PositiveSmallIntegerField()
+    alias = models.CharField(max_length=50, null=True, blank=True)
 
     def __unicode__(self):
-        return str(self.raceid)
+        return str(self.alias)
 
 
 class Site(models.Model):
@@ -58,7 +59,7 @@ class Site(models.Model):
     shortname = models.CharField(max_length=30)
     configdirname = models.CharField(max_length=50)
     ECSlists = models.ManyToManyField(ECS)
-    port = models.PositiveSmallIntegerField(null=True)
+    port = models.PositiveSmallIntegerField(null=True, blank=True)
     testpage = models.CharField(max_length=30, null=True)
     devcharge = models.CharField(max_length=10, null=True, blank=True)
     deployattention = models.TextField(null=True, blank=True)
@@ -69,7 +70,7 @@ class Site(models.Model):
         choices=status_CHOICES,
         default=ENABLE,
     )
-    siterace = models.ForeignKey(Siterace, on_delete=models.CASCADE, null=True, blank=True)
+    siterace = models.ForeignKey(Siterace, on_delete=models.CASCADE, default=0)
     
     def get_ECSlists_list(self):
         list = []

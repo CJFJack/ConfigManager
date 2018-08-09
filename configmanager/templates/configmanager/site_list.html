@@ -2,37 +2,41 @@
 {% block content %}
 
 {% if Site_list %}
-    <ul>
-    <table border="1">
-    <th>站点名称</th>
-    <th>站点简称</th>
-    <th>配置文件夹名称</th>
-    <th>配置文件名称</th>
-    <th>所属ECS</th>
-    <th>操作</th>
-    {% for site in Site_list %}
-    <tr>
-        <td><a href="{% url 'configmanager:sitechange' site.id %}">{{ site.fullname }}</a></td>
-        <td>{{ site.shortname }}</td>
-        <td>{{ site.configdirname }}</td>
-        <td>
-            {% for configfile in site.configfile_set.all %}
-                <span>{{ configfile.filename }}</span><br />
+    <table class="table table-hover">
+        <thead>
+            <th>站点名称</th>
+            <th>站点简称</th>
+            <th>配置文件夹名称</th>
+            <th>配置文件名称</th>
+            <th>所属ECS</th>
+            <th>操作</th>
+        </thead>
+        <tbody>
+            {% for site in Site_list %}
+                <tr>
+                    <td><a href="{% url 'configmanager:sitechange' site.id %}">{{ site.fullname }}</a></td>
+                    <td>{{ site.shortname }}</td>
+                    <td>{{ site.configdirname }}</td>
+                    <td>
+                        {% for configfile in site.configfile_set.all %}
+                            <span>{{ configfile.filename }}</span><br />
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for ecs in site.ECSlists.all %}
+                            <span>{{ ecs }}</span><br />
+                        {% endfor %}
+                    </td>
+                    <td>
+                        &nbsp;<a class="btn btn-primary" href="{% url 'configmanager:sitechange' site.id %}">修改</a>&nbsp;
+                        &nbsp;<a class="btn btn-danger" href="{% url 'configmanager:sitedelete' site.id %}">删除</a>&nbsp;
+                    </td>
+                </tr>
             {% endfor %}
-        </td>
-        <td>
-            {% for ecs in site.ECSlists.all %}
-                <span>{{ ecs }}</span><br />
-            {% endfor %}
-        </td>
-        <td>
-            &nbsp;<a href="{% url 'configmanager:sitechange' site.id %}">修改</a>&nbsp;
-            &nbsp;<a href="{% url 'configmanager:sitedelete' site.id %}">删除</a>&nbsp;
-        </td>
-    </tr>
-    {% endfor %}
-    </ul>
+        </tbody>
+    </table>
 {% else %}
     <p>No Sites are available.</p>
 {% endif %}
+
 {% endblock %}

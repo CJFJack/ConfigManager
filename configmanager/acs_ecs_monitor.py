@@ -4,9 +4,20 @@
 from aliyunsdkcore import client
 from aliyunsdkcms.request.v20180308 import QueryMetricLastRequest
 from datetime import datetime, timedelta
-import json
+import json, os
+import ConfigParser
 
-clt = client.AcsClient('LTAI8oND4553ucVr','0zI2YXs2LKKPT57e7P4qVQ4Nzo1BhD','cn-hangzhou')
+config = ConfigParser.RawConfigParser()
+currentdir = os.path.abspath('.')
+configFilePath = os.path.join(currentdir, 'configmanager', 'acs_config', 'acs_config.ini')
+print configFilePath
+config.read(configFilePath)
+AccessKeyId = config.get('acs', 'AccessKeyId')
+AccessKeySecret = config.get('acs', 'AccessKeySecret')
+RegionId = config.get('acs', 'RegionId')
+
+clt = client.AcsClient(AccessKeyId, AccessKeySecret, RegionId)
+
 now=datetime.now()
 starttime=str(now+timedelta(minutes = -5))
 endtime=str(now)

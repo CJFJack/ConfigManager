@@ -3,15 +3,12 @@
 {% block content %}
 
 
-<div id="bgDiv"></div>
-<div id="myspin">
-<h2>SLB管理 > SLB列表</h2>
     <ul class="object-tools">
     <li>
-        <a href="javascript:void(0);" onclick="AllSLBinfoUpdate()"  class="link">同步SLB基本信息</a>
+        <a href="javascript:void(0);" onclick="AllSLBinfoUpdate()" >同步SLB基本信息</a>
     </li>
     <li>
-        <a href="javascript:void(0);" onclick="AllSLBHealthUpdate()" class="link">刷新所有SLB健康信息</a>
+        <a href="javascript:void(0);" onclick="AllSLBHealthUpdate()">刷新所有SLB健康信息</a>
     </li>
 </ul>
 {% if slb_list %}
@@ -66,7 +63,7 @@
 {% else %}
     <p>No SLB are available.</p>
 {% endif %}
-</div>
+
 
 
 

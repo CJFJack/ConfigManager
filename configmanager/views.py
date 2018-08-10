@@ -116,7 +116,7 @@ def ecs_disable(request, ecs_id):
 def ecs_delete(request, ecs_id):
     ecs = get_object_or_404(ECS, pk=ecs_id)
     ecs.delete()
-    return HttpResponseRedirect(reverse('configmanager:ecslist'))
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
 @login_required(login_url='/login/')
@@ -314,10 +314,6 @@ def site_save(request, site_id):
  
         '''增加关联站点'''
         add_relation_site(request, s)
-      
-        '''若站点没有任何关联站点族，则将其从站点族中删除'''
-        if not s.get_relation_sites():
-            s.siterace_set.all().delete()
 
         return HttpResponseRedirect(reverse('configmanager:sitelist'))
 
@@ -373,7 +369,7 @@ def site_add(request):
 def site_delete(request, site_id):
     site = get_object_or_404(Site, pk=site_id)
     site.delete()
-    return HttpResponseRedirect(reverse('configmanager:sitelist'))
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -949,7 +945,19 @@ def apply_part_refresh(request,site_id):
 @login_required(login_url='/login/')
 def ecs_part_refresh(request,ecs_id):
     ecs = get_object_or_404(ECS, pk=ecs_id)
-    template = 'configmanager/ecslist_template.html'
+    template = 'configmanager/ecslist_part_template.html'
     return render(request, template, {"ecs":ecs})
 
 
+@login_required(login_url='/login/')
+def ecs_whole_refresh(request):
+    ECS_list = ECS.objects.order_by('name')
+    template = 'configmanager/ecslist_whole_template.html'
+    return render(request, template, {'ECS_list': ECS_list})
+
+
+@login_required(login_url='/login/')
+def site_whole_refresh(request):
+    Site_list = Site.objects.order_by('fullname')
+    template = 'configmanager/sitelist_whole_template.html'
+    return render(request, template, {'Site_list': Site_list})

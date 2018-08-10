@@ -1,10 +1,4 @@
-{% extends 'configmanager/__base__.html' %}
-{% block content %}
-
-<div style="display:none;" id="alert-div" class="alert"></div>
-
-<div id="whole">
-    {% if Site_list %}
+{% if Site_list %}
         <table class="table table-hover">
             <thead>
                 <th>站点名称</th>
@@ -45,52 +39,3 @@
     {% else %}
         <p>No Sites are available.</p>
     {% endif %}
-</div>
-
-
-<script>
-$.ajaxSetup({
-    data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
-});
-
-//主体刷新
-function WholePartialRefresh() {
-    var postUrl = "/site/wholerefresh/"
-    $.post(postUrl, function(data) {
-        $('#whole').html(data)
-    });
-}
-
-//删除Site
-function Sitedelete(siteid, sitename) {
-    var postUrl = "/site/"+siteid+"/delete/";
-    var sitename = sitename
-
-    target = $("#myspin").get(0);
-    var bgDiv = document.getElementById("bgDiv");
-    bgDiv.style.display = "block";
-    spinner.spin(target);
-
-    $.post(postUrl, function (data) {
-        if (data.success) {
-            WholePartialRefresh();
-            $("#alert-div").css("display", "");
-            $("#alert-div").attr("class","alert alert-danger");
-            $("#alert-div").text("成功！删除站点 "+sitename);
-            setTimeout(function () {
-                $("#alert-div").fadeOut();
-            },30000);
-        } else {
-            alert("操作失败！"+data.message);
-        }
-        setTimeout(function () {
-            spinner.spin();
-            bgDiv.style.display = "none";
-        },300);
-    });
-}
-
-</script>
-
-
-{% endblock %}

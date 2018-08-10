@@ -1,6 +1,7 @@
 {% extends 'configmanager/__base__.html' %}
 {% block content %}
 
+<div style="display:none;" id="alert-div" class="alert"></div>
 
 <div class="btn-toolbar container-fluid" role="toolbar">
     <div class="btn-group">
@@ -9,7 +10,7 @@
         <a href="javascript:void(0);" onclick="UpdateAllECSHealth()" type="button" class="btn btn-default btn-success">刷新所有ECS监控数据</a>
      </div>
 </div><br>
-<div class="container-fluid">
+<div id="whole" class="container-fluid">
     {% if ECS_list %}
         <table class="table table-hover table-condensed">
             <thead>
@@ -55,14 +56,14 @@
                         <td>{{ ecs.recently_memory }}</td>
                         <td>{{ ecs.recently_diskusage }}</td>
                         <td>
-                            <a type="button" class="btn btn-danger" href="{% url 'configmanager:ecsdelete' ecs.id %}">删除</a>
+                            <a type="button" class="btn btn-danger" href="javascript:void(0)" onclick="ECSdelete('{{ ecs.id }}', '{{ ecs.name }}')">删除</a>
                             {% if ecs.status == "Y" %}
-                                <a type="button" class="btn btn-warning" href="javascript:void(0)" onclick="ECSdisable({{ ecs.id }})">禁用</a>
+                                <a type="button" class="btn btn-warning" href="javascript:void(0)" onclick="ECSdisable('{{ ecs.id }}', '{{ ecs.name }}')">禁用</a>
                             {% else %}
-                                <a type="button" class="btn btn-success" href="javascript:void(0)" onclick="ECSenable({{ ecs.id }})">启用</a>
+                                <a type="button" class="btn btn-success" href="javascript:void(0)" onclick="ECSenable('{{ ecs.id }}', '{{ ecs.name }}')">启用</a>
                             {% endif %}
-                            <a type="button" class="btn btn-info" href="javascript:void(0)" onclick="UpdateECSMonitor({{ ecs.id }})">刷新监控数据</a>
-                            <a type="button" class="btn btn-success" href="javascript:void(0)" onclick="UpdateECSInfo({{ ecs.id }})">刷新基础信息</a>
+                            <a type="button" class="btn btn-info" href="javascript:void(0)" onclick="UpdateECSMonitor('{{ ecs.id }}', '{{ ecs.name }}')">刷新监控数据</a>
+                            <a type="button" class="btn btn-success" href="javascript:void(0)" onclick="UpdateECSInfo('{{ ecs.id }}', '{{ ecs.name }}')">刷新基础信息</a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -87,6 +88,14 @@ function PartialRefresh(ecsid) {
     });
 }
 
+//主体刷新
+function WholePartialRefresh() {
+    var postUrl = "/ecs/wholerefresh/"
+    $.post(postUrl, function(data) {
+        $('#whole').html(data)
+    });
+}
+
 //同步所有ECS
 function SyncAllECS() {
     var postUrl = "/ecs/syncallecsinfo/";
@@ -98,8 +107,13 @@ function SyncAllECS() {
 
     $.post(postUrl, function (data) {
         if (data.success) {
-            window.location.href="/ecs/";
-            alert("操作成功！");
+            WholePartialRefresh();
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！同步所有ECS");
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
         } else {
             alert("操作失败！"+data.message);
         }
@@ -121,8 +135,13 @@ function UpdateAllECSInfo() {
 
     $.post(postUrl, function (data) {
         if (data.success) {
-            window.location.href="/ecs/";
-            alert("操作成功！");
+            WholePartialRefresh();
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！刷新所有ECS基础信息");
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
         } else {
             alert("操作失败！"+data.message);
         }
@@ -144,8 +163,13 @@ function UpdateAllECSHealth() {
 
     $.post(postUrl, function (data) {
         if (data.success) {
-            window.location.href="/ecs/";
-            alert("操作成功！");
+            WholePartialRefresh();
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！刷新所有ECS监控信息");
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
         } else {
             alert("操作失败！"+data.message);
         }
@@ -157,8 +181,9 @@ function UpdateAllECSHealth() {
 }
 
 //禁用ECS
-function ECSdisable(ecsid) {
+function ECSdisable(ecsid, ecsname) {
     var postUrl = "/ecs/"+ecsid+"/disable/";
+    var ecsname = ecsname
 
     target = $("#myspin").get(0);
     var bgDiv = document.getElementById("bgDiv");
@@ -168,6 +193,12 @@ function ECSdisable(ecsid) {
     $.post(postUrl, function (data) {
         if (data.success) {
             PartialRefresh(ecsid);
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-warning");
+            $("#alert-div").text("成功！禁用ECS "+ecsname);
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
         } else {
             alert("操作失败！"+data.message);
         }
@@ -179,8 +210,9 @@ function ECSdisable(ecsid) {
 }
 
 //启用ECS
-function ECSenable(ecsid) {
+function ECSenable(ecsid, ecsname) {
     var postUrl = "/ecs/"+ecsid+"/enable/";
+    var ecsname = ecsname
 
     target = $("#myspin").get(0);
     var bgDiv = document.getElementById("bgDiv");
@@ -190,6 +222,41 @@ function ECSenable(ecsid) {
     $.post(postUrl, function (data) {
         if (data.success) {
             PartialRefresh(ecsid);
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！启用ECS "+ecsname);
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();
+            bgDiv.style.display = "none";
+        },300);
+    });
+}
+
+//删除ECS
+function ECSdelete(ecsid, ecsname) {
+    var postUrl = "/ecs/"+ecsid+"/delete/";
+    var ecsname = ecsname
+
+    target = $("#myspin").get(0);
+    var bgDiv = document.getElementById("bgDiv");
+    bgDiv.style.display = "block";
+    spinner.spin(target);
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            WholePartialRefresh();
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-danger");
+            $("#alert-div").text("成功！删除ECS "+ecsname);
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },30000);
         } else {
             alert("操作失败！"+data.message);
         }
@@ -201,8 +268,9 @@ function ECSenable(ecsid) {
 }
 
 //刷新ECS监控数据
-function UpdateECSMonitor(ecsid) {
+function UpdateECSMonitor(ecsid, ecsname) {
     var postUrl = "/ecs/"+ecsid+"/updatemonitor/";
+    var ecsname = ecsname
 
     target = $("#myspin").get(0);
     var bgDiv = document.getElementById("bgDiv");
@@ -212,6 +280,12 @@ function UpdateECSMonitor(ecsid) {
     $.post(postUrl, function (data) {
         if (data.success) {
             PartialRefresh(ecsid);
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！刷新监控数据 "+ecsname);
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
         } else {
             alert("操作失败！"+data.message);
         }
@@ -223,8 +297,9 @@ function UpdateECSMonitor(ecsid) {
 }
 
 //刷新ECS基础数据
-function UpdateECSInfo(ecsid) {
+function UpdateECSInfo(ecsid, ecsname) {
     var postUrl = "/ecs/"+ecsid+"/updateinfo/";
+    var ecsname = ecsname
 
     target = $("#myspin").get(0);
     var bgDiv = document.getElementById("bgDiv");
@@ -234,6 +309,12 @@ function UpdateECSInfo(ecsid) {
     $.post(postUrl, function (data) {
         if (data.success) {
             PartialRefresh(ecsid);
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！刷新基础数据 "+ecsname);
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
         } else {
             alert("操作失败！"+data.message);
         }

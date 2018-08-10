@@ -1,7 +1,13 @@
 {% extends 'configmanager/__base__.html' %}
 {% block content %}
 
-<div style="display:none;" id="alert-div" class="alert"></div>
+<div {% if messages %}style="display:;"{% else %}style="display:none;"{% endif %} id="alert-div" class="alert alert-info">
+    {% if messages %}
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    {% endif %}
+</div>
 
 <div id="whole">
     {% if Site_list %}

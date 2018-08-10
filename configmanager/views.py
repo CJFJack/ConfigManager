@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from django.views.decorators import csrf
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from time import time
 from datetime import datetime
-from re import split
 from django.core.files import File
-from django.contrib.auth.decorators import user_passes_test
 import os, json
+from django.contrib import messages
 
 # Create your views here.
 
@@ -241,12 +239,6 @@ class SiteChangeView(generic.DetailView):
 
 
 @login_required(login_url='/login/')
-def site_change(request, site_id):
-    s = get_object_or_404(Site, pk=site_id)
-    f = ';'.join([f.filename for f in s.configfile_set.all()]) 
-    return render(request, 'configmanager/site_change.html', {'site': s, 'configfiles': f})
-
-@login_required(login_url='/login/')
 def add_relation_ecs(request, site):
 
     for key in request.POST:
@@ -314,11 +306,13 @@ def site_save(request, site_id):
  
         '''增加关联站点'''
         add_relation_site(request, s)
-
+        Message = '成功！修改站点 '+s.fullname
+        print Message
+        messages.success(request, Message)
         return HttpResponseRedirect(reverse('configmanager:sitelist'))
 
     if request.POST.has_key('site-goback'):
-        return HttpResponseRedirect(reverse('configmanager:sitelist')) 
+        return HttpResponseRedirect(reverse('configmanager:sitelist'))
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')

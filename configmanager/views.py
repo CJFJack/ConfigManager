@@ -306,9 +306,7 @@ def site_save(request, site_id):
  
         '''增加关联站点'''
         add_relation_site(request, s)
-        Message = '成功！修改站点 '+s.fullname
-        print Message
-        messages.success(request, Message)
+        messages.success(request, "成功！修改站点 <a href=\'/site/"+str(site_id)+"/change/\'>"+s.fullname+"</a>")
         return HttpResponseRedirect(reverse('configmanager:sitelist'))
 
     if request.POST.has_key('site-goback'):
@@ -420,6 +418,7 @@ def race_site_relation(request, race_id):
             else:
                 site.siterace_id=race_id
                 site.save()
+    messages.success(request, "成功！修改站点族 <a href=\'/race/" + str(race_id) + "/change/\'>" + race.alias + "</a>")
     return HttpResponseRedirect(reverse('configmanager:racelist'))
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')

@@ -1,43 +1,41 @@
 {% extends 'configmanager/__base__.html' %}
-{% block title %}修改配置 | {% endblock %}
 {% block content %}
-<h2>配置管理 > 修改配置</h2>
 
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
-<form action="{% url 'configmanager:configsave' configfile.id %}" method="post">
-{% csrf_token %}
-<table>
-    <tbody>
-        <tr>
-            <th>站点名</th>
-            <td>{{ configfile.site }}</td>
-        </tr>
-        <tr>
-            <th>配置文件名</th>
-            <td>{{ configfile.filename }}</td>
-        </tr>
-        <tr>
-            <th>修改站点</th>
-            <td>
-                <span><input type="checkbox" name="{{ configfile.site }}" value="{{ configfile.site }}"  checked />{{ configfile.site }}</span>
-                {% if configfile.site.get_relation_sites %}
-                    {% for rs in configfile.site.get_relation_sites %}
-                        <span><input type="checkbox" name="{{ rs }}" value="{{ rs }}" {% if "log" not in configfile.filename %}checked{% endif %} />{{ rs }}</span>
-                    {% endfor %}
-                {% endif %}
-            </td>
-        </tr>
-        <tr>
-            <th>配置内容</th>
-            <td>
-                <textarea name="configcontent" id="id_configcontent" rows="30" cols="150">{{ configfile.content }}</textarea>
-            </td>
-        </tr>
-    </tbody>
-</table>
-<input type="submit" name="config-save"value="保存" />
-<input type="submit" name="config-goback" value="返回" />
-</form>
+<div id="whole" class="container-fluid table-responsive">
+    <form class="form-horizontal" role="form" action="{% url 'configmanager:configsave' configfile.id %}" method="post">
+        {% csrf_token %}
+        <table class="table table-hover">
+            <tbody>
+                <tr>
+                    <th>站点名</th>
+                    <td>{{ configfile.site }}</td>
+                </tr>
+                <tr>
+                    <th>配置文件名</th>
+                    <td>{{ configfile.filename }}</td>
+                </tr>
+                <tr>
+                    <th>修改站点</th>
+                    <td>
+                        <span><input type="checkbox" name="{{ configfile.site }}" value="{{ configfile.site }}"  checked />{{ configfile.site }}</span>
+                        {% if configfile.site.get_relation_sites %}
+                            {% for rs in configfile.site.get_relation_sites %}
+                                <span><input type="checkbox" name="{{ rs }}" value="{{ rs }}" {% if "log" not in configfile.filename %}checked{% endif %} />{{ rs }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>配置内容</th>
+                    <td>
+                        <textarea name="configcontent" id="id_configcontent" rows="30" cols="150">{{ configfile.content }}</textarea>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <input class="btn btn-primary" type="submit" name="config-save" value="保存" />
+        <input class="btn btn-default" type="submit" name="config-goback" value="返回" />
+    </form>
+</div>
 
 {% endblock %}

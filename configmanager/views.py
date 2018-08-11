@@ -418,7 +418,7 @@ def race_site_relation(request, race_id):
             else:
                 site.siterace_id=race_id
                 site.save()
-    messages.success(request, "成功！修改站点族 <a href=\'/race/" + str(race_id) + "/change/\'>" + race.alias + "</a>")
+        messages.success(request, "成功！修改 <a href=\'/race/" + str(race_id) + "/change/\'>" + race.alias + "</a>")
     return HttpResponseRedirect(reverse('configmanager:racelist'))
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -839,8 +839,11 @@ def more_slb_health_update(request, site_id):
         return HttpResponse(json.dumps({'success':False, 'message':'没有此站点，请重新刷新页面'}), content_type="application/json")
     else:
         slb_id_list = s.get_slb_id_list()
-        for slbid in slb_id_list:
-            slb_health_update(request, slb_id=slbid)
+        if 0 not in slb_id_list:
+            for slbid in slb_id_list:
+                slb_health_update(request, slb_id=slbid)
+        else:
+            return HttpResponse(json.dumps({'success': False, 'message': '该站点没有关联SLB，请到SLB管理页面进行关联'}),content_type="application/json")
         return HttpResponse(json.dumps({'success':True}), content_type="application/json")
 
 

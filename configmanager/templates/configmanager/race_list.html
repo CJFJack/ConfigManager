@@ -1,26 +1,14 @@
 {% extends 'configmanager/__base__.html' %}
 {% block content %}
 
-<div {% if messages %}style="display:;"{% else %}style="display:none;"{% endif %} id="message-div" class="alert alert-info">
-    <button type="button" class="close" data-dismiss="alert"
-                    aria-hidden="true">
-                &times;
-    </button>
-    {% if messages %}
-        {% for message in messages %}
-            {% autoescape off %}
-                {{ message }}
-            {% endautoescape %}
-        {% endfor %}
-    {% endif %}
-</div>
 
 <div style="display:none;" id="alert-div" class="alert"></div>
 
 <div class="btn-group">
         <a href="javascript:void(0);" onclick="RaceAdd()" type="button" class="btn btn-default btn-success">新增站点族</a>
-</div><br>
-<div id="whole" class="table-responsive">
+</div><br><br>
+
+<div id="whole" class="container-fluid table-responsive">
     {% if Race_list %}
         <table class="table table-striped table-hover table-condensed">
             <thead>

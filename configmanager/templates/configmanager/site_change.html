@@ -4,7 +4,7 @@
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 <form class="form-horizontal" role="form" action="{% url 'configmanager:sitesave' site.id %}" method="post">
-{% csrf_token %}
+    {% csrf_token %}
     <table class="table table-hover">
         <tbody>
         <tr>

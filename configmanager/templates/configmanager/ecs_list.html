@@ -1,7 +1,6 @@
 {% extends 'configmanager/__base__.html' %}
 {% block content %}
 
-<div style="display:none;" id="alert-div" class="alert"></div>
 
 <div class="btn-toolbar container-fluid" role="toolbar">
     <div class="btn-group">
@@ -10,6 +9,7 @@
         <a href="javascript:void(0);" onclick="UpdateAllECSHealth()" type="button" class="btn btn-default btn-success">刷新所有ECS监控数据</a>
      </div>
 </div><br>
+
 <div id="whole" class="container-fluid">
     {% if ECS_list %}
         <table class="table table-striped table-hover table-condensed">

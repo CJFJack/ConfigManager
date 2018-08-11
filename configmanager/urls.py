@@ -73,4 +73,5 @@ urlpatterns = [
     url(r'^slb/(?P<site_id>[0-9]+)/siteremovebackendserver/(?P<server_id>[0-9]+)/$', views.site_remove_backend_server, name='siteremovebackendserver'),
     url(r'^slb/(?P<site_id>[0-9]+)/siteaddbackendserver/(?P<server_id>[0-9]+)/$', views.site_add_backend_server, name='siteaddbackendserver'),
     url(r'^slb/(?P<slb_id>[0-9]+)/partrefresh/$', views.slb_part_refresh, name='slbpartrefresh'),
+    url(r'^slb/wholerefresh/$', views.slb_whole_refresh, name='slbwholerefresh'),
 ]

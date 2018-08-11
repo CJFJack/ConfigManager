@@ -2,6 +2,7 @@
 {% block title %}SLB列表 | {% endblock %}
 {% block content %}
 
+<div style="display:none;" id="alert-div" class="alert"></div>
 
 <div class="btn-toolbar container-fluid" role="toolbar">
     <div class="btn-group">
@@ -9,65 +10,64 @@
         <a href="javascript:void(0);" onclick="AllSLBHealthUpdate()" type="button" class="btn btn-default btn-success" >刷新所有SLB健康信息</a>
      </div>
 </div><br>
-<div class="container-fluid">
-{% if slb_list %}
-    <table class="table table-striped table-hover table-condensed table-responsive">
-        <thead>
-            <th class="text-right">ECS名称&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SLB状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;健康状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操作&nbsp;&nbsp;&nbsp;</th>
-            <th>健康状态</th>
-            <th>实例ID</th>
-            <th>实例别名</th>
-            <th>实例状态</th>
-            <th>实例IP</th>
-            <th>IP地址类型</th>
-            <th>网络类型</th>
-            <th>创建时间</th>
-            <th>站点列表</th>
-        </thead>
-        <tbody>
-            {% for slb in slb_list %}
-            <tr>
-                <td align="right" id="td_{{ slb.id }}">
-                    {% for ecs in slb.slbhealthstatus_set.all %}
-                        <p>
-                            <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
-                            {% if ecs.SLBstatus == "added" %}<span class="text-info">已添加</span>{% else %}<span class="text-danger">已移除</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
-                            {% if ecs.SLBstatus == "added" %}
-                                {% if ecs.healthstatus == "normal" %}<span class="text-success">正常</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                {% elif ecs.healthstatus == "abnormal" %}<span class="text-danger">异常</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                {% else %}<span class="text-warning">正在检查</span>&nbsp;
+<div id="whole" class="container-fluid">
+    {% if slb_list %}
+        <table class="table table-striped table-hover table-condensed">
+            <thead>
+                <th class="text-right">ECS名称&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SLB状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;健康状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操作&nbsp;&nbsp;&nbsp;</th>
+                <th>健康状态</th>
+                <th>实例ID</th>
+                <th>实例别名</th>
+                <th>实例状态</th>
+                <th>实例IP</th>
+                <th>IP地址类型</th>
+                <th>网络类型</th>
+                <th>创建时间</th>
+                <th>站点列表</th>
+            </thead>
+            <tbody>
+                {% for slb in slb_list %}
+                <tr>
+                    <td align="right" id="td_{{ slb.id }}">
+                        {% for ecs in slb.slbhealthstatus_set.all %}
+                            <p>
+                                <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                {% if ecs.SLBstatus == "added" %}<span class="text-info">已添加</span>{% else %}<span class="text-danger">已移除</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
+                                {% if ecs.SLBstatus == "added" %}
+                                    {% if ecs.healthstatus == "normal" %}<span class="text-success">正常</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    {% elif ecs.healthstatus == "abnormal" %}<span class="text-danger">异常</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    {% else %}<span class="text-warning">正在检查</span>&nbsp;
+                                    {% endif %}
+                                {% else %}
+                                    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 {% endif %}
-                            {% else %}
-                                <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                            {% endif %}
-                            <span>
-                                {% if ecs.SLBstatus == "added" %}<a href="javascript:void(0);" id="removebackendserver{{ slb.id }}" onclick="RemoveBackendServer({{ slb.id }},{{ ecs.ECS_id }})" type="button" class="btn btn-sm btn-warning" >移除</a>{% endif %}
-                                {% if ecs.SLBstatus == "removed" %}<a href="javascript:void(0);" id="addbackendserver{{ slb.id }}" onclick="AddBackendServer({{ slb.id }},{{ ecs.ECS_id }})" type="button" class="btn btn-sm btn-success" >添加</a>{% endif %}
-                            </span>
-                         </p>
-                    {% endfor %}
-                </td>
-                <td><a href="javascript:void(0);" id="healthrefresh{{ slb.id }}" onclick="HealthRefresh({{ slb.id }})" type="button" class="btn btn-sm btn-info" >刷新</a></td>
-                <td><a href="{% url 'configmanager:slbdetail' slb.id %}">{{ slb.instanceid }}</td>
-                <td>{{ slb.name }}</td>
-                <td>{{ slb.status }}</td>
-                <td>{{ slb.ip }}</td>
-                <td>{% if slb.addresstype == "internet" %}公网{% endif %}{% if slb.addresstype == "intranet" %}私网{% endif %}</td>
-                <td>{% if slb.networktype == "classic" %}经典网络{% endif %}{% if slb.networktype == "vpc" %}专有网络{% endif %}</td>
-                <td>{{ slb.createdate }}</td>
-                <td>
-                    {% for site in slb.slbsite_set.all %}
-                        <p>{{ site }}</p>
-                    {% endfor %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>No SLB are available.</p>
-{% endif %}
-
+                                <span>
+                                    {% if ecs.SLBstatus == "added" %}<a href="javascript:void(0);" id="removebackendserver{{ slb.id }}" onclick="RemoveBackendServer('{{ slb.id }}', '{{ slb.instanceid }}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')" type="button" class="btn btn-sm btn-warning" >移除</a>{% endif %}
+                                    {% if ecs.SLBstatus == "removed" %}<a href="javascript:void(0);" id="addbackendserver{{ slb.id }}" onclick="AddBackendServer('{{ slb.id }}', '{{ slb.instanceid }}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')" type="button" class="btn btn-sm btn-success" >添加</a>{% endif %}
+                                </span>
+                             </p>
+                        {% endfor %}
+                    </td>
+                    <td><a href="javascript:void(0);" id="healthrefresh{{ slb.id }}" onclick="HealthRefresh('{{ slb.id }}', '{{ slb.instanceid }}')" type="button" class="btn btn-sm btn-info" >刷新</a></td>
+                    <td><a href="{% url 'configmanager:slbdetail' slb.id %}">{{ slb.instanceid }}</td>
+                    <td>{{ slb.name }}</td>
+                    <td>{{ slb.status }}</td>
+                    <td>{{ slb.ip }}</td>
+                    <td>{% if slb.addresstype == "internet" %}公网{% endif %}{% if slb.addresstype == "intranet" %}私网{% endif %}</td>
+                    <td>{% if slb.networktype == "classic" %}经典网络{% endif %}{% if slb.networktype == "vpc" %}专有网络{% endif %}</td>
+                    <td>{{ slb.createdate }}</td>
+                    <td>
+                        {% for site in slb.slbsite_set.all %}
+                            <p>{{ site }}</p>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No SLB are available.</p>
+    {% endif %}
 </div>
 
 
@@ -85,9 +85,16 @@ function PartialRefresh(slbid) {
     });
 }
 
+//主体刷新
+function WholePartialRefresh() {
+    var postUrl = "/slb/wholerefresh/"
+    $.post(postUrl, function(data) {
+        $('#whole').html(data)
+    });
+}
 
 //刷新SLB健康状态
-function HealthRefresh(slbid) {
+function HealthRefresh(slbid, slbinstanceid) {
     var postUrl = "/slb/"+slbid+"/slbhealthupdate/";
 
     target = $("#myspin").get(0);                                                                                 
@@ -98,6 +105,12 @@ function HealthRefresh(slbid) {
     $.post(postUrl, function (data) {
         if (data.success) {
             PartialRefresh(slbid);
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！刷新SLB 实例ID："+slbinstanceid+" 健康状态");
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
         } else {
             alert("操作失败！"+data.message);
         }
@@ -110,7 +123,7 @@ function HealthRefresh(slbid) {
 
 
 //移除SLB后端服务器
-function RemoveBackendServer(slbid, serverid) {
+function RemoveBackendServer(slbid, slbinstanceid, serverid, servername) {
     var postUrl = "/slb/"+slbid+"/removebackendserver/"+serverid+"/";
 
     target = $("#myspin").get(0);                                                                                 
@@ -120,7 +133,13 @@ function RemoveBackendServer(slbid, serverid) {
 
     $.post(postUrl, function (data) {
         if (data.success) {
-            PartialRefresh(slbid)
+            PartialRefresh(slbid);
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！移除SLB 实例ID："+slbinstanceid+" 后端服务器 "+servername);
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
         } else {
             alert("操作失败！"+data.message);
         }
@@ -133,7 +152,7 @@ function RemoveBackendServer(slbid, serverid) {
 
 
 //添加SLb后端服务器
-function AddBackendServer(slbid, serverid) {                                                                                           
+function AddBackendServer(slbid, slbinstanceid, serverid, servername) {
     var postUrl = "/slb/"+slbid+"/addbackendserver/"+serverid+"/";                                                                     
                                                                                                                                           
     target = $("#myspin").get(0);                                                                                                         
@@ -143,7 +162,13 @@ function AddBackendServer(slbid, serverid) {
                                                                                                                                           
     $.post(postUrl, function (data) {                                                                                                     
         if (data.success) {                                                                                                               
-            PartialRefresh(slbid)
+            PartialRefresh(slbid);
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！添加SLB 实例ID："+slbinstanceid+" 后端服务器 "+servername);
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
         } else {                                                                                                                          
             alert("操作失败！"+data.message);                                                                                             
         }                                                                                                                                 
@@ -155,7 +180,7 @@ function AddBackendServer(slbid, serverid) {
 } 
 
 
-//同步SLB基本信息
+//同步所有SLB基本信息
 function AllSLBinfoUpdate() {                                                                                           
     var postUrl = "/slb/allinfoupdate/";
                                                                                                                                           
@@ -166,8 +191,13 @@ function AllSLBinfoUpdate() {
                                                                                                                                           
     $.post(postUrl, function (data) {                                                                                                     
         if (data.success) {                                                                                                               
-            alert("操作成功！");
-            window.location.href="/slb/"
+            WholePartialRefresh();
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！同步所有SLB基本信息");
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
         } else {                                                                                                                          
             alert("操作失败！"+data.message);                                                                                             
         }                                                                                                                                 
@@ -190,8 +220,13 @@ function AllSLBHealthUpdate() {
                                                                                                                                           
     $.post(postUrl, function (data) {                                                                                                     
         if (data.success) {                                                                                                               
-            alert("操作成功！");
-            window.location.href="/slb/"
+            WholePartialRefresh();
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！刷新所有SLB健康信息");
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
         } else {                                                                                                                          
             alert("操作失败！"+data.message);                                                                                             
         }                                                                                                                                 

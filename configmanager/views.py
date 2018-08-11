@@ -924,8 +924,15 @@ def site_add_backend_server(request, site_id, server_id):
 @login_required(login_url='/login/') 
 def slb_part_refresh(request, slb_id):
     slb = SLB.objects.get(pk=slb_id)
-    template = 'configmanager/slb_health_template.html'
+    template = 'configmanager/slbpart_health_template.html'
     return render(request, template, {"slb":slb})
+
+
+@login_required(login_url='/login/')
+def slb_whole_refresh(request):
+    slb_list = SLB.objects.all()
+    template = 'configmanager/slbwhole_health_template.html'
+    return render(request, template, {"slb_list":slb_list})
 
 
 @login_required(login_url='/login/')

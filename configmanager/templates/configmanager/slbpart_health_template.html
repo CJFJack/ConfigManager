@@ -11,8 +11,8 @@
                                 <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                             {% endif %}
                             <span>
-                                {% if ecs.SLBstatus == "added" %}<a href="javascript:void(0);" id="removebackendserver{{ slb.id }}" onclick="RemoveBackendServer({{ slb.id }},{{ ecs.ECS_id }})" type="button" class="btn btn-sm btn-warning" >移除</a>{% endif %}
-                                {% if ecs.SLBstatus == "removed" %}<a href="javascript:void(0);" id="addbackendserver{{ slb.id }}" onclick="AddBackendServer({{ slb.id }},{{ ecs.ECS_id }})" type="button" class="btn btn-sm btn-success" >添加</a>{% endif %}
+                                {% if ecs.SLBstatus == "added" %}<a href="javascript:void(0);" id="removebackendserver{{ slb.id }}" onclick="RemoveBackendServer('{{ slb.id }}', '{{ slb.instanceid }}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')" type="button" class="btn btn-sm btn-warning" >移除</a>{% endif %}
+                                {% if ecs.SLBstatus == "removed" %}<a href="javascript:void(0);" id="addbackendserver{{ slb.id }}" onclick="AddBackendServer('{{ slb.id }}', '{{ slb.instanceid }}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')" type="button" class="btn btn-sm btn-success" >添加</a>{% endif %}
                             </span>
                          </p>
                     {% endfor %}

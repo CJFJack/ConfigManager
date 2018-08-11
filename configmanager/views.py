@@ -397,6 +397,13 @@ def race_add(request):
 
 
 @login_required(login_url='/login/')
+def race_delete(request, race_id):
+    siterace = Siterace(id=race_id)
+    siterace.delete()
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+
+@login_required(login_url='/login/')
 def race_site_relation(request, race_id):
     if request.POST.has_key('save'):
         race = Siterace.objects.get(pk=race_id)
@@ -955,3 +962,10 @@ def site_whole_refresh(request):
     Site_list = Site.objects.order_by('fullname')
     template = 'configmanager/sitelist_whole_template.html'
     return render(request, template, {'Site_list': Site_list})
+
+
+@login_required(login_url='/login/')
+def race_wholerefresh(request):
+    Race_list = Siterace.objects.order_by('raceid')
+    template = 'configmanager/racelist_whole_template.html'
+    return render(request, template, {'Race_list': Race_list})

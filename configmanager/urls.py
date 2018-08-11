@@ -36,8 +36,10 @@ urlpatterns = [
     # 站点族页面
     url(r'^race/$', views.RaceListView.as_view(), name='racelist'),
     url(r'^race/add/$', views.race_add, name='raceadd'),
-    url(r'^race/(?P<pk>[0-9]+)/change$', views.RaceEditView.as_view(), name='raceedit'),
-    url(r'^race/(?P<race_id>[0-9]+)/siterelations$', views.race_site_relation, name='racesiterelation'),
+    url(r'^race/(?P<race_id>[0-9]+)/delete/$', views.race_delete, name='racedelete'),
+    url(r'^race/(?P<pk>[0-9]+)/change/$', views.RaceEditView.as_view(), name='raceedit'),
+    url(r'^race/(?P<race_id>[0-9]+)/siterelations/$', views.race_site_relation, name='racesiterelation'),
+    url(r'^race/wholerefresh/$', views.race_wholerefresh, name='racewholerefresh'),
     # Config页面
     url(r'^config/$', views.ConfigListView.as_view(), name='configlist'),
     url(r'^undeployconfig/$', views.UndeployConfigListView.as_view(), name='undeployconfiglist'),

@@ -5,97 +5,99 @@
 
 <form class="form-horizontal" role="form" action="{% url 'configmanager:sitesave' site.id %}" method="post">
     {% csrf_token %}
-    <table class="table table-hover">
-        <tbody>
-        <tr>
-            <th>站点名称</th>
-            <td><input type="text" name="fullname" value="{{ site.fullname }}" id="id_fullname"  maxlength="30"></td>
-        </tr>
-        <tr>
-            <th>站点简称</th>
-            <td><input type="text" name="shortname" value="{{ site.shortname }}" id="id_shortname"  maxlength="30"></td>
-        </tr>
-        <tr>
-            <th>配置文件夹名称</th>
-            <td><input type="text" name="configdirname" value="{{ site.configdirname }}" id="id_configdirname"  maxlength="30"></td>
-        </tr>
-        <tr>
-            <th>配置文件</th>
-            <td><input type="text" name="configfiles" value="{{ site.get_configfiles }}" id="id_configfiles"  maxlength="300" style="width:350px;"></td>
-        </tr>
-        <tr>
-            <th>所属ECS</th>
-            <td>
-                {% for ecs in ECSs %}
-                    <input type="checkbox" name="{{ ecs.name }}" value="{{ ecs.name }}" {% if ecs in site.ECSlists.all %}checked="checked"{% endif %} />{{ ecs.name }}
-                {% endfor %}
-            </td>
-        </tr>
-        <tr>
-            <th>所属站点族</th>
-            <td>
-                {% for race in Siteraces %}
-                    <input type="radio" name="optionsRadios" id="optionsRadios{{ race.id }}" value="{{ race.id }}" {% if site in race.site_set.all %}checked{% endif %} >{{ race.alias }}<br>
-                {% endfor %}
-            </td>
-        </tr>
-        <tr>
-            <th>端口号</th>
-            <td><input type="text" name="port" value="{{ site.port }}" id="id_port"  maxlength="30"></td>
-        </tr>
-        <tr>
-            <th>测试页面</th>
-            <td><input type="text" name="testpage" value="{{ site.testpage }}" id="id_testpage" maxlength="30"></td>
-        </tr>
-        <tr>
-            <th>状态</th>
-            <td>
-                <select name="status" id="id_status" >
-                    <option value="Y" {% if site.status == 'Y' %}selected{% endif %}>启用</option>
-                    <option value="N" {% if site.status == 'N' %}selected{% endif %}>禁用</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <th>研发负责人</th>
-            <td>
-                <input type="text" name="devcharge" value="{{ site.devcharge }}" id="id_devcharge" maxlength="30">
-            </td>
-        </tr>
-        <tr>
-            <th>发布注意事项</th>
-            <td>
-                <textarea name="deployattention" id="id_deployattention" rows="15" cols="60">{{ site.deployattention }}</textarea>
-            </td>
-        </tr>
-        <tr>
-            <th>修改人</th>
-            <td><span>{{ site.modified_user }}</span></td>
-        </tr>
-        <tr>
-            <th>修改时间</th>
-            <td><span>{{ site.modified_time }}</span></td>
-        </tr>
-        <tr>
-            <th>配置修改记录</th>
-            <td>
-            <table>
-                <th>配置文件名</th>
-                <th>配置修改人</th>
-                <th>配置修改时间</th>
-                {% for c in site.configfile_set.all %}
-                <tr>
-                    <td>{{ c.filename }}</td>
-                    <td>{{ c.modified_user }}</td>
-                    <td>{{ c.modified_time }}</td>
-                    <br />
-                </tr>
-                {% endfor %}
-            </table>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <tbody>
+            <tr>
+                <th>站点名称</th>
+                <td><input type="text" name="fullname" value="{{ site.fullname }}" id="id_fullname"  maxlength="30"></td>
+            </tr>
+            <tr>
+                <th>站点简称</th>
+                <td><input type="text" name="shortname" value="{{ site.shortname }}" id="id_shortname"  maxlength="30"></td>
+            </tr>
+            <tr>
+                <th>配置文件夹名称</th>
+                <td><input type="text" name="configdirname" value="{{ site.configdirname }}" id="id_configdirname"  maxlength="30"></td>
+            </tr>
+            <tr>
+                <th>配置文件</th>
+                <td><input type="text" name="configfiles" value="{{ site.get_configfiles }}" id="id_configfiles"  maxlength="300" style="width:350px;"></td>
+            </tr>
+            <tr>
+                <th>所属ECS</th>
+                <td>
+                    {% for ecs in ECSs %}
+                        <input type="checkbox" name="{{ ecs.name }}" value="{{ ecs.name }}" {% if ecs in site.ECSlists.all %}checked="checked"{% endif %} />{{ ecs.name }}
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <th>所属站点族</th>
+                <td>
+                    {% for race in Siteraces %}
+                        <input type="radio" name="optionsRadios" id="optionsRadios{{ race.id }}" value="{{ race.id }}" {% if site in race.site_set.all %}checked{% endif %} >{{ race.alias }}<br>
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <th>端口号</th>
+                <td><input type="text" name="port" value="{{ site.port }}" id="id_port"  maxlength="30"></td>
+            </tr>
+            <tr>
+                <th>测试页面</th>
+                <td><input type="text" name="testpage" value="{{ site.testpage }}" id="id_testpage" maxlength="30"></td>
+            </tr>
+            <tr>
+                <th>状态</th>
+                <td>
+                    <select name="status" id="id_status" >
+                        <option value="Y" {% if site.status == 'Y' %}selected{% endif %}>启用</option>
+                        <option value="N" {% if site.status == 'N' %}selected{% endif %}>禁用</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>研发负责人</th>
+                <td>
+                    <input type="text" name="devcharge" value="{{ site.devcharge }}" id="id_devcharge" maxlength="30">
+                </td>
+            </tr>
+            <tr>
+                <th>发布注意事项</th>
+                <td>
+                    <textarea name="deployattention" id="id_deployattention" rows="15" cols="60">{{ site.deployattention }}</textarea>
+                </td>
+            </tr>
+            <tr>
+                <th>修改人</th>
+                <td><span>{{ site.modified_user }}</span></td>
+            </tr>
+            <tr>
+                <th>修改时间</th>
+                <td><span>{{ site.modified_time }}</span></td>
+            </tr>
+            <tr>
+                <th>配置修改记录</th>
+                <td>
+                <table>
+                    <th>配置文件名</th>
+                    <th>配置修改人</th>
+                    <th>配置修改时间</th>
+                    {% for c in site.configfile_set.all %}
+                    <tr>
+                        <td>{{ c.filename }}</td>
+                        <td>{{ c.modified_user }}</td>
+                        <td>{{ c.modified_time }}</td>
+                        <br />
+                    </tr>
+                    {% endfor %}
+                </table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
     <button type="submit" name="site-save" class="btn btn-primary" />保存</button>
     <button type="submit" name="site-goback" class="btn btn-default" />返回</button>

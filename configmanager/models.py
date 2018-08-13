@@ -80,7 +80,7 @@ class Site(models.Model):
 
     def exist_or_not_in_siterace(self):
         try:
-            raceid = Siterace.objects.filter(siteid=self.id)[:1][0].raceid
+            race_id = self.siterace.id
         except:
             return False
         else:
@@ -91,24 +91,25 @@ class Site(models.Model):
         返回站点对应的raceid，若无则返回False
         '''
         try:
-            raceid = Siterace.objects.filter(siteid=self.id)[:1][0].raceid
+            race_id = self.siterace.id
         except:
             return 0
         else:
-            return raceid
+            return race_id
 
     def get_relation_sites(self):
         '''
         返回所有关联站点fullname属性的list，若无关联站点，则返回False
         '''
-        raceid = self.get_raceid() 
-        if not raceid:
+        race_id = self.get_raceid()
+        if race_id == 0:
             return False
         else:
             L = []
-            for sr in Siterace.objects.filter(raceid=raceid):
-                if sr.siteid.id != self.id:
-                    L.append(sr.siteid.fullname)
+            siterace = Siterace.objects.get(pk=race_id)
+            for sr in siterace.site_set.all():
+                if sr.id != self.id:
+                    L.append(sr.fullname)
         if L:
             return L
         else:

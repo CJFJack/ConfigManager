@@ -33,86 +33,88 @@ $(document).ready(function() {
     {{ slb_form.management_form }}
     {{ slbsite_form.management_form }}
         <input type="hidden" name="slbsite_set-TOTAL_FORMS" id="id_item_items-TOTAL_FORMS" value="{{ slbsite_form.total_form_count }}">
-        <table class="table table-hover">
-            <tbody>
-            <tr>
-                <th>实例ID</th>
-                <td>{{ slb.instanceid }}</td>
-            </tr>
-            <tr>
-                <th>实例别名</th>
-                <td>{{ slb.name }}</td>
-            </tr>
-            <tr>
-                <th>实例状态</th>
-                <td>{{ slb.status }}</td>
-            </tr>
-            <tr>
-                <th>实例IP</th>
-                <td>{{ slb.ip }}</td>
-            </tr>
-            <tr>
-                <th>创建时间</th>
-                <td>{{ slb.createdate }}</td>
-            </tr>
-            <tr>
-                <th>后端服务器信息</th>
-                <td>
-                    {% for ecs in slb.slbhealthstatus_set.all %}
-                        <p>
-                            <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
-                            {% if ecs.SLBstatus == "added" %}<span class="text-info">已添加</span>{% else %}<span class="text-danger">已移除</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
-                            {% if ecs.SLBstatus == "added" %}
-                                {% if ecs.healthstatus == "normal" %}<span class="text-success">正常</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                {% elif ecs.healthstatus == "abnormal" %}<span class="text-danger">异常</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                {% else %}<span class="text-warning">正在检查</span>&nbsp;
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <tbody>
+                <tr>
+                    <th>实例ID</th>
+                    <td>{{ slb.instanceid }}</td>
+                </tr>
+                <tr>
+                    <th>实例别名</th>
+                    <td>{{ slb.name }}</td>
+                </tr>
+                <tr>
+                    <th>实例状态</th>
+                    <td>{{ slb.status }}</td>
+                </tr>
+                <tr>
+                    <th>实例IP</th>
+                    <td>{{ slb.ip }}</td>
+                </tr>
+                <tr>
+                    <th>创建时间</th>
+                    <td>{{ slb.createdate }}</td>
+                </tr>
+                <tr>
+                    <th>后端服务器信息</th>
+                    <td>
+                        {% for ecs in slb.slbhealthstatus_set.all %}
+                            <p>
+                                <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                {% if ecs.SLBstatus == "added" %}<span class="text-info">已添加</span>{% else %}<span class="text-danger">已移除</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
+                                {% if ecs.SLBstatus == "added" %}
+                                    {% if ecs.healthstatus == "normal" %}<span class="text-success">正常</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    {% elif ecs.healthstatus == "abnormal" %}<span class="text-danger">异常</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    {% else %}<span class="text-warning">正在检查</span>&nbsp;
+                                    {% endif %}
+                                {% else %}
+                                    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 {% endif %}
-                            {% else %}
-                                <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                            {% endif %}
-                        </p>
-                    {% endfor %}
-                </td>
-            </tr>
-            <tr>
-                <th>选择站点</th>
-                <td>
-                     <table id="table_id_slbsite" class="table table-striped table-hover table-condensed">
-                         <thead>
-                             <tr>
-                                 {% for form in slbsite_form %}
-                                     {% if forloop.first %}
-                                         {% for field in form %}
-                                             {% if field.label != "Id" and field.label != "SLB" %}
-                                                <th>{{ field.label }}</th>
-                                             {% endif %}
-                                         {% endfor %}
-                                     {% endif %}
-                                 {% endfor %}
-                             </tr>
-                         </thead>
-                         <tbody id="id-slbsite-tbody">
-                             {% for form in slbsite_form %}
-                                 <tr id="slbsite-set-{{ forloop.counter0 }}">
-                                     <td>{{ form.site }}</td>
-                                     <td>{{ form.DELETE }}</td>
-                                     <td>{{ form.id }}</td>
-                                     {# <!-- or for crispy forms --> {% crispy slbsite_form %} #}
+                            </p>
+                        {% endfor %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>选择站点</th>
+                    <td>
+                         <table id="table_id_slbsite" class="table table-striped table-hover table-condensed">
+                             <thead>
+                                 <tr>
+                                     {% for form in slbsite_form %}
+                                         {% if forloop.first %}
+                                             {% for field in form %}
+                                                 {% if field.label != "Id" and field.label != "SLB" %}
+                                                    <th>{{ field.label }}</th>
+                                                 {% endif %}
+                                             {% endfor %}
+                                         {% endif %}
+                                     {% endfor %}
                                  </tr>
-                             {% endfor %}
-                         </tbody>
-                         <tfoot>
-                             <tr class="add-row">
-                                 <td colspan="7">
-                                     <a href="#" class="add-item" >添加另一个 关联站点</a>
-                                 </td>
-                             </tr>
-                         </tfoot>
-                     </table>
-                </td>
-            </tr>
-           </tbody>
-        </table>
+                             </thead>
+                             <tbody id="id-slbsite-tbody">
+                                 {% for form in slbsite_form %}
+                                     <tr id="slbsite-set-{{ forloop.counter0 }}">
+                                         <td>{{ form.site }}</td>
+                                         <td>{{ form.DELETE }}</td>
+                                         <td>{{ form.id }}</td>
+                                         {# <!-- or for crispy forms --> {% crispy slbsite_form %} #}
+                                     </tr>
+                                 {% endfor %}
+                             </tbody>
+                             <tfoot>
+                                 <tr class="add-row">
+                                     <td colspan="7">
+                                         <a href="#" class="add-item" >添加另一个 关联站点</a>
+                                     </td>
+                                 </tr>
+                             </tfoot>
+                         </table>
+                    </td>
+                </tr>
+               </tbody>
+            </table>
+        </div>
         <input type="submit" name="slb-rela-site" value="保存" class="btn btn-primary" />
         <input type="submit" name="slb-goback" value="返回" class="btn btn-default" />
     </form>

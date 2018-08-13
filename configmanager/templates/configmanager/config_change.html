@@ -19,9 +19,11 @@
                     <td>
                         <span><input type="checkbox" name="{{ configfile.site }}" value="{{ configfile.site }}"  checked />{{ configfile.site }}</span>
                         {% if configfile.site.get_relation_sites %}
-                            {% for rs in configfile.site.get_relation_sites %}
-                                <span><input type="checkbox" name="{{ rs }}" value="{{ rs }}" {% if "log" not in configfile.filename %}checked{% endif %} />{{ rs }}</span>
-                            {% endfor %}
+                            {% if "log" not in configfile.filename %}
+                                {% for rs in configfile.site.get_relation_sites %}
+                                    <span><input type="checkbox" name="{{ rs }}" value="{{ rs }}" checked />{{ rs }}</span>
+                                {% endfor %}
+                            {% endif %}
                         {% endif %}
                     </td>
                 </tr>

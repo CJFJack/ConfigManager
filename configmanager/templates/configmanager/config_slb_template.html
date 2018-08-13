@@ -6,15 +6,15 @@
                                 {% if ecs.SLBstatus == "added" %}
                                     {% if ecs.healthstatus == "normal" %}<span class="text-success">正常</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                     {% elif ecs.healthstatus == "abnormal" %}<span class="text-danger">异常</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    {% else %}<span class="text-danger">正在检查</span>&nbsp;
+                                    {% else %}<span class="text-danger">正在检查</span>&nbsp;&nbsp;
                                     {% endif %}
                                 {% else %}
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 {% endif %}
-                            </span>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <span>
-                                {% if ecs.SLBstatus == "added" %}<a class="btn btn-warning"href="javascript:void(0)" onclick="SiteRemoveBackendServer({{ site.id }}, {{ ecs.ECS_id }})">移除</a>{% endif %}
-                                {% if ecs.SLBstatus == "removed" %}<a class="btn btn-success" href="javascript:void(0)" onclick="SiteAddBackendServer({{ site.id }}, {{ ecs.ECS_id }})")>添加</a>{% endif %}
                             </span>
-                        <p/>
+                            <span>
+                                {% if ecs.SLBstatus == "added" %}<a class="btn btn-warning"href="javascript:void(0)" onclick="SiteRemoveBackendServer('{{ site.id }}', '{{ site.fullname}}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')">移除</a>{% endif %}
+                                {% if ecs.SLBstatus == "removed" %}<a class="btn btn-success" href="javascript:void(0)" onclick="SiteAddBackendServer('{{ site.id }}', '{{ site.fullname}}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')">添加</a>{% endif %}
+                            </span>
+                        </p>
                     {% endfor %}

@@ -50,7 +50,8 @@ urlpatterns = [
     url(r'^config/(?P<pk>[0-9]+)/historydetail/$', views.ConfigHistoryDetailView.as_view(), name='confighistorydetail'),
     url(r'^config/(?P<confighistorydetail_id>[0-9]+)/rollback/$', views.config_rollback, name='configrollback'),
     url(r'^config/(?P<deployecs_id>[0-9]+)/deploy/(?P<release_id>[0-9]+)/$', views.apply_config_deploy, name='applyconfigdeploy'),
-    url(r'^config/(?P<site_id>[0-9]+)/partrefresh/$', views.config_part_refresh, name='configslbrefresh'),
+    url(r'^config/(?P<site_id>[0-9]+)/slbpartrefresh/$', views.config_slb_part_refresh, name='configslbrefresh'),
+    url(r'^config/(?P<site_id>[0-9]+)/ecspartrefresh/$', views.config_ecs_part_refresh, name='configecsrefresh'),
     # Apply页面
     url(r'^apply/$', views.ApplyListView.as_view(), name='applylist'),
     url(r'^undeployapply/$', views.UndeployApplyListView.as_view(), name='undeployapplylist'),

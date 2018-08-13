@@ -27,13 +27,13 @@
                         </p>
                     {% endfor %}
                 </td>
-                <td align="right">
+                <td align="right" id=td_ecs_{{ site.id }}>
                     {% for r in site.release_set.all %}
                         {% if r.ECS.name in site.get_ECSlists_list %}
                         <p>
                             {{ r.ECS }}&nbsp;
                             {% if r.status == "N" %}
-                                <span class="text-danger">待生效</span>&nbsp;&nbsp;&nbsp;<a class="btn btn-success" href="{% url 'configmanager:configdeploy' r.id %}" >发布</a>&nbsp;
+                                <span class="text-danger">待生效</span>&nbsp;&nbsp;&nbsp;<a class="btn btn-success" href="javascript:void(0);" onclick="DeployConfig('{{ r.id }}', '{{ r.ECS.name }}', '{{ site.id }}', '{{ site.fullname }}')" >发布</a>&nbsp;
                             {% endif %}
                             {% if r.status == "Y" %}
                                 <span class="text-success">已生效</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -42,7 +42,7 @@
                         {% endif %}
                     {% endfor %}
                 </td>
-                <td align="right" id=td_{{ site.id }}>
+                <td align="right" id=td_slb_{{ site.id }}>
                     {% for ecs in site.get_one_slb.slbhealthstatus_set.all %}
                         <p>
                             <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -58,8 +58,8 @@
                                 {% endif %}
                             </span>
                             <span>
-                                {% if ecs.SLBstatus == "added" %}<a class="btn btn-warning"href="javascript:void(0)" onclick="SiteRemoveBackendServer({{ site.id }}, {{ ecs.ECS_id }})">移除</a>{% endif %}
-                                {% if ecs.SLBstatus == "removed" %}<a class="btn btn-success" href="javascript:void(0)" onclick="SiteAddBackendServer({{ site.id }}, {{ ecs.ECS_id }})">添加</a>{% endif %}
+                                {% if ecs.SLBstatus == "added" %}<a class="btn btn-warning"href="javascript:void(0)" onclick="SiteRemoveBackendServer('{{ site.id }}', '{{ site.fullname}}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')">移除</a>{% endif %}
+                                {% if ecs.SLBstatus == "removed" %}<a class="btn btn-success" href="javascript:void(0)" onclick="SiteAddBackendServer('{{ site.id }}', '{{ site.fullname}}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')">添加</a>{% endif %}
                             </span>
                         </p>
                     {% endfor %}
@@ -89,14 +89,21 @@ $.ajaxSetup({
     data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
 });
 
-//局部刷新
-function PartialRefresh(siteid) {
-    var postUrl = "/config/"+siteid+"/partrefresh/"
+//SLB状态局部刷新
+function SLBPartialRefresh(siteid) {
+    var postUrl = "/config/"+siteid+"/slbpartrefresh/"
     $.post(postUrl, function(data) {
-        $('#td_'+siteid).html(data)
+        $('#td_slb_'+siteid).html(data)
     });
 }
 
+//ECS状态局部刷新
+function ECSPartialRefresh(siteid) {
+    var postUrl = "/config/"+siteid+"/ecspartrefresh/"
+    $.post(postUrl, function(data) {
+        $('#td_ecs_'+siteid).html(data)
+    });
+}
 
 //刷新SLB健康状态
 function MoreHealthRefresh(siteid) {
@@ -109,7 +116,7 @@ function MoreHealthRefresh(siteid) {
 
     $.post(postUrl, function (data) {
         if (data.success) {
-            PartialRefresh(siteid);
+            SLBPartialRefresh(siteid);
         } else {
             alert("操作失败！"+data.message);
         }
@@ -123,7 +130,7 @@ function MoreHealthRefresh(siteid) {
 
 
 //移除站点所属SLB后端服务器
-function SiteRemoveBackendServer(siteid, serverid) {
+function SiteRemoveBackendServer(siteid, sitename, serverid, servername) {
     var postUrl = "/slb/"+siteid+"/siteremovebackendserver/"+serverid+"/";
 
     target = $("#myspin").get(0);                                                                                 
@@ -133,7 +140,13 @@ function SiteRemoveBackendServer(siteid, serverid) {
 
     $.post(postUrl, function (data) {
         if (data.success) {
-            PartialRefresh(siteid);
+            SLBPartialRefresh(siteid);
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！移除站点 "+sitename+" 关联SLB的后端服务器 "+servername);
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
         } else {
             alert("操作失败！"+data.message);
         }
@@ -146,7 +159,7 @@ function SiteRemoveBackendServer(siteid, serverid) {
 
 
 //添加站点所属SLB后端服务器
-function SiteAddBackendServer(siteid, serverid) {
+function SiteAddBackendServer(siteid, sitename, serverid, servername) {
     var postUrl = "/slb/"+siteid+"/siteaddbackendserver/"+serverid+"/";
 
     target = $("#myspin").get(0);                                                                                 
@@ -156,7 +169,13 @@ function SiteAddBackendServer(siteid, serverid) {
 
     $.post(postUrl, function (data) {
         if (data.success) {
-            PartialRefresh(siteid);
+            SLBPartialRefresh(siteid);
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！新增站点 "+sitename+" 关联SLB的后端服务器 "+servername);
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
         } else {
             alert("操作失败！"+data.message);
         }
@@ -167,6 +186,33 @@ function SiteAddBackendServer(siteid, serverid) {
     });
 }
 
+//发布配置文件
+function DeployConfig(release_id, ecs_name, site_id, site_fullname) {
+    var postUrl = "/config/"+release_id+"/deploy/";
+
+    target = $("#myspin").get(0);
+    var bgDiv = document.getElementById("bgDiv");
+    bgDiv.style.display = "block";
+    spinner.spin(target);
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            ECSPartialRefresh(site_id);
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！发布 "+ecs_name+" 站点 "+site_fullname+" "+"配置文件");
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();
+            bgDiv.style.display = "none";
+        },800);
+    });
+}
 </script>
 
 

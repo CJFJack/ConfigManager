@@ -5,8 +5,9 @@ from django.urls import reverse
 from time import time
 from datetime import datetime
 from django.core.files import File
-import os, json
+import os, json, ConfigParser
 from django.contrib import messages
+
 
 # Create your views here.
 
@@ -485,17 +486,23 @@ def config_deploy(request, release_id):
     r.status = 'Y'
     r.modified_user = request.user.username
     r.save()
+    '''获取发布配置文件存放目录'''
+    config = ConfigParser.RawConfigParser()
+    currentdir = os.path.abspath('.')
+    configFilePath = os.path.join(currentdir, 'configmanager', 'acs_config', 'deploy_filepath.ini')
+    config.read(configFilePath)
+    deploydirpath = config.get('deploydirpath', 'dirpath')
     '''生成配置文件'''
     ecs = r.ECS.name
-    config_path = os.path.join('/release', r.site.fullname, ecs, 'releaseconfig')
+    config_path = os.path.join(deploydirpath, r.site.fullname, ecs, 'releaseconfig')
     if not os.path.exists(config_path):
         os.makedirs(config_path)
     for c in r.site.configfile_set.all():
         file_name = os.path.join(config_path, c.filename)
         with open(file_name, 'w') as f:
             myfile = File(f)
-            myfile.write(c.content)
-    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+            myfile.write(str(c.content))
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
 @login_required(login_url='/login/')
@@ -534,6 +541,7 @@ def config_rollback(request, confighistorydetail_id):
         c = Configfile.objects.get(pk=configfileid)
         c.content = rollbackcontent
         c.save()
+        messages.success(request, "成功！回滚站点 "+ch.get_site_fullname()+" 配置文件 "+ch.filename+" 修改编号："+confighistorydetail_id)
         return HttpResponseRedirect(reverse('configmanager:configlist'))
     if request.POST.has_key('config-goback'):
         return HttpResponseRedirect(reverse('configmanager:confighistory', args=(configfileid,)))
@@ -939,9 +947,16 @@ def slb_whole_refresh(request):
 
 
 @login_required(login_url='/login/')
-def config_part_refresh(request, site_id):
+def config_slb_part_refresh(request, site_id):
     site = Site.objects.get(pk=site_id)
     template = 'configmanager/config_slb_template.html'
+    return render(request, template, {"site":site})
+
+
+@login_required(login_url='/login/')
+def config_ecs_part_refresh(request, site_id):
+    site = Site.objects.get(pk=site_id)
+    template = 'configmanager/config_ecs_template.html'
     return render(request, template, {"site":site})
 
 

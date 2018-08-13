@@ -1,0 +1,13 @@
+                    {% for r in site.release_set.all %}
+                        {% if r.ECS.name in site.get_ECSlists_list %}
+                        <p>
+                            {{ r.ECS }}&nbsp;
+                            {% if r.status == "N" %}
+                                <span class="text-danger">待生效</span>&nbsp;&nbsp;&nbsp;<a class="btn btn-success" href="javascript:void(0);" onclick="DeployConfig('{{ r.id }}', '{{ r.ECS.name }}', '{{ site.id }}', '{{ site.fullname }}')" >发布</a>&nbsp;
+                            {% endif %}
+                            {% if r.status == "Y" %}
+                                <span class="text-success">已生效</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            {% endif %}
+                        </p>
+                        {% endif %}
+                    {% endfor %}

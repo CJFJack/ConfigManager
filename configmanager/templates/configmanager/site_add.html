@@ -1,6 +1,5 @@
 {% extends 'configmanager/__base__.html' %}
 {% block title %}添加站点 | {% endblock %}
-{% block goback %}{% url 'configmanager:sitelist' %}{% endblock %}
 {% block content %}
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}

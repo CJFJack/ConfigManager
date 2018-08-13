@@ -98,6 +98,10 @@ var spinner = new Spinner(opts);
 						</ul>
 					</li>
 				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href="#"><span class="glyphicon glyphicon-user"></span> 欢迎！{{ request.user.username }}</a></li>
+					<li><a href="{% url 'logout' %}" target="_top"><span class="glyphicon glyphicon-log-out"></span> 注销</a></li>
+				</ul>
 			</div>
 		</div>
 	</nav>

@@ -4,7 +4,7 @@
 
 <div id="whole" class="container-fluid table-responsive">
     {% if site_list %}
-        <table class="table table-striped table-hover table-condensed">
+        <table class="table table-striped table-hover table-condensed table-bordered">
             <th>站点名称</th>
             <th>发布注意事项</th>
             <th class="text-center">配置文件</th>
@@ -28,7 +28,7 @@
                         </p>
                     {% endfor %}
                 </td>
-                <td align="right" id=td_ecs_{{ site.id }}>
+                <td align="right" id="td_ecs_{{ site.id }}">
                     {% for r in site.release_set.all %}
                         {% if r.ECS.name in site.get_ECSlists_list %}
                         <p>

@@ -1,19 +1,19 @@
-            {% for ecs in site.deploysite.get_one_slb.slbhealthstatus_set.all %}                                                          
-                <p>                                                                                                                       
-                    <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;                                                                    
-                    <span>{% if ecs.SLBstatus == "added" %}已添加{% else %}<font color="red">已移除</font>{% endif %}</span>&nbsp;&nbsp;&nbsp;&nbsp;    
-                    <span>                                                                                                                
-                        {% if ecs.SLBstatus == "added" %}                                                                                 
-                            {% if ecs.healthstatus == "normal" %}正常&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;               
-                            {% elif ecs.healthstatus == "abnormal" %}<font color="red">异常</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            {% else %}<font color="red">正在检查</font>&nbsp;                                                             
-                            {% endif %}                                                                                                   
-                        {% else %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        {% endif %}                                                                                                       
-                    </span>&nbsp;&nbsp;&nbsp;&nbsp;                                                                                       
-                    <span>                                                                                                                
-                        {% if ecs.SLBstatus == "added" %}<a href="javascript:void(0)" onclick="SiteRemoveBackendServer({{ site.deploysite.id }}, {{ site.id }}, {{ ecs.ECS.id }})">移除</a>{% endif %}
-                        {% if ecs.SLBstatus == "removed" %}<a href="javascript:void(0)" onclick="SiteAddBackendServer({{ site.deploysite.id }}, {{ site.id }}, {{ ecs.ECS.id }})">添加</a>{% endif %}
-                    </span>                                                                                                               
-                <p/>                                                                                                                      
-            {% endfor %} 
+                    {% for ecs in site.deploysite.get_one_slb.slbhealthstatus_set.all %}
+                        <p>
+                            <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;
+                            <span>{% if ecs.SLBstatus == "added" %}已添加{% else %}<font color="red">已移除</font>{% endif %}</span>&nbsp;&nbsp;
+                            <span>
+                                {% if ecs.SLBstatus == "added" %}
+                                    {% if ecs.healthstatus == "normal" %}&nbsp;&nbsp;&nbsp;&nbsp;正常&nbsp;&nbsp;&nbsp;&nbsp;
+                                    {% elif ecs.healthstatus == "abnormal" %}<font color="red">异常</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    {% else %}<font color="red">正在检查</font>&nbsp;
+                                    {% endif %}
+                                {% else %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                {% endif %}
+                            </span>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <span>
+                                {% if ecs.SLBstatus == "added" %}<a class="btn btn-warning" href="javascript:void(0)" onclick="SiteRemoveBackendServer('{{ site.deploysite.id }}', '{{ site.deploysite.fullname }}', '{{ site.id }}', '{{ ecs.ECS.id }}', '{{ ecs.ECS.name }}')">移除</a>{% endif %}
+                                {% if ecs.SLBstatus == "removed" %}<a class="btn btn-success" href="javascript:void(0)" onclick="SiteAddBackendServer('{{ site.deploysite.id }}', '{{ site.deploysite.fullname }}', '{{ site.id }}', '{{ ecs.ECS.id }}', '{{ ecs.ECS.name }}')">添加</a>{% endif %}
+                            </span>
+                        <p/>
+                    {% endfor %}

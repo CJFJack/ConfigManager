@@ -48,23 +48,6 @@ def nav_top(request):
     return render(request, 'configmanager/nav_top.html', context)
 
 
-@login_required(login_url='/login/')
-def welcome(request):
-    context = {}
-    return render(request, 'configmanager/welcome.html', context)
-
-
-@login_required(login_url='/login/')
-def deploymanager(request):
-    context = {}
-    return render(request, 'configmanager/deploymanager.html', context) 
-
-
-@login_required(login_url='/login/')
-def systemmanager(request):
-    return render_to_response('configmanager/systemmanager.html')
-
-
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class ECSListView(generic.ListView):
     template_name = 'configmanager/ecs_list.html'

@@ -9,6 +9,7 @@ import ConfigParser
 
 config = ConfigParser.RawConfigParser()
 currentdir = os.path.abspath('.')
+print currentdir
 configFilePath = os.path.join(currentdir, 'configmanager', 'acs_config', 'acs_config.ini')
 print configFilePath
 config.read(configFilePath)

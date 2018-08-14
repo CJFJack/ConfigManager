@@ -79,12 +79,6 @@ class ECSChangeView(generic.DetailView):
     template_name = 'configmanager/ecs_change.html'
 
 
-@method_decorator(login_required(login_url='/login/'), name='dispatch')
-class ECSAddView(generic.ListView):
-    model = ECS
-    template_name = 'configmanager/ecs_add.html'
-
-
 @login_required(login_url='/login/')
 def ecs_save(request, ecs_id):
     ecs = get_object_or_404(ECS, pk=ecs_id)
@@ -431,7 +425,15 @@ class ConfigListView(generic.ListView):
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class UndeployConfigListView(generic.ListView):
     model = Site
-    template_name = 'configmanager/undeploy_config_list.html'
+    template_name = 'configmanager/config_list.html'
+    context_object_name = 'site_list'
+
+    def get_queryset(self):
+        L = []
+        for site in Site.objects.all():
+            if site.have_undeploy_config_or_not():
+                L.append(site)
+        return L
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -691,6 +693,7 @@ class ApplyAdd(CreateView):
         apply_form = self.get_form(form_class)
         deployitem_form = DeployitemFormSet(self.request.POST)
         if (apply_form.is_valid() and deployitem_form.is_valid()):
+            messages.success(request, "成功！创建发布申请单")
             return self.form_valid(apply_form, deployitem_form)
         else:
             return self.form_invalid(apply_form, deployitem_form)

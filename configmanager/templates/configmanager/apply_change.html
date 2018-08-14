@@ -1,12 +1,10 @@
 {% extends 'configmanager/__base__.html' %}
 {% block title %}发布申请详情 | {% endblock %}
 {% block content %}
+
 {% load systemmanager %}
-<h2>发布管理 > 发布申请详情</h2>
 
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
 <script type="text/html" id="item-template">
 <tr id="deployitem-set-__prefix__">
     <td>{{ deployitem_form.empty_form.deployorderby }}</td>
@@ -52,183 +50,184 @@ var pageObject = {
 }
 </script>
 
-
-<form action="{% url 'configmanager:applystatuschange' apply.id %}" method="post">
-{% csrf_token %}
-{{ apply_form.management_form }}
-{{ deployitem_form.management_form }}
-<input type="hidden" name="deployitem_set-TOTAL_FORMS" id="id_item_items-TOTAL_FORMS" value="{{ deployitem_form.total_form_count }}">
-<table>
-    <tbody>
-        <tr>
-            <th>申请编号</th>
-            <td>{{ apply.applyproject }}</td>
-        </tr>
-        <tr>
-            <th>期望发布时间</th>
-            {% if apply.status == "WC" %}
-                <td>{{ apply_form.wishdeploy_time }}</td>
-            {% else %}
-                <td>{{ apply.wishdeploy_time }}</td>
-            {% endif %}
-        </tr>
-        <tr>
-            <th>选择发布站点</th>
-            <td>
-                <table id="table_id_deployitem">
-                    <thead>
-                        <tr>
-                            {% for form in deployitem_form %}
-                                {% if forloop.first %}
-                                    {% for field in form %}
-                                        {% if field.label != "Id" and field.label != "Applyproject" %}
-                                            <th>{{ field.label }}</th>
+<div id="whole" class="container-fluid table-responsive">
+    <form action="{% url 'configmanager:applystatuschange' apply.id %}" method="post">
+        {% csrf_token %}
+        {{ apply_form.management_form }}
+        {{ deployitem_form.management_form }}
+        <input type="hidden" name="deployitem_set-TOTAL_FORMS" id="id_item_items-TOTAL_FORMS" value="{{ deployitem_form.total_form_count }}">
+        <table class="table table-hover table-condensed">
+            <tbody>
+                <tr>
+                    <th>申请编号</th>
+                    <td>{{ apply.applyproject }}</td>
+                </tr>
+                <tr>
+                    <th>期望发布时间</th>
+                    {% if apply.status == "WC" %}
+                        <td>{{ apply_form.wishdeploy_time }}</td>
+                    {% else %}
+                        <td>{{ apply.wishdeploy_time }}</td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <th>选择发布站点</th>
+                    <td>
+                        <table class="table table-striped table-hover table-condensed" id="table_id_deployitem">
+                            <thead>
+                                <tr>
+                                    {% for form in deployitem_form %}
+                                        {% if forloop.first %}
+                                            {% for field in form %}
+                                                {% if field.label != "Id" and field.label != "Applyproject" %}
+                                                    <th>{{ field.label }}</th>
+                                                {% endif %}
+                                            {% endfor %}
                                         {% endif %}
                                     {% endfor %}
-                                {% endif %}
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody id="id-deployitem-tbody">
-                        {% for form in deployitem_form %}
-                            <tr id="deployitem-set-{{ forloop.counter0 }}">
-                                <td>{{ form.deployorderby }}</td>
-                                <td>{{ form.jenkinsversion }}</td>
-                                <td>{{ form.deploysite }}</td>
-                                <td>{{ form.type }}</td>
-                                <td>{{ form.deploy_status }}</td>
-                                <td>{{ form.DELETE }}</td>
-                                <td>{{ form.id }}</td>
-                                <td>{{ form.applyproject }}</td>
-                                {# <!-- or for crispy forms --> {% crispy deployitem_form %} #}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                    <tfoot>
-                        <tr class="add-row"><td colspan="7"><a href="#" class="add-item" >添加另一个 发布站点</a></td></tr>
-                    </tfoot>
-                </table>
-           </td>
-        </tr>
-        <tr>
-            <th valign="top">配置修改说明</th>
-            <td>
-                {% if apply.status == "WC" %}
-                    {{ apply_form.confamendexplain }}
-                {% else %}
-                    <textarea readonly="readonly" name="confamendexplain" rows="20" cols="80" id="id_confamendexplain">{{ apply.confamendexplain }}</textarea>
-                {% endif %}
-            </td>
-        </tr>
-        <tr>
-            <th valign="top">备注事项</th>
-            <td>
-                {% if apply.status == "WC" %}
-                    {{ apply_form.remarkexplain }}
-                {% else %}
-                    <textarea readonly="readonly" name="confamendexplain" rows="20" cols="80" id="id_remarkexplain">{{ apply.remarkexplain }}</textarea>
-                {% endif %}
-            </td>
-        </tr>
-        <tr>
-            <th>状态</th>
-            <td name="deploystatus"> 
-                {% if apply.status == "WC" %}
-                    <span>待提交</span>
-                {% elif apply.status == "WD" %}
-                    <span>待发布</span>
-                {% elif apply.status == "C" %}
-                    <span>已取消</span>
-                {% elif apply.status == "D" %}
-                    <span>已发布</span>
-                {% elif apply.status == "DA" %}
-                    <span>研发经理审批中</span>
-                {% elif apply.status == "OA" %}
-                    <span>运维经理审批中</span>
-                {% elif apply.status == "EA" %}
-                    <span>运维工程师审批中</span>
-                {% elif apply.status == "TA" %}
-                    <span>测试经理审批中</span>
-                {% elif apply.status == "TDA" %}
-                    <span>技术总监审批中</span>
-                {% endif %}
-            </td>
-        </tr>
-        <tr>
-            <th>申请人</th>
-            <td>
-                {{ apply.apply_user }}
-            </td>
-        </tr>
-        <tr>
-            <th>申请时间</th>
-            <td>
-                {{ apply.apply_time }}
-            </td>
-        </tr>
-        <tr>
-            <th><a href="javascript:void(0)" onclick="pageObject.showOperateLog(this);">展开操作日志</a></th>
-            <td>
-                <div style="display:none;" id="divOperateLog">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>操作类型</th>
-                                <th>操作人</th>
-                                <th>操作时间</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for log in apply.applyoperatelog_set.all %}
-                                <tr>
-                                    <td>{{ log.type }}</td>
-                                    <td>{{ log.OperatorName }}</td>
-                                    <td>{{ log.OperationTime }}</td>
                                 </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </td>
-        </tr>
-    </tbody>
-</table>
+                            </thead>
+                            <tbody id="id-deployitem-tbody">
+                                {% for form in deployitem_form %}
+                                    <tr id="deployitem-set-{{ forloop.counter0 }}">
+                                        <td>{{ form.deployorderby }}</td>
+                                        <td>{{ form.jenkinsversion }}</td>
+                                        <td>{{ form.deploysite }}</td>
+                                        <td>{{ form.type }}</td>
+                                        <td>{{ form.deploy_status }}</td>
+                                        <td>{{ form.DELETE }}</td>
+                                        <td>{{ form.id }}</td>
+                                        <td>{{ form.applyproject }}</td>
+                                        {# <!-- or for crispy forms --> {% crispy deployitem_form %} #}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="add-row"><td colspan="7"><a href="#" class="add-item" >添加另一个 发布站点</a></td></tr>
+                            </tfoot>
+                        </table>
+                   </td>
+                </tr>
+                <tr>
+                    <th valign="top">配置修改说明</th>
+                    <td>
+                        {% if apply.status == "WC" %}
+                            {{ apply_form.confamendexplain }}
+                        {% else %}
+                            <textarea readonly="readonly" name="confamendexplain" rows="20" cols="80" id="id_confamendexplain">{{ apply.confamendexplain }}</textarea>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th valign="top">备注事项</th>
+                    <td>
+                        {% if apply.status == "WC" %}
+                            {{ apply_form.remarkexplain }}
+                        {% else %}
+                            <textarea readonly="readonly" name="confamendexplain" rows="20" cols="80" id="id_remarkexplain">{{ apply.remarkexplain }}</textarea>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>状态</th>
+                    <td name="deploystatus">
+                        {% if apply.status == "WC" %}
+                            <span>待提交</span>
+                        {% elif apply.status == "WD" %}
+                            <span>待发布</span>
+                        {% elif apply.status == "C" %}
+                            <span>已取消</span>
+                        {% elif apply.status == "D" %}
+                            <span>已发布</span>
+                        {% elif apply.status == "DA" %}
+                            <span>研发经理审批中</span>
+                        {% elif apply.status == "OA" %}
+                            <span>运维经理审批中</span>
+                        {% elif apply.status == "EA" %}
+                            <span>运维工程师审批中</span>
+                        {% elif apply.status == "TA" %}
+                            <span>测试经理审批中</span>
+                        {% elif apply.status == "TDA" %}
+                            <span>技术总监审批中</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>申请人</th>
+                    <td>
+                        {{ apply.apply_user }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>申请时间</th>
+                    <td>
+                        {{ apply.apply_time }}
+                    </td>
+                </tr>
+                <tr>
+                    <th><a href="javascript:void(0)" onclick="pageObject.showOperateLog(this);">展开操作日志</a></th>
+                    <td>
+                        <div style="display:none;" id="divOperateLog" class="container-fluid table-responsive">
+                            <table class="table table-striped table-hover table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>操作类型</th>
+                                        <th>操作人</th>
+                                        <th>操作时间</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for log in apply.applyoperatelog_set.all %}
+                                        <tr>
+                                            <td>{{ log.type }}</td>
+                                            <td>{{ log.OperatorName }}</td>
+                                            <td>{{ log.OperationTime }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
-<input type={% if apply.status == 'WC' %}"submit"{% else %}"hidden"{% endif %} name="apply-save" value="保存" />
-<input type={% if apply.status == 'WC' %}"submit"{% else %}"hidden"{% endif %} name="apply-commit" value="保存并提交" />
-<input type={% if apply.status == 'WC' %}"submit"{% else %}"hidden"{% endif %} name="apply-cancel" value="取消" />
+        <input class="btn btn-primary" type="{% if apply.status == 'WC' %}submit{% else %}hidden{% endif %}" name="apply-save" value="保存" />
+        <input class="btn btn-success" type="{% if apply.status == 'WC' %}submit{% else %}hidden{% endif %}" name="apply-commit" value="保存并提交" />
+        <input class="btn btn-warning" type="{% if apply.status == 'WC' %}submit{% else %}hidden{% endif %}" name="apply-cancel" value="取消" />
 
-{% if request.user|has_group:"研发经理" or request.user|has_group:"admin" %}
-<input type={% if apply.status == 'DA' %}"submit"{% else %}"hidden"{% endif %} name="dev-approval" value="研发经理审核通过" />
-<input type={% if apply.status == 'DA' %}"submit"{% else %}"hidden"{% endif %} name="dev-unapproval" value="研发经理审核不通过" />
-{% endif %}
-    
-{% if request.user|has_group:"测试经理" or request.user|has_group:"admin" %}
-<input type={% if apply.status == 'TA' %}"submit"{% else %}"hidden"{% endif %} name="test-approval" value="测试经理审核通过" />
-<input type={% if apply.status == 'TA' %}"submit"{% else %}"hidden"{% endif %} name="test-unapproval" value="测试经理审核不通过" />
-{% endif %}
+        {% if request.user|has_group:"研发经理" or request.user|has_group:"admin" %}
+            <input class="btn btn-primary" type="{% if apply.status == 'DA' %}submit{% else %}hidden{% endif %}" name="dev-approval" value="研发经理审核通过" />
+            <input class="btn btn-warning" type="{% if apply.status == 'DA' %}submit{% else %}hidden{% endif %}" name="dev-unapproval" value="研发经理审核不通过" />
+        {% endif %}
 
-{% if request.user|has_group:"运维工程师" or request.user|has_group:"admin" %}
-<input type={% if apply.status == 'EA' %}"submit"{% else %}"hidden"{% endif %} name="EA-approval" value="运维工程师审核通过" />
-<input type={% if apply.status == 'EA' %}"submit"{% else %}"hidden"{% endif %} name="EA-unapproval" value="运维工程师审核不通过" />
-{% endif %}
+        {% if request.user|has_group:"测试经理" or request.user|has_group:"admin" %}
+            <input class="btn btn-primary" type="{% if apply.status == 'TA' %}submit{% else %}hidden{% endif %}" name="test-approval" value="测试经理审核通过" />
+            <input class="btn btn-warning" type="{% if apply.status == 'TA' %}submit{% else %}hidden{% endif %}" name="test-unapproval" value="测试经理审核不通过" />
+        {% endif %}
 
-{% if request.user|has_group:"运维经理" or request.user|has_group:"admin" %}
-<input type={% if apply.status == 'OA' %}"submit"{% else %}"hidden"{% endif %} name="OA-approval" value="运维经理审核通过" />
-<input type={% if apply.status == 'OA' %}"submit"{% else %}"hidden"{% endif %} name="OA-unapproval" value="运维经理审核不通过" />
-{% endif %}
+        {% if request.user|has_group:"运维工程师" or request.user|has_group:"admin" %}
+            <input class="btn btn-primary" type="{% if apply.status == 'EA' %}submit{% else %}hidden{% endif %}" name="EA-approval" value="运维工程师审核通过" />
+            <input class="btn btn-warning" type="{% if apply.status == 'EA' %}submit{% else %}hidden{% endif %}" name="EA-unapproval" value="运维工程师审核不通过" />
+        {% endif %}
 
-{% if request.user|has_group:"技术总监" or request.user|has_group:"admin" %}
-<input type={% if apply.status == 'TDA' %}"submit"{% else %}"hidden"{% endif %} name="TDA-approval" value="技术总监审核通过" />
-<input type={% if apply.status == 'TDA' %}"submit"{% else %}"hidden"{% endif %} name="TDA-unapproval" value="技术总监审核不通过" />
-{% endif %}
+        {% if request.user|has_group:"运维经理" or request.user|has_group:"admin" %}
+            <input class="btn btn-primary" type="{% if apply.status == 'OA' %}submit{% else %}hidden{% endif %}" name="OA-approval" value="运维经理审核通过" />
+            <input class="btn btn-warning" type="{% if apply.status == 'OA' %}submit{% else %}hidden{% endif %}" name="OA-unapproval" value="运维经理审核不通过" />
+        {% endif %}
 
-{% if request.user|has_group:"运维工程师" or request.user|has_group:"admin" %}
-<input type={% if apply.status == 'WD' %}"submit"{% else %}"hidden"{% endif %} name="deploy-finish" value="已发布" />
-<input type={% if apply.status == 'WD' %}"submit"{% else %}"hidden"{% endif %} name="goto-deploy" value="现在去发布" />
-{% endif %}
+        {% if request.user|has_group:"技术总监" or request.user|has_group:"admin" %}
+            <input class="btn btn-primary" type="{% if apply.status == 'TDA' %}submit{% else %}hidden{% endif %}" name="TDA-approval" value="技术总监审核通过" />
+            <input class="btn btn-warning" type="{% if apply.status == 'TDA' %}submit{% else %}hidden{% endif %}" name="TDA-unapproval" value="技术总监审核不通过" />
+        {% endif %}
 
-<input type="submit" name="goback" value="返回" onclick='location.href=("/apply")'/>
-</form>
+        {% if request.user|has_group:"运维工程师" or request.user|has_group:"admin" %}
+            <input class="btn btn-success" type="{% if apply.status == 'WD' %}submit{% else %}hidden{% endif %}" name="deploy-finish" value="已发布" />
+            <input class="btn btn-info" type="{% if apply.status == 'WD' %}submit{% else %}hidden{% endif %}" name="goto-deploy" value="发布" />
+        {% endif %}
+
+        <input class="btn btn-default" type="submit" name="goback" value="返回" onclick='location.href=("/apply")'/>
+    </form>
+</div>
 
 {% endblock %}

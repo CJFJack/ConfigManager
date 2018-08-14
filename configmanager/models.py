@@ -147,14 +147,14 @@ class Site(models.Model):
                 c = self.configfile_set.get(filename=rfl)
                 c.delete()
      
-    def if_have_undeploy_config(self):
+    def have_undeploy_config_or_not(self):
         '''
-        判断配置是否发布，若存在一台或以上服务器未发布，则返回True，否则返回False
+        得到存在未生效配置的站点对象列表
         '''
         result = False
         for r in self.release_set.all():
             if r.status == 'N':
-                result = True
+                return True
                 break
             else:
                 continue

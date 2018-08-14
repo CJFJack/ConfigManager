@@ -1,4 +1,5 @@
 {% extends 'configmanager/__base__.html' %}
+{% block title %}配置管理 | {% endblock %}
 {% block content %}
 
 <div id="whole" class="container-fluid table-responsive">
@@ -64,7 +65,7 @@
                         </p>
                     {% endfor %}
                 </td>
-                <td><a class="btn btn-info" href="javascript:void(0);" onclick="MoreHealthRefresh({{ site.id }})">刷新</a></td>
+                <td><a class="btn btn-info" href="javascript:void(0);" onclick="MoreHealthRefresh('{{ site.id }}', '{{ site.fullname }}')">刷新</a></td>
                 <td>
                     {% for config in site.configfile_set.all %}
                         <p>{{ config.modified_user }}</p>
@@ -79,7 +80,7 @@
             {% endfor %}
         </table>
     {% else %}
-        <p>No ECS are available.</p>
+        <p>No Sites are available.</p>
     {% endif %}
 </div>
 
@@ -106,7 +107,7 @@ function ECSPartialRefresh(siteid) {
 }
 
 //刷新SLB健康状态
-function MoreHealthRefresh(siteid) {
+function MoreHealthRefresh(siteid, sitename) {
     var postUrl = "/slb/"+siteid+"/moreslbhealthupdate/";
 
     target = $("#myspin").get(0);                                                                                 
@@ -117,8 +118,19 @@ function MoreHealthRefresh(siteid) {
     $.post(postUrl, function (data) {
         if (data.success) {
             SLBPartialRefresh(siteid);
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！刷新 "+sitename+" 关联SLB健康状态");
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
         } else {
-            alert("操作失败！"+data.message);
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-warning");
+            $("#alert-div").text("失败！站点 "+sitename+" 没有关联SLB，请移步SLB管理页面进行关联");
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
         }
         setTimeout(function () {
             spinner.spin();                                                                                           
@@ -126,8 +138,6 @@ function MoreHealthRefresh(siteid) {
         },800);
     });
 }
-
-
 
 //移除站点所属SLB后端服务器
 function SiteRemoveBackendServer(siteid, sitename, serverid, servername) {

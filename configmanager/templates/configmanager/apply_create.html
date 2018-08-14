@@ -1,24 +1,21 @@
 {% extends 'configmanager/__base__.html' %}
 {% block title %}创建发布申请 | {% endblock %}
 {% block content %}
-<h2>发布管理 > 创建发布申请</h2>
 
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
 <script type="text/html" id="item-template">
-<tr id="deployitem-set-__prefix__">
-    <td>{{ deployitem_form.empty_form.deployorderby }}</td>
-    <td>{{ deployitem_form.empty_form.jenkinsversion }}</td>
-    <td>{{ deployitem_form.empty_form.deploysite }}</td>
-    <td>{{ deployitem_form.empty_form.type }}</td>
-    <td>{{ deployitem_form.empty_form.deploy_status }}</td>
-    <td>{{ deployitem_form.empty_form.DELETE }}</td>
-    <td>{{ deployitem_form.empty_form.id }}</td>
-    <td>{{ deployitem_form.empty_form.applyproject }}</td>
-    {# <!-- or for crispy forms --> {% crispy deployitem_form.empty_form item_forms.
-form.helper %} #}
-</tr>
+    <tr id="deployitem-set-__prefix__">
+        <td>{{ deployitem_form.empty_form.deployorderby }}</td>
+        <td>{{ deployitem_form.empty_form.jenkinsversion }}</td>
+        <td>{{ deployitem_form.empty_form.deploysite }}</td>
+        <td>{{ deployitem_form.empty_form.type }}</td>
+        <td>{{ deployitem_form.empty_form.deploy_status }}</td>
+        <td>{{ deployitem_form.empty_form.DELETE }}</td>
+        <td>{{ deployitem_form.empty_form.id }}</td>
+        <td>{{ deployitem_form.empty_form.applyproject }}</td>
+        {# <!-- or for crispy forms --> {% crispy deployitem_form.empty_form item_forms.
+    form.helper %} #}
+    </tr>
 </script>
 
 <script>
@@ -41,57 +38,59 @@ $(document).ready(function() {
 });
 </script>
 
-<form action="" method="post">
-{% csrf_token %}
-{{ form.management_form }}
-{{ deployitem_form.management_form }}
-<input type="hidden" name="deployitem_set-TOTAL_FORMS" id="id_item_items-TOTAL_FORMS" value="{{ deployitem_form.total_form_count }}">
-<table>
-    <tbody>
-        {% for field in form %}
-        <tr>
-            {% if field.label != "状态" and field.label != "申请人" and field.label != "发布人" and field.label != "实际发布时间" and field.label != "审核状态" and field.label != "期望发布日期" %}
-                <th>{{ field.label }}</th>
-                <td>{{ field }}</td>
-            {% endif %}
-            {% if field.label == "期望发布日期" %}
-                <th>期望发布日期</th>
-                <td>
-                    <input type="text" name="wishdeploy_time" id="id_wishdeploy_time" required="" class="vDateField" size="10">
-                </td>
-            {% endif %}
-        </tr>
-        {% endfor %}
-        <tr>
-            <th>选择发布站点</th>
-            <td>
-                <table id="table_id_deployitem">
-                    <thead>
-                        <tr>
-                            {% for form in deployitem_form %}
-                                {% if forloop.first %}
-                                    {% for field in form %}
-                                        {% if field.label != "Id" and field.label != "Applyproject" %}
-                                            <th>{{ field.label }}</th>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody id="id-deployitem-tbody">
-                    </tbody>
-                    <tfoot>
-                        <tr class="add-row"><td colspan="7"><a href="#" class="add-item" >添加另一个 发布站点</a></td></tr>
-                    </tfoot>
-                </table>
-           </td>
-        </tr>
-   </tbody>
-</table>
 
-<input type="submit" name="create" value="创建" />
-<input type="button" name="goback" value="返回" onclick='location.href=("/apply")'/>
+
+<form class="form-horizontal" role="form" method="post">
+    {% csrf_token %}
+    {{ form.management_form }}
+    {{ deployitem_form.management_form }}
+    <input type="hidden" name="deployitem_set-TOTAL_FORMS" id="id_item_items-TOTAL_FORMS" value="{{ deployitem_form.total_form_count }}">
+    <table class="table table-hover table-condensed">
+        <tbody>
+            {% for field in form %}
+            <tr>
+                {% if field.label != "状态" and field.label != "申请人" and field.label != "发布人" and field.label != "实际发布时间" and field.label != "审核状态" and field.label != "期望发布日期" %}
+                    <th>{{ field.label }}</th>
+                    <td>{{ field }}</td>
+                {% endif %}
+                {% if field.label == "期望发布日期" %}
+                    <th>期望发布日期</th>
+                    <td>
+                        <input type="date" name="wishdeploy_time" id="id_wishdeploy_time" size="10" />
+                    </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            <tr>
+                <th>选择发布站点</th>
+                <td>
+                    <table class="table table-hover table-condensed">
+                        <thead>
+                            <tr>
+                                {% for form in deployitem_form %}
+                                    {% if forloop.first %}
+                                        {% for field in form %}
+                                            {% if field.label != "Id" and field.label != "Applyproject" %}
+                                                <th>{{ field.label }}</th>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody id="id-deployitem-tbody">
+                        </tbody>
+                        <tfoot>
+                            <tr class="add-row"><td colspan="7"><a href="#" class="add-item" >添加另一个 发布站点</a></td></tr>
+                        </tfoot>
+                    </table>
+               </td>
+            </tr>
+       </tbody>
+    </table>
+
+    <input class="btn btn-primary" type="submit" name="create" value="创建" />
+    <input class="btn btn-default" type="button" name="goback" value="返回" onclick='location.href=("/apply")'/>
 </form>
 
 {% endblock %}

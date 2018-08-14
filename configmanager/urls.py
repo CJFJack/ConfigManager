@@ -21,7 +21,6 @@ urlpatterns = [
     url(r'^ecs/(?P<ecs_id>[0-9]+)/updateinfo/$', views.update_ecs_info, name='updateinfo'),
     url(r'^ecs/updateallinfo/$', views.update_allecs_info, name='updateallinfo'),
     url(r'^ecs/syncallecsinfo/$', views.sync_all_ecs_info, name='syncallecsinfo'),
-    url(r'^ecs/add/$', views.ECSAddView.as_view(), name='ecsadd'),
     url(r'^ecs/addmethod/$', views.ecs_add, name='ecsaddmethod'),
     url(r'^ecs/(?P<ecs_id>[0-9]+)/partrefresh/$', views.ecs_part_refresh, name='ecspartrefresh'),
     url(r'^ecs/wholerefresh/$', views.ecs_whole_refresh, name='ecswholerefresh'),

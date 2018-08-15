@@ -20,8 +20,6 @@ from django.http import HttpResponse
 from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.views.generic import TemplateView
-from django.forms import inlineformset_factory
 from django.views.generic.edit import UpdateView
 from django.views.generic.edit import CreateView
 from .acs_ecs_monitor import query_ecs_api
@@ -31,6 +29,7 @@ from .acs_slb_health import query_slb_health
 from .acs_slb_backendserver_remove import remove_backendserver
 from .acs_slb_backendserver_add import add_backendserver
 from .acs_all_ecs_info import query_all_ecs
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 app_name = 'configmanager'
 
@@ -51,9 +50,13 @@ def nav_top(request):
 class ECSListView(generic.ListView):
     template_name = 'configmanager/ecs_list.html'
     context_object_name = 'ECS_list'
+    paginate_by = 10
 
     def get_queryset(self):
         return ECS.objects.order_by('name')
+
+    def get_paginate_by(self, queryset):
+        return self.request.GET.get('paginate_by', self.paginate_by)
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -186,6 +189,7 @@ def update_allecs_info(request):
 class SiteListView(generic.ListView):
     template_name = 'configmanager/site_list.html'
     context_object_name = 'Site_list'
+    paginate_by = 10
 
     def get_queryset(self):
         return Site.objects.order_by('fullname')
@@ -194,6 +198,9 @@ class SiteListView(generic.ListView):
         context = super(SiteListView, self).get_context_data(**kwargs)
         context['configfile'] = Site.configfile_set
         return context
+
+    def get_paginate_by(self, queryset):
+        return self.request.GET.get('paginate_by', self.paginate_by)
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -346,9 +353,13 @@ def site_delete(request, site_id):
 class RaceListView(generic.ListView):
     template_name = 'configmanager/race_list.html'
     context_object_name = 'Race_list'
+    paginate_by = 5
 
     def get_queryset(self):
         return Siterace.objects.order_by('raceid')
+
+    def get_paginate_by(self, queryset):
+        return self.request.GET.get('paginate_by', self.paginate_by)
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -404,6 +415,13 @@ def race_site_relation(request, race_id):
 class ConfigListView(generic.ListView):
     model = Site
     template_name = 'configmanager/config_list.html'
+    paginate_by = 5
+
+    def get_queryset(self):
+        return Site.objects.order_by('fullname')
+
+    def get_paginate_by(self, queryset):
+        return self.request.GET.get('paginate_by', self.paginate_by)
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -411,6 +429,7 @@ class UndeployConfigListView(generic.ListView):
     model = Site
     template_name = 'configmanager/config_list.html'
     context_object_name = 'site_list'
+    paginate_by = 5
 
     def get_queryset(self):
         L = []
@@ -418,6 +437,9 @@ class UndeployConfigListView(generic.ListView):
             if site.have_undeploy_config_or_not():
                 L.append(site)
         return L
+
+    def get_paginate_by(self, queryset):
+        return self.request.GET.get('paginate_by', self.paginate_by)
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -540,6 +562,13 @@ def config_rollback(request, confighistorydetail_id):
 class ApplyListView(generic.ListView):
     model = Apply
     template_name = 'configmanager/Apply_list.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Apply.objects.order_by('-apply_time')
+
+    def get_paginate_by(self, queryset):
+        return self.request.GET.get('paginate_by', self.paginate_by)
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -548,7 +577,10 @@ class UndeployApplyListView(generic.ListView):
     context_object_name = 'apply_list'
 
     def get_queryset(self):
-        return Apply.objects.filter(status='WD')
+        return Apply.objects.filter(status='WD').order_by('-wishdeploy_time').order_by('-apply_time')
+
+    def get_paginate_by(self, queryset):
+        return self.request.GET.get('paginate_by', self.paginate_by)
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -731,9 +763,13 @@ class DeploySiteView(generic.DetailView):
 class SLBListView(generic.ListView):
     template_name = 'configmanager/slb_list.html'
     context_object_name = 'slb_list'
+    paginate_by = 10
 
     def get_queryset(self):
         return SLB.objects.order_by('name')
+
+    def get_paginate_by(self, queryset):
+        return self.request.GET.get('paginate_by', self.paginate_by)
 
 
 @login_required(login_url='/login/')

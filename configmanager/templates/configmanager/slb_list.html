@@ -5,74 +5,112 @@
 
 <div class="btn-toolbar container-fluid" role="toolbar">
     <div class="btn-group">
-        <a href="javascript:void(0);" onclick="AllSLBinfoUpdate()" type="button" class="btn btn-default btn-info" >同步SLB基本信息</a>
-        <a href="javascript:void(0);" onclick="AllSLBHealthUpdate()" type="button" class="btn btn-default btn-success" >刷新所有SLB健康信息</a>
-     </div>
+        <a href="javascript:void(0);" onclick="AllSLBinfoUpdate()" type="button" class="btn btn-default btn-info">同步SLB基本信息</a>
+        <a href="javascript:void(0);" onclick="AllSLBHealthUpdate()" type="button" class="btn btn-default btn-success">刷新所有SLB健康信息</a>
+    </div>
 </div><br>
 <div id="whole" class="container-fluid table-responsive">
     {% if slb_list %}
-        <table class="table table-striped table-hover table-condensed">
-            <thead>
-                <th class="text-right">ECS名称&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SLB状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;健康状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操作&nbsp;&nbsp;&nbsp;</th>
-                <th>健康状态</th>
-                <th>实例ID</th>
-                <th>实例别名</th>
-                <th>实例状态</th>
-                <th>实例IP</th>
-                <th>IP地址类型</th>
-                <th>网络类型</th>
-                <th>创建时间</th>
-                <th>站点列表</th>
-            </thead>
-            <tbody>
-                {% for slb in slb_list %}
-                <tr>
-                    <td class="text-right" id="td_{{ slb.id }}">
-                        {% for ecs in slb.slbhealthstatus_set.all %}
-                            <p>
-                                <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
-                                {% if ecs.SLBstatus == "added" %}<span class="text-info">已添加</span>{% else %}<span class="text-danger">已移除</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
-                                {% if ecs.SLBstatus == "added" %}
-                                    {% if ecs.healthstatus == "normal" %}<span class="text-success">正常</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    {% elif ecs.healthstatus == "abnormal" %}<span class="text-danger">异常</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    {% else %}<span class="text-warning">正在检查</span>&nbsp;
-                                    {% endif %}
-                                {% else %}
-                                    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                {% endif %}
-                                <span>
-                                    {% if ecs.SLBstatus == "added" %}<a href="javascript:void(0);" id="removebackendserver{{ slb.id }}" onclick="RemoveBackendServer('{{ slb.id }}', '{{ slb.instanceid }}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')" type="button" class="btn btn-sm btn-warning" >移除</a>{% endif %}
-                                    {% if ecs.SLBstatus == "removed" %}<a href="javascript:void(0);" id="addbackendserver{{ slb.id }}" onclick="AddBackendServer('{{ slb.id }}', '{{ slb.instanceid }}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')" type="button" class="btn btn-sm btn-success" >添加</a>{% endif %}
+    <table class="table table-striped table-hover table-condensed">
+        <thead>
+        <th class="text-right">ECS名称&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SLB状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;健康状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操作&nbsp;&nbsp;&nbsp;</th>
+        <th>健康状态</th>
+        <th>实例ID</th>
+        <th>实例别名</th>
+        <th>实例状态</th>
+        <th>实例IP</th>
+        <th>IP地址类型</th>
+        <th>网络类型</th>
+        <th>创建时间</th>
+        <th>站点列表</th>
+        </thead>
+        <tbody>
+        {% for slb in slb_list %}
+        <tr>
+            <td class="text-right" id="td_{{ slb.id }}">
+                {% for ecs in slb.slbhealthstatus_set.all %}
+                <p>
+                    <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% if ecs.SLBstatus == "added" %}<span class="text-info">已添加</span>{% else %}<span
+                        class="text-danger">已移除</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% if ecs.SLBstatus == "added" %}
+                    {% if ecs.healthstatus == "normal" %}<span class="text-success">正常</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% elif ecs.healthstatus == "abnormal" %}<span class="text-danger">异常</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% else %}<span class="text-warning">正在检查</span>&nbsp;
+                    {% endif %}
+                    {% else %}
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    {% endif %}
+                    <span>
+                                    {% if ecs.SLBstatus == "added" %}<a href="javascript:void(0);"
+                                                                        id="removebackendserver{{ slb.id }}"
+                                                                        onclick="RemoveBackendServer('{{ slb.id }}', '{{ slb.instanceid }}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')"
+                                                                        type="button"
+                                                                        class="btn btn-sm btn-warning">移除</a>{% endif %}
+                                    {% if ecs.SLBstatus == "removed" %}<a href="javascript:void(0);"
+                                                                          id="addbackendserver{{ slb.id }}"
+                                                                          onclick="AddBackendServer('{{ slb.id }}', '{{ slb.instanceid }}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')"
+                                                                          type="button" class="btn btn-sm btn-success">添加</a>{% endif %}
                                 </span>
-                             </p>
-                        {% endfor %}
-                    </td>
-                    <td><a href="javascript:void(0);" id="healthrefresh{{ slb.id }}" onclick="HealthRefresh('{{ slb.id }}', '{{ slb.instanceid }}')" type="button" class="btn btn-sm btn-info" >刷新</a></td>
-                    <td>
-                        <button type="button" class="btn btn-link">
-                            <a href="{% url 'configmanager:slbdetail' slb.id %}">{{ slb.instanceid }}</a>
-                        </button>
-                    </td>
-                    <td>{{ slb.name }}</td>
-                    <td>{{ slb.status }}</td>
-                    <td>{{ slb.ip }}</td>
-                    <td>{% if slb.addresstype == "internet" %}公网{% endif %}{% if slb.addresstype == "intranet" %}私网{% endif %}</td>
-                    <td>{% if slb.networktype == "classic" %}经典网络{% endif %}{% if slb.networktype == "vpc" %}专有网络{% endif %}</td>
-                    <td>{{ slb.createdate }}</td>
-                    <td>
-                        {% for site in slb.slbsite_set.all %}
-                            <p>{{ site }}</p>
-                        {% endfor %}
-                    </td>
-                </tr>
+                </p>
                 {% endfor %}
-            </tbody>
-        </table>
+            </td>
+            <td><a href="javascript:void(0);" id="healthrefresh{{ slb.id }}"
+                   onclick="HealthRefresh('{{ slb.id }}', '{{ slb.instanceid }}')" type="button"
+                   class="btn btn-sm btn-info">刷新</a></td>
+            <td>
+                <button type="button" class="btn btn-link">
+                    <a href="{% url 'configmanager:slbdetail' slb.id %}">{{ slb.instanceid }}</a>
+                </button>
+            </td>
+            <td>{{ slb.name }}</td>
+            <td>{{ slb.status }}</td>
+            <td>{{ slb.ip }}</td>
+            <td>{% if slb.addresstype == "internet" %}公网{% endif %}{% if slb.addresstype == "intranet" %}私网{% endif %}
+            </td>
+            <td>{% if slb.networktype == "classic" %}经典网络{% endif %}{% if slb.networktype == "vpc" %}专有网络{% endif %}
+            </td>
+            <td>{{ slb.createdate }}</td>
+            <td>
+                {% for site in slb.slbsite_set.all %}
+                <p>{{ site }}</p>
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
     {% else %}
-        <p>No SLB are available.</p>
+    <p>No SLB are available.</p>
     {% endif %}
-</div>
 
+    {% if is_paginated %}
+    <ul class="pagination">
+        <li>
+            <span>共有 {{ page_obj.paginator.count }} 条记录</span>&nbsp;&nbsp;
+            <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        </li>
+        {% if page_obj.has_previous %}
+        <li><a href="?page={{ page_obj.previous_page_number }}">上一页</a></li>
+        {% else %}
+        <li class="disabled"><span>上一页</span></li>
+        {% endif %}
+        {% for i in paginator.page_range %}
+        {% if page_obj.number == i %}
+        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+        {% else %}
+        <li><a href="?page={{ i }}">{{ i }}</a></li>
+        {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+        <li><a href="?page={{ page_obj.next_page_number }}">下一页</a></li>
+        {% else %}
+        <li class="disabled"><span>下一页</span></li>
+        {% endif %}
+    </ul>
+    {% endif %}
+
+</div>
 
 
 <script>
@@ -242,8 +280,8 @@ function AllSLBHealthUpdate() {
 
 
 
-</script>
 
+</script>
 
 
 {% endblock %}

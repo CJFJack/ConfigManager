@@ -3,8 +3,14 @@
 {% block content %}
 
 <div id="whole" class="container-fluid table-responsive">
+    <div>
+        <a href="{% url 'configmanager:applychange' apply.id %}" type="button" class="btn btn-default">返回</a>
+    </div>
     {% if apply %}
-        <table class="table table-striped table-hover table-condensed table-bordered">
+    <table class="table table-striped table-hover table-condensed table-bordered">
+        <caption><strong>发布编号：{{ apply.applyproject }}</strong></caption>
+        <thead>
+        <tr>
             <th>发布优先级</th>
             <th>代码分支</th>
             <th>Jenkins版本号</th>
@@ -14,35 +20,38 @@
             <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;所属ECS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SLB状态&nbsp;&nbsp;&nbsp;健康状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操作</th>
             <th>健康检查</th>
             <th>&nbsp;&nbsp;&nbsp;&nbsp;所属ECS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;发布状态&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;操作</th>
-            {% for site in apply.deployitem_set.all %}
-            <tr>
-                <td>{{ site.deployorderby }}</td>
-                <td>{% if site.type == "T" %}主干{% else %}分支{% endif %}</td>
-                <td>{{ site.jenkinsversion }}</td>
-                <td>
-                    <a href="{% url 'configmanager:sitechange' site.deploysite.id %}" target="_blank">{{ site.deploysite.fullname }}</a>
-                </td>
-                <td>{{ site.deploysite.deployattention }}</td>
-                <td align="right">
-                    {% for r in site.deploysite.release_set.all %}
-                        <p>
-                            {{ r.ECS }}&nbsp;&nbsp;&nbsp;
-                            {% if r.status == "N" %}
-                                <font color="red">待生效</font>&nbsp;&nbsp;&nbsp;
-                            {% endif %}
-                            {% if r.status == "Y" %}
-                                已生效&nbsp;&nbsp;&nbsp;
-                            {% endif %}
-                            <a class="btn btn-primary" href="">浏览测试页</a>
-                        </p>
-                    {% endfor %}
-                </td>
-                <td id="td_{{ site.id }}" align="right">
-                    {% for ecs in site.deploysite.get_one_slb.slbhealthstatus_set.all %}
-                        <p>
-                            <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;
-                            <span>{% if ecs.SLBstatus == "added" %}已添加{% else %}<font color="red">已移除</font>{% endif %}</span>&nbsp;&nbsp;
-                            <span>
+        </tr>
+        </thead>
+        <tbody>
+        {% for site in apply.deployitem_set.all %}
+        <tr>
+            <td>{{ site.deployorderby }}</td>
+            <td>{% if site.type == "T" %}主干{% else %}分支{% endif %}</td>
+            <td>{{ site.jenkinsversion }}</td>
+            <td>
+                <a href="{% url 'configmanager:sitechange' site.deploysite.id %}" target="_blank"><span>{{ site.deploysite.fullname }}</span></a>
+            </td>
+            <td>{{ site.deploysite.deployattention }}</td>
+            <td align="right">
+                {% for r in site.deploysite.release_set.all %}
+                <p>
+                    {{ r.ECS }}&nbsp;&nbsp;&nbsp;
+                    {% if r.status == "N" %}
+                    <font color="red">待生效</font>&nbsp;&nbsp;&nbsp;
+                    {% endif %}
+                    {% if r.status == "Y" %}
+                    已生效&nbsp;&nbsp;&nbsp;
+                    {% endif %}
+                    <a class="btn btn-primary" href="">浏览测试页</a>
+                </p>
+                {% endfor %}
+            </td>
+            <td id="td_{{ site.id }}" align="right">
+                {% for ecs in site.deploysite.get_one_slb.slbhealthstatus_set.all %}
+                <p>
+                    <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;
+                    <span>{% if ecs.SLBstatus == "added" %}已添加{% else %}<font color="red">已移除</font>{% endif %}</span>&nbsp;&nbsp;
+                    <span>
                                 {% if ecs.SLBstatus == "added" %}
                                     {% if ecs.healthstatus == "normal" %}&nbsp;&nbsp;&nbsp;&nbsp;正常&nbsp;&nbsp;&nbsp;&nbsp;
                                     {% elif ecs.healthstatus == "abnormal" %}<font color="red">异常</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -51,48 +60,54 @@
                                 {% else %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 {% endif %}
                             </span>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <span>
-                                {% if ecs.SLBstatus == "added" %}<a class="btn btn-warning" href="javascript:void(0)" onclick="SiteRemoveBackendServer('{{ site.deploysite.id }}', '{{ site.deploysite.fullname }}', '{{ site.id }}', '{{ ecs.ECS.id }}', '{{ ecs.ECS.name }}')">移除</a>{% endif %}
-                                {% if ecs.SLBstatus == "removed" %}<a class="btn btn-success" href="javascript:void(0)" onclick="SiteAddBackendServer('{{ site.deploysite.id }}', '{{ site.deploysite.fullname }}', '{{ site.id }}', '{{ ecs.ECS.id }}', '{{ ecs.ECS.name }}')">添加</a>{% endif %}
+                    <span>
+                                {% if ecs.SLBstatus == "added" %}<a class="btn btn-warning" href="javascript:void(0)"
+                                                                    onclick="SiteRemoveBackendServer('{{ site.deploysite.id }}', '{{ site.deploysite.fullname }}', '{{ site.id }}', '{{ ecs.ECS.id }}', '{{ ecs.ECS.name }}')">移除</a>{% endif %}
+                                {% if ecs.SLBstatus == "removed" %}<a class="btn btn-success" href="javascript:void(0)"
+                                                                      onclick="SiteAddBackendServer('{{ site.deploysite.id }}', '{{ site.deploysite.fullname }}', '{{ site.id }}', '{{ ecs.ECS.id }}', '{{ ecs.ECS.name }}')">添加</a>{% endif %}
                             </span>
-                        <p/>
-                    {% endfor %}
-                </td>
-                <td><a class="btn btn-info" href="javascript:void(0)" onclick="MoreHealthRefresh('{{ site.deploysite.id }}', '{{ site.deploysite.fullname }}', '{{ site.id }}')">刷新</a></td>
-                <td align="right">
-                    {% for d in site.deploysite.deployecs_set.all %}
-                        {% if d.applyproject_id == apply.id %}
-                        <p>
-                            <span>{{ d.ECS }}</span>&nbsp;&nbsp;
-                            <span>{% if d.ECSdeploystatus == "N" %}<font color="red">待发布</font>{% else %}已发布{% endif %}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            <span>
+                <p/>
+                {% endfor %}
+            </td>
+            <td><a class="btn btn-info" href="javascript:void(0)"
+                   onclick="MoreHealthRefresh('{{ site.deploysite.id }}', '{{ site.deploysite.fullname }}', '{{ site.id }}')">刷新</a>
+            </td>
+            <td align="right">
+                {% for d in site.deploysite.deployecs_set.all %}
+                {% if d.applyproject_id == apply.id %}
+                <p>
+                    <span>{{ d.ECS }}</span>&nbsp;&nbsp;
+                    <span>{% if d.ECSdeploystatus == "N" %}<font color="red">待发布</font>{% else %}已发布{% endif %}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span>
                                 {% if d.ECSdeploystatus == "N" %}
                                     {% for r in d.site.release_set.all %}
                                         {% if r.ECS.id == d.ECS.id %}
                                             {% if r.status == "N" %}
-                                                <a class="btn btn-primary" href="{% url 'configmanager:applyconfigdeploy' deployecs_id=d.id release_id=r.id %}">发布</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                                                <a class="btn btn-primary"
+                                                   href="{% url 'configmanager:applyconfigdeploy' deployecs_id=d.id release_id=r.id %}">发布</a>&nbsp;&nbsp;&nbsp;&nbsp;
                                             {% else %}
-                                                <a class="btn btn-success" href="{% url 'configmanager:applyconfigdeploy' deployecs_id=d.id release_id=r.id %}">标记为已发布</a>
+                                                <a class="btn btn-success"
+                                                   href="{% url 'configmanager:applyconfigdeploy' deployecs_id=d.id release_id=r.id %}">标记为已发布</a>
                                             {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                 {% endif %}
                             </span>
-                        </p>
-                        {% endif %}
-                    {% endfor %}
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
+                </p>
+                {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
     {% else %}
-        <p>No deploysite are available.</p>
+    <p>No deploysite are available.</p>
     {% endif %}
 </div>
 <br>
-<div>
-    <button type="button" class="btn btn-default">返回</button>
-</div>
+
+
 <script>
 $.ajaxSetup({
     data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
@@ -105,7 +120,6 @@ function PartialRefresh(siteid) {
         $('#td_'+siteid).html(data)
     });
 }
-
 
 //刷新SLB健康状态
 function MoreHealthRefresh(siteid, sitename, deploysiteid) {
@@ -193,6 +207,16 @@ function SiteAddBackendServer(siteid, sitename, deploysiteid, serverid, serverna
         },300);
     });
 }
+
+
+
+
+
+
+
+
+
+
 
 </script>
 

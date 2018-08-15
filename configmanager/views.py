@@ -8,13 +8,13 @@ from django.core.files import File
 import os, json, ConfigParser
 from django.contrib import messages
 
-
 # Create your views here.
 
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
-from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem, SLB, SLBsite, SLBhealthstatus, DeployECS
+from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem, SLB, \
+    SLBsite, SLBhealthstatus, DeployECS
 from .forms import ApplyForm, DeployitemFormSet, SLBForm, SLBsiteFormSet
 from django.http import HttpResponse
 from django.views import generic
@@ -31,7 +31,6 @@ from .acs_slb_health import query_slb_health
 from .acs_slb_backendserver_remove import remove_backendserver
 from .acs_slb_backendserver_add import add_backendserver
 from .acs_all_ecs_info import query_all_ecs
-
 
 app_name = 'configmanager'
 
@@ -52,6 +51,7 @@ def nav_top(request):
 class ECSListView(generic.ListView):
     template_name = 'configmanager/ecs_list.html'
     context_object_name = 'ECS_list'
+
     def get_queryset(self):
         return ECS.objects.order_by('name')
 
@@ -98,21 +98,20 @@ def ecs_delete(request, ecs_id):
 @login_required(login_url='/login/')
 def ecs_add(request):
     if request.POST.has_key('ecs-add'):
-        instanceid = request.POST['instanceid']                                                                                           
+        instanceid = request.POST['instanceid']
         ecs = ECS(instanceid=instanceid)
-        ecs.save()                                                                                                                            
-    return HttpResponseRedirect(reverse('configmanager:ecslist'))   
-        
+        ecs.save()
+    return HttpResponseRedirect(reverse('configmanager:ecslist'))
 
 
-@login_required(login_url='/login/') 
+@login_required(login_url='/login/')
 def update_ecs_monitor(request, ecs_id):
     ecs = get_object_or_404(ECS, pk=ecs_id)
     instanceid = ecs.instanceid.encode('utf-8')
     try:
-        recently_cpu=query_ecs_api(instanceid=instanceid, metric="cpu_total")
-        recently_mem=query_ecs_api(instanceid=instanceid, metric="memory_usedutilization")
-        recently_diskusage=query_ecs_api(instanceid=instanceid, metric="diskusage_utilization")
+        recently_cpu = query_ecs_api(instanceid=instanceid, metric="cpu_total")
+        recently_mem = query_ecs_api(instanceid=instanceid, metric="memory_usedutilization")
+        recently_diskusage = query_ecs_api(instanceid=instanceid, metric="diskusage_utilization")
     except:
         pass
     else:
@@ -131,12 +130,12 @@ def update_allecs_monitor(request):
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
-@login_required(login_url='/login/')                                                                                                      
-def update_ecs_info(request, ecs_id): 
+@login_required(login_url='/login/')
+def update_ecs_info(request, ecs_id):
     ecs = get_object_or_404(ECS, pk=ecs_id)
     instanceid = ecs.instanceid.encode('utf-8')
     try:
-        result=query_ecs_info(instanceids=[instanceid])
+        result = query_ecs_info(instanceids=[instanceid])
     except:
         pass
     else:
@@ -146,7 +145,7 @@ def update_ecs_info(request, ecs_id):
         ecs.regionId = result['RegionId']
         ecs.osname = result['OSName']
         ecs.expiredtime = result['ExpiredTime']
-        ecs.memory = result['Memory']/1024
+        ecs.memory = result['Memory'] / 1024
         ecs.ostype = result['OSType']
         ecs.networktype = result['NetworkType']
         ecs.name = result['InstanceName']
@@ -173,7 +172,7 @@ def sync_all_ecs_info(request):
         if ecsinstanceid not in ecs_aliyun:
             ecs = get_object_or_404(ECS, instanceid=ecsinstanceid)
             ecs.delete()
-    return HttpResponse(json.dumps({'success':True}), content_type="application/json")
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
 @login_required(login_url='/login/')
@@ -183,18 +182,18 @@ def update_allecs_info(request):
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
-    
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class SiteListView(generic.ListView):
     template_name = 'configmanager/site_list.html'
     context_object_name = 'Site_list'
+
     def get_queryset(self):
         return Site.objects.order_by('fullname')
 
     def get_context_data(self, **kwargs):
         context = super(SiteListView, self).get_context_data(**kwargs)
         context['configfile'] = Site.configfile_set
-        return context            
+        return context
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -218,7 +217,6 @@ class SiteChangeView(generic.DetailView):
 
 @login_required(login_url='/login/')
 def add_relation_ecs(request, site):
-
     for key in request.POST:
         try:
             e = ECS.objects.get(name=key)
@@ -226,6 +224,7 @@ def add_relation_ecs(request, site):
             pass
         else:
             site.ECSlists.add(e)
+
 
 @login_required(login_url='/login/')
 def add_relation_site(request, site):
@@ -252,7 +251,7 @@ def site_save(request, site_id):
         s.deployattention = request.POST['deployattention']
         s.modified_user = request.user.username
         s.save()
-        
+
         '''新增或删除关联配置文件'''
         post_filenames_list = []
         post_filenames = request.POST['configfiles']
@@ -260,7 +259,7 @@ def site_save(request, site_id):
         s.update_configfiles(post_filenames_list=post_filenames_list)
 
         ''''增加所属ECS'''
-        add_relation_ecs(request=request, site=s) 
+        add_relation_ecs(request=request, site=s)
 
         '''减少所属ECS'''
         for es in s.ECSlists.all():
@@ -280,11 +279,11 @@ def site_save(request, site_id):
             for rs in s.get_relation_sites():
                 if rs not in L:
                     rs_obj = Site.objects.get(fullname=rs)
-                    rs_obj.siterace_set.all().delete()                        
- 
+                    rs_obj.siterace_set.all().delete()
+
         '''增加关联站点'''
         add_relation_site(request, s)
-        messages.success(request, "成功！修改站点 <a href=\'/site/"+str(site_id)+"/change/\'>"+s.fullname+"</a>")
+        messages.success(request, "成功！修改站点 <a href=\'/site/" + str(site_id) + "/change/\'>" + s.fullname + "</a>")
         return HttpResponseRedirect(reverse('configmanager:sitelist'))
 
     if request.POST.has_key('site-goback'):
@@ -302,7 +301,7 @@ class SiteAddView(generic.ListView):
         Siteraces = Siterace.objects.all()
         context['ECSs'] = ECSs
         context['Siteraces'] = Siteraces
-        return context 
+        return context
 
 
 @login_required(login_url='/login/')
@@ -321,7 +320,8 @@ def site_add(request):
         devcharge = request.POST['devcharge']
         deployattention = request.POST['deployattention']
         modified_user = request.user.username
-        site = Site(fullname=fullname, shortname=shortname, configdirname=configdirname, port=port, testpage=testpage, status=status, devcharge=devcharge, deployattention=deployattention, modified_user=modified_user)
+        site = Site(fullname=fullname, shortname=shortname, configdirname=configdirname, port=port, testpage=testpage,
+                    status=status, devcharge=devcharge, deployattention=deployattention, modified_user=modified_user)
         site.save()
         '''添加关联ECS'''
         add_relation_ecs(request, site)
@@ -394,16 +394,17 @@ def race_site_relation(request, race_id):
             except:
                 pass
             else:
-                site.siterace_id=race_id
+                site.siterace_id = race_id
                 site.save()
         messages.success(request, "成功！修改 <a href=\'/race/" + str(race_id) + "/change/\'>" + race.alias + "</a>")
     return HttpResponseRedirect(reverse('configmanager:racelist'))
+
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class ConfigListView(generic.ListView):
     model = Site
     template_name = 'configmanager/config_list.html'
-    
+
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class UndeployConfigListView(generic.ListView):
@@ -429,6 +430,7 @@ class ConfigChangeView(generic.DetailView):
 def config_save(request, configfile_id):
     if request.POST.has_key('config-save'):
         '''保存配置函数'''
+
         def relation_config_save(request, configfileid):
             '''保存基本配置信息'''
             c = get_object_or_404(Configfile, pk=configfileid)
@@ -447,8 +449,9 @@ def config_save(request, configfile_id):
                     r = Release.objects.get(site_id=siteid, ECS_id=ecsid)
                     r.status = 'N'
                     r.save()
+
         '''保存配置内容'''
-        c = get_object_or_404(Configfile, pk=configfile_id)    
+        c = get_object_or_404(Configfile, pk=configfile_id)
         for key in request.POST:
             try:
                 s = Site.objects.get(fullname=key)
@@ -458,7 +461,7 @@ def config_save(request, configfile_id):
                 for p_c in s.configfile_set.all():
                     if p_c.filename == c.filename:
                         relation_config_save(request, configfileid=p_c.id)
-            
+
         return HttpResponseRedirect(reverse('configmanager:configlist'))
     if request.POST.has_key('config-goback'):
         return HttpResponseRedirect(reverse('configmanager:configlist'))
@@ -508,7 +511,7 @@ def config_history(request, configfile_id):
     confighistory_list = ConfigmanagerHistoricalconfigfile.objects.filter(id=configfile_id).order_by('-modified_time')
     template_name = 'configmanager/config_history.html'
     return render_to_response(template_name, {'confighistory_list': confighistory_list})
-    
+
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class ConfigHistoryDetailView(generic.DetailView):
@@ -520,13 +523,14 @@ class ConfigHistoryDetailView(generic.DetailView):
 @login_required(login_url='/login/')
 def config_rollback(request, confighistorydetail_id):
     ch = ConfigmanagerHistoricalconfigfile.objects.get(pk=confighistorydetail_id)
-    configfileid=ch.id
+    configfileid = ch.id
     if request.POST.has_key('config-rollback'):
         rollbackcontent = ch.content
         c = Configfile.objects.get(pk=configfileid)
         c.content = rollbackcontent
         c.save()
-        messages.success(request, "成功！回滚站点 "+ch.get_site_fullname()+" 配置文件 "+ch.filename+" 修改编号："+confighistorydetail_id)
+        messages.success(request,
+                         "成功！回滚站点 " + ch.get_site_fullname() + " 配置文件 " + ch.filename + " 修改编号：" + confighistorydetail_id)
         return HttpResponseRedirect(reverse('configmanager:configlist'))
     if request.POST.has_key('config-goback'):
         return HttpResponseRedirect(reverse('configmanager:confighistory', args=(configfileid,)))
@@ -540,8 +544,9 @@ class ApplyListView(generic.ListView):
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class UndeployApplyListView(generic.ListView):
-    template_name = 'configmanager/undeploy_apply_list.html'
+    template_name = 'configmanager/apply_list.html'
     context_object_name = 'apply_list'
+
     def get_queryset(self):
         return Apply.objects.filter(status='WD')
 
@@ -549,9 +554,9 @@ class UndeployApplyListView(generic.ListView):
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class ApplyChangeView(UpdateView):
     model = Apply
-    form_class = ApplyForm 
+    form_class = ApplyForm
     template_name = 'configmanager/apply_change.html'
-    
+
     def get_context_data(self, **kwargs):
         context = super(ApplyChangeView, self).get_context_data(**kwargs)
         if self.request.POST:
@@ -560,8 +565,8 @@ class ApplyChangeView(UpdateView):
         else:
             context['apply_form'] = ApplyForm(instance=self.object)
             context['deployitem_form'] = DeployitemFormSet(instance=self.object)
-        return context   
-    
+        return context
+
 
 @login_required(login_url='/login/')
 def apply_save(request, obj):
@@ -597,51 +602,61 @@ def apply_status_change(request, apply_id):
         if request.POST.has_key('dev-approval'):
             a.status = 'TA'
             a.save()
-            a.applyoperatelog_set.create(type='研发经理审核通过', OperatorName=request.user.username, OperationTime=datetime.now())
+            a.applyoperatelog_set.create(type='研发经理审核通过', OperatorName=request.user.username,
+                                         OperationTime=datetime.now())
         if request.POST.has_key('dev-unapproval'):
             a.status = 'WC'
             a.save()
-            a.applyoperatelog_set.create(type='研发经理审核不通过', OperatorName=request.user.username, OperationTime=datetime.now())
+            a.applyoperatelog_set.create(type='研发经理审核不通过', OperatorName=request.user.username,
+                                         OperationTime=datetime.now())
         return HttpResponseRedirect(reverse('configmanager:applylist'))
     if a.status == 'TA':
         if request.POST.has_key('test-approval'):
             a.status = 'EA'
             a.save()
-            a.applyoperatelog_set.create(type='测试经理审核通过', OperatorName=request.user.username, OperationTime=datetime.now())
+            a.applyoperatelog_set.create(type='测试经理审核通过', OperatorName=request.user.username,
+                                         OperationTime=datetime.now())
         if request.POST.has_key('test-unapproval'):
             a.status = 'WC'
             a.save()
-            a.applyoperatelog_set.create(type='测试经理审核不通过', OperatorName=request.user.username, OperationTime=datetime.now())
+            a.applyoperatelog_set.create(type='测试经理审核不通过', OperatorName=request.user.username,
+                                         OperationTime=datetime.now())
         return HttpResponseRedirect(reverse('configmanager:applylist'))
     if a.status == 'EA':
         if request.POST.has_key('EA-approval'):
             a.status = 'OA'
             a.save()
-            a.applyoperatelog_set.create(type='运维工程师审核通过', OperatorName=request.user.username, OperationTime=datetime.now())
+            a.applyoperatelog_set.create(type='运维工程师审核通过', OperatorName=request.user.username,
+                                         OperationTime=datetime.now())
         if request.POST.has_key('EA-unapproval'):
             a.status = 'WC'
             a.save()
-            a.applyoperatelog_set.create(type='运维工程师审核不通过', OperatorName=request.user.username, OperationTime=datetime.now())
+            a.applyoperatelog_set.create(type='运维工程师审核不通过', OperatorName=request.user.username,
+                                         OperationTime=datetime.now())
         return HttpResponseRedirect(reverse('configmanager:applylist'))
     if a.status == 'OA':
         if request.POST.has_key('OA-approval'):
             a.status = 'TDA'
             a.save()
-            a.applyoperatelog_set.create(type='运维经理审核通过', OperatorName=request.user.username, OperationTime=datetime.now())
+            a.applyoperatelog_set.create(type='运维经理审核通过', OperatorName=request.user.username,
+                                         OperationTime=datetime.now())
         if request.POST.has_key('OA-unapproval'):
             a.status = 'WC'
             a.save()
-            a.applyoperatelog_set.create(type='运维经理审核不通过', OperatorName=request.user.username, OperationTime=datetime.now())
+            a.applyoperatelog_set.create(type='运维经理审核不通过', OperatorName=request.user.username,
+                                         OperationTime=datetime.now())
         return HttpResponseRedirect(reverse('configmanager:applylist'))
     if a.status == 'TDA':
         if request.POST.has_key('TDA-approval'):
             a.status = 'WD'
             a.save()
-            a.applyoperatelog_set.create(type='技术总监审核通过', OperatorName=request.user.username, OperationTime=datetime.now())
+            a.applyoperatelog_set.create(type='技术总监审核通过', OperatorName=request.user.username,
+                                         OperationTime=datetime.now())
         if request.POST.has_key('TDA-unapproval'):
             a.status = 'WC'
             a.save()
-            a.applyoperatelog_set.create(type='技术总监审核不通过', OperatorName=request.user.username, OperationTime=datetime.now())
+            a.applyoperatelog_set.create(type='技术总监审核不通过', OperatorName=request.user.username,
+                                         OperationTime=datetime.now())
         return HttpResponseRedirect(reverse('configmanager:applylist'))
     if a.status == 'WD':
         if request.POST.has_key('deploy-finish'):
@@ -693,6 +708,7 @@ class ApplyAdd(CreateView):
                 d.save()
         deployitem_form.save()
         return HttpResponseRedirect(reverse('configmanager:applylist'))
+
     def form_invalid(self, apply_form, deployitem_form):
         return self.render_to_response(
             self.get_context_data(apply_form=apply_form, deployitem_form=deployitem_form))
@@ -715,6 +731,7 @@ class DeploySiteView(generic.DetailView):
 class SLBListView(generic.ListView):
     template_name = 'configmanager/slb_list.html'
     context_object_name = 'slb_list'
+
     def get_queryset(self):
         return SLB.objects.order_by('name')
 
@@ -725,39 +742,43 @@ def all_slb_info_update(request):
     try:
         result = query_slb_info(regionid='cn-hangzhou')
     except:
-        return HttpResponse(json.dumps({'success':False, 'message':'网络超时，调用阿里云接口失败'}), content_type="application/json") 
+        return HttpResponse(json.dumps({'success': False, 'message': '网络超时，调用阿里云接口失败'}),
+                            content_type="application/json")
     else:
         if 'Message' in result:
-            return HttpResponse(json.dumps({'success':False, 'message':result['Message']}), content_type="application/json")
+            return HttpResponse(json.dumps({'success': False, 'message': result['Message']}),
+                                content_type="application/json")
         else:
             for slb in result:
                 '''新增或更新现有SLB'''
                 if not SLB.objects.filter(instanceid=slb['LoadBalancerId']):
-                    s = SLB(instanceid=slb['LoadBalancerId'], name=slb['LoadBalancerName'], status=slb['LoadBalancerStatus'], ip=slb['Address'], addresstype=slb['AddressType'], createdate=slb['CreateTime'], networktype=slb['NetworkType'])
+                    s = SLB(instanceid=slb['LoadBalancerId'], name=slb['LoadBalancerName'],
+                            status=slb['LoadBalancerStatus'], ip=slb['Address'], addresstype=slb['AddressType'],
+                            createdate=slb['CreateTime'], networktype=slb['NetworkType'])
                     s.save()
                 else:
                     s = SLB.objects.get(instanceid=slb['LoadBalancerId'])
-                    s.instanceid=slb['LoadBalancerId']
-                    s.name=slb['LoadBalancerName']
-                    s.status=slb['LoadBalancerStatus']
-                    s.ip=slb['Address']
-                    s.addresstype=slb['AddressType']
-                    s.createdate=slb['CreateTime']
-                    s.networktype=slb['NetworkType']
+                    s.instanceid = slb['LoadBalancerId']
+                    s.name = slb['LoadBalancerName']
+                    s.status = slb['LoadBalancerStatus']
+                    s.ip = slb['Address']
+                    s.addresstype = slb['AddressType']
+                    s.createdate = slb['CreateTime']
+                    s.networktype = slb['NetworkType']
                     s.save()
-                slb_list.append(slb['LoadBalancerId'])    
+                slb_list.append(slb['LoadBalancerId'])
             for current_slb in SLB.objects.all():
                 '''删除阿里云没有的SLB'''
                 if current_slb.instanceid not in slb_list:
                     current_slb.delete()
-            return HttpResponse(json.dumps({'success':True}), content_type="application/json")
-            
-        
+            return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class SLBDetailView(UpdateView):
     model = SLB
     form_class = SLBForm
-    template_name = 'configmanager/slb_detail.html'    
+    template_name = 'configmanager/slb_detail.html'
 
     def get_context_data(self, **kwargs):
         context = super(SLBDetailView, self).get_context_data(**kwargs)
@@ -767,7 +788,7 @@ class SLBDetailView(UpdateView):
         else:
             context['slb_form'] = SLBForm(instance=self.object)
             context['slbsite_form'] = SLBsiteFormSet(instance=self.object)
-        return context  
+        return context
 
 
 @login_required(login_url='/login/')
@@ -787,17 +808,19 @@ def slb_health_update(request, slb_id):
         '''判断SLB实例是否存在'''
         slb = get_object_or_404(SLB, pk=slb_id)
     except:
-        return render_to_response(request.META['HTTP_REFERER'], {'success':False})
+        return render_to_response(request.META['HTTP_REFERER'], {'success': False})
     else:
         try:
             '''判断调用阿里云接口是否成功'''
             result = query_slb_health(LoadBalancerId=slb.instanceid)
         except:
-            return HttpResponse(json.dumps({'success':False, 'message':'网络超时，调用阿里云接口失败'}), content_type="application/json")
-        else: 
+            return HttpResponse(json.dumps({'success': False, 'message': '网络超时，调用阿里云接口失败'}),
+                                content_type="application/json")
+        else:
             if 'Message' in result:
                 '''判断调用阿里云是否返回报错信息'''
-                return HttpResponse(json.dumps({'success':False, 'message':result['Message']}), content_type="application/json")
+                return HttpResponse(json.dumps({'success': False, 'message': result['Message']}),
+                                    content_type="application/json")
             else:
                 '''无报错则开始处理返回数据'''
                 for sh in SLBhealthstatus.objects.filter(SLB_id=slb.id):
@@ -809,20 +832,22 @@ def slb_health_update(request, slb_id):
                         '''判断数据库中是否存在ECS，没有则需要先到ECS页面同步ECS信息'''
                         ecs = get_object_or_404(ECS, instanceid=r['ServerId'])
                     except:
-                        return HttpResponse(json.dumps({'success':False, 'message':'ECS不存在，请到ECS页面进行同步后再刷新SLB信息'}), content_type="application/json")
+                        return HttpResponse(json.dumps({'success': False, 'message': 'ECS不存在，请到ECS页面进行同步后再刷新SLB信息'}),
+                                            content_type="application/json")
                     else:
                         '''判断数据库中该SLB是否有对应的后端服务器记录，没有则增加，有则更新'''
                         if not SLBhealthstatus.objects.filter(SLB_id=slb.id, ECS_id=ecs.id):
-                            sh = SLBhealthstatus(SLB_id=slb.id, ECS_id=ecs.id, SLBstatus='added', healthstatus=r['ServerHealthStatus'])
+                            sh = SLBhealthstatus(SLB_id=slb.id, ECS_id=ecs.id, SLBstatus='added',
+                                                 healthstatus=r['ServerHealthStatus'])
                             sh.save()
                         else:
                             sh = SLBhealthstatus.objects.get(SLB_id=slb.id, ECS_id=ecs.id)
-                            sh.SLB_id=slb.id
-                            sh.ECS_id=ecs.id
-                            sh.SLBstatus='added'
-                            sh.healthstatus=r['ServerHealthStatus']
+                            sh.SLB_id = slb.id
+                            sh.ECS_id = ecs.id
+                            sh.SLBstatus = 'added'
+                            sh.healthstatus = r['ServerHealthStatus']
                             sh.save()
-                return HttpResponse(json.dumps({'success':True}), content_type="application/json")
+                return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
 @login_required(login_url='/login/')
@@ -830,23 +855,23 @@ def more_slb_health_update(request, site_id):
     try:
         s = get_object_or_404(Site, pk=site_id)
     except:
-        return HttpResponse(json.dumps({'success':False, 'message':'没有此站点，请重新刷新页面'}), content_type="application/json")
+        return HttpResponse(json.dumps({'success': False, 'message': '没有此站点，请重新刷新页面'}), content_type="application/json")
     else:
         slb_id_list = s.get_slb_id_list()
         if 0 not in slb_id_list:
             for slbid in slb_id_list:
                 slb_health_update(request, slb_id=slbid)
         else:
-            return HttpResponse(json.dumps({'success': False, 'message': '该站点没有关联SLB，请到SLB管理页面进行关联'}),content_type="application/json")
-        return HttpResponse(json.dumps({'success':True}), content_type="application/json")
+            return HttpResponse(json.dumps({'success': False, 'message': '该站点没有关联SLB，请到SLB管理页面进行关联'}),
+                                content_type="application/json")
+        return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
 @login_required(login_url='/login/')
 def all_slb_health_update(request):
     for slb in SLB.objects.all():
         slb_health_update(request, slb_id=slb.id)
-    return HttpResponse(json.dumps({'success':True}), content_type="application/json")
-    
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
 @login_required(login_url='/login/')
@@ -860,13 +885,15 @@ def remove_backend_server(request, slb_id, server_id):
     try:
         r = remove_backendserver(LoadBalancerId=slbinstanceId, BackendServers=backendservers)
     except:
-        return HttpResponse(json.dumps({'success':False, 'message':'网络超时，调用阿里云接口失败'}), content_type="application/json")
+        return HttpResponse(json.dumps({'success': False, 'message': '网络超时，调用阿里云接口失败'}),
+                            content_type="application/json")
     else:
         if 'Message' in r:
-            return HttpResponse(json.dumps({'success':False, 'message':r['Message']}), content_type="application/json") 
+            return HttpResponse(json.dumps({'success': False, 'message': r['Message']}),
+                                content_type="application/json")
         else:
             slb_health_update(request, slb.id)
-            return HttpResponse(json.dumps({'success':True}), content_type="application/json")
+            return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
 @login_required(login_url='/login/')
@@ -874,13 +901,14 @@ def site_remove_backend_server(request, site_id, server_id):
     try:
         s = get_object_or_404(Site, pk=site_id)
     except:
-        return HttpResponse(json.dumps({'success':False, 'message':'该站点不存在，请重新刷新页面'}), content_type="application/json")
+        return HttpResponse(json.dumps({'success': False, 'message': '该站点不存在，请重新刷新页面'}),
+                            content_type="application/json")
     else:
         for slb in s.slbsite_set.all():
             remove_backend_server(request, slb_id=slb.SLB.id, server_id=server_id)
         slb_health_update(request, slb_id=slb.SLB.id)
-        return HttpResponse(json.dumps({'success':True}), content_type="application/json")
-    
+        return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
 
 @login_required(login_url='/login/')
 def add_backend_server(request, slb_id, server_id):
@@ -896,13 +924,15 @@ def add_backend_server(request, slb_id, server_id):
     try:
         result = add_backendserver(LoadBalancerId=slbinstanceId, BackendServers=backendservers)
     except:
-        return HttpResponse(json.dumps({'success':False, 'message':'网络超时，调用阿里云接口失败'}), content_type="application/json")
+        return HttpResponse(json.dumps({'success': False, 'message': '网络超时，调用阿里云接口失败'}),
+                            content_type="application/json")
     else:
         if 'Message' in result:
-            return HttpResponse(json.dumps({'success':False, 'message':result['Message']}), content_type="application/json")
-        else:                                                                                                                             
+            return HttpResponse(json.dumps({'success': False, 'message': result['Message']}),
+                                content_type="application/json")
+        else:
             slb_health_update(request, slb.id)
-            return HttpResponse(json.dumps({'success':True}), content_type="application/json") 
+            return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
 @login_required(login_url='/login/')
@@ -910,54 +940,55 @@ def site_add_backend_server(request, site_id, server_id):
     try:
         s = get_object_or_404(Site, pk=site_id)
     except:
-        return HttpResponse(json.dumps({'success':False, 'message':'该站点不存在，请重新刷新页面'}), content_type="application/json")
+        return HttpResponse(json.dumps({'success': False, 'message': '该站点不存在，请重新刷新页面'}),
+                            content_type="application/json")
     else:
         for slb in s.slbsite_set.all():
             add_backend_server(request, slb_id=slb.SLB.id, server_id=server_id)
         slb_health_update(request, slb_id=slb.SLB.id)
-        return HttpResponse(json.dumps({'success':True}), content_type="application/json")
+        return HttpResponse(json.dumps({'success': True}), content_type="application/json")
 
 
-@login_required(login_url='/login/') 
+@login_required(login_url='/login/')
 def slb_part_refresh(request, slb_id):
     slb = SLB.objects.get(pk=slb_id)
     template = 'configmanager/slbpart_health_template.html'
-    return render(request, template, {"slb":slb})
+    return render(request, template, {"slb": slb})
 
 
 @login_required(login_url='/login/')
 def slb_whole_refresh(request):
     slb_list = SLB.objects.all()
     template = 'configmanager/slbwhole_health_template.html'
-    return render(request, template, {"slb_list":slb_list})
+    return render(request, template, {"slb_list": slb_list})
 
 
 @login_required(login_url='/login/')
 def config_slb_part_refresh(request, site_id):
     site = Site.objects.get(pk=site_id)
     template = 'configmanager/config_slb_template.html'
-    return render(request, template, {"site":site})
+    return render(request, template, {"site": site})
 
 
 @login_required(login_url='/login/')
 def config_ecs_part_refresh(request, site_id):
     site = Site.objects.get(pk=site_id)
     template = 'configmanager/config_ecs_template.html'
-    return render(request, template, {"site":site})
+    return render(request, template, {"site": site})
 
 
 @login_required(login_url='/login/')
-def apply_part_refresh(request,site_id):
+def apply_part_refresh(request, site_id):
     site = Deployitem.objects.get(pk=site_id)
     template = 'configmanager/deploysite_template.html'
-    return render(request, template, {"site":site})
+    return render(request, template, {"site": site})
 
 
 @login_required(login_url='/login/')
-def ecs_part_refresh(request,ecs_id):
+def ecs_part_refresh(request, ecs_id):
     ecs = get_object_or_404(ECS, pk=ecs_id)
     template = 'configmanager/ecslist_part_template.html'
-    return render(request, template, {"ecs":ecs})
+    return render(request, template, {"ecs": ecs})
 
 
 @login_required(login_url='/login/')

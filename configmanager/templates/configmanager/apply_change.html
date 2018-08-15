@@ -223,7 +223,7 @@ var pageObject = {
 
         {% if request.user|has_group:"运维工程师" or request.user|has_group:"admin" %}
             <input class="btn btn-success" type="{% if apply.status == 'WD' %}submit{% else %}hidden{% endif %}" name="deploy-finish" value="已发布" />
-            <input class="btn btn-info" type="{% if apply.status == 'WD' %}submit{% else %}hidden{% endif %}" name="goto-deploy" value="发布" />
+            <input class="btn btn-info" type="{% if apply.status == 'WD' %}submit{% else %}hidden{% endif %}" name="goto-deploy" value="现在去发布" />
         {% endif %}
 
         <input class="btn btn-default" type="submit" name="goback" value="返回" onclick='location.href=("/apply")'/>

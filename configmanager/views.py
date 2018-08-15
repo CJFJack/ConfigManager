@@ -327,8 +327,7 @@ def site_add(request):
         devcharge = request.POST['devcharge']
         deployattention = request.POST['deployattention']
         modified_user = request.user.username
-        site = Site(fullname=fullname, shortname=shortname, configdirname=configdirname, port=port, testpage=testpage,
-                    status=status, devcharge=devcharge, deployattention=deployattention, modified_user=modified_user)
+        site = Site(fullname=fullname, shortname=shortname, configdirname=configdirname, port=port, testpage=testpage, status=status, devcharge=devcharge, deployattention=deployattention, modified_user=modified_user)
         site.save()
         '''添加关联ECS'''
         add_relation_ecs(request, site)
@@ -378,6 +377,7 @@ class RaceEditView(generic.DetailView):
 def race_add(request):
     L = []
     randomraceid = int(round(time() * 1000))
+    print randomraceid
     siterace = Siterace(raceid=randomraceid)
     siterace.save()
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")

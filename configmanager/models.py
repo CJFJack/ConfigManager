@@ -41,7 +41,7 @@ class ECS(models.Model):
 
 
 class Siterace(models.Model):
-    raceid = models.PositiveSmallIntegerField()
+    raceid = models.BigIntegerField()
     alias = models.CharField(max_length=50, null=True, blank=True)
 
     def __unicode__(self):
@@ -70,7 +70,7 @@ class Site(models.Model):
         choices=status_CHOICES,
         default=ENABLE,
     )
-    siterace = models.ForeignKey(Siterace, on_delete=models.CASCADE, default=0)
+    siterace = models.ForeignKey(Siterace, on_delete=models.CASCADE, null=True, blank=True)
     
     def get_ECSlists_list(self):
         list = []
@@ -279,7 +279,7 @@ class Apply(models.Model):
 class ApplyOperateLog(models.Model):
     applyproject = models.ForeignKey(Apply, on_delete=models.CASCADE)
     type = models.CharField(max_length=10)
-    OperatorName = models.CharField(max_length=20)
+    OperatorName = models.CharField(max_length=30)
     OperationTime = models.DateTimeField()
 
 

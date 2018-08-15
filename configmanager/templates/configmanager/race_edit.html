@@ -22,8 +22,7 @@
         <div class="checkbox">
             <label>
                 {% for s in site_list %}
-                <input type="checkbox" name="{{ s.fullname }}" value="{{ s.fullname }}" {% if s in siterace.site_set.all
-                       %}checked{% endif %}/>{{ s.fullname }}<br>
+                <input type="checkbox" name="{{ s.fullname }}" value="{{ s.fullname }}"  {% if s in siterace.site_set.all %}checked{% endif %} />{{ s.fullname }}<br>
                 {% endfor %}
             </label>
         </div>

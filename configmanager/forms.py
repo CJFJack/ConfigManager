@@ -22,5 +22,5 @@ class SLBForm(ModelForm):
         exclude = '__all__'
 
 
-DeployitemFormSet = inlineformset_factory(Apply, Deployitem, fields=('deployorderby', 'jenkinsversion', 'deploysite', 'type', 'deploy_status'), extra=1, can_delete=True) 
+DeployitemFormSet = inlineformset_factory(Apply, Deployitem, fields=('deployorderby', 'jenkinsversion', 'deploysite', 'type'), extra=1, can_delete=True)
 SLBsiteFormSet = inlineformset_factory(SLB, SLBsite, fields=('site',), extra=1, can_delete=True)

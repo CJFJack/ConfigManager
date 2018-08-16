@@ -66,7 +66,7 @@
                 </td>
                 <td class="text-right">
                     {% if apply.status == "WC" %}
-                        <a class="btn btn-primary" href="{% url 'configmanager:applychange' apply.id %}">修改</a>
+                        <a class="btn btn-success" href="{% url 'configmanager:applychange' apply.id %}">修改</a>
                     {% endif %}
                     {% if apply.status != "WC" and apply.status != "WD" and apply.status != "C" and apply.status != "D" %}
                         <a class="btn btn-primary" href="{% url 'configmanager:applychange' apply.id %}">审核</a>

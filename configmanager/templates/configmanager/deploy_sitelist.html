@@ -37,7 +37,7 @@
                 <p>
                     {{ r.ECS }}&nbsp;&nbsp;&nbsp;
                     {% if r.status == "N" %}
-                    <font color="red">待生效</font>&nbsp;&nbsp;&nbsp;
+                    <span class="text-danger"><strong>待生效</strong></span>&nbsp;&nbsp;&nbsp;
                     {% endif %}
                     {% if r.status == "Y" %}
                     已生效&nbsp;&nbsp;&nbsp;
@@ -50,12 +50,15 @@
                 {% for ecs in site.deploysite.get_one_slb.slbhealthstatus_set.all %}
                 <p>
                     <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;
-                    <span>{% if ecs.SLBstatus == "added" %}已添加{% else %}<font color="red">已移除</font>{% endif %}</span>&nbsp;&nbsp;
+                    <span>{% if ecs.SLBstatus == "added" %}已添加{% else %}<span
+                            class="text-danger"><strong>已移除</strong></span>{% endif %}</span>&nbsp;&nbsp;
                     <span>
                                 {% if ecs.SLBstatus == "added" %}
                                     {% if ecs.healthstatus == "normal" %}&nbsp;&nbsp;&nbsp;&nbsp;正常&nbsp;&nbsp;&nbsp;&nbsp;
-                                    {% elif ecs.healthstatus == "abnormal" %}<font color="red">异常</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    {% else %}<font color="red">正在检查</font>&nbsp;
+                                    {% elif ecs.healthstatus == "abnormal" %}<span
+                            class="text-danger"><strong>异常</strong></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    {% else %}<span
+                            class="text-danger"><strong>正在检查</strong></span>&nbsp;
                                     {% endif %}
                                 {% else %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 {% endif %}
@@ -77,7 +80,8 @@
                 {% if d.applyproject_id == apply.id %}
                 <p>
                     <span>{{ d.ECS }}</span>&nbsp;&nbsp;
-                    <span>{% if d.ECSdeploystatus == "N" %}<font color="red">待发布</font>{% else %}已发布{% endif %}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span>{% if d.ECSdeploystatus == "N" %}<span class="text-danger"><strong>待发布</strong></span>{% else %}<span
+                            class="text-success"><strong>已发布</strong></span>{% endif %}</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <span>
                                 {% if d.ECSdeploystatus == "N" %}
                                     {% for r in d.site.release_set.all %}
@@ -207,6 +211,13 @@ function SiteAddBackendServer(siteid, sitename, deploysiteid, serverid, serverna
         },300);
     });
 }
+
+
+
+
+
+
+
 
 
 

@@ -95,23 +95,23 @@ class DeployitemInline(admin.TabularInline):
     extra = 0
     def get_readonly_fields(self, request, obj=Apply):
         if obj and obj.status == 'WC':
-            self.readonly_fields =  ['deploy_status',]
+            self.readonly_fields =  []
             return self.readonly_fields
         if obj and obj.status != 'WC' and obj.status != 'WD':
-            self.readonly_fields = ['deployorderby', 'jenkinsversion', 'deploysite', 'type', 'deploy_status']
+            self.readonly_fields = ['deployorderby', 'jenkinsversion', 'deploysite', 'type']
             return self.readonly_fields
         if obj and obj.status == 'WD':
             self.readonly_fields = ['deployorderby', 'jenkinsversion', 'deploysite', 'type']
             return self.readonly_fields
         else:
-            self.readonly_fields = ['deploy_status',]
+            self.readonly_fields = []
             return self.readonly_fields
 
     def get_ECSlists(self, obj):
         return obj.deploy_site.ECSlists
         
     fieldsets = [
-        (None, {'fields': ['deployorderby', 'jenkinsversion', 'type', 'deploysite', 'deploy_status']}),
+        (None, {'fields': ['deployorderby', 'jenkinsversion', 'type', 'deploysite']}),
     ]
 
 
@@ -258,7 +258,7 @@ class DeployitemAdmin(admin.ModelAdmin):
         return ', '.join([e.name for e in obj.deploysite.ECSlists.all()])
     get_ECSlists.short_description = 'ECSs'
 
-    list_display = ['applyproject', 'deployorderby', 'jenkinsversion', 'type', 'deploysite', 'get_ECSlists', 'deploy_status']
+    list_display = ['applyproject', 'deployorderby', 'jenkinsversion', 'type', 'deploysite', 'get_ECSlists']
     list_filter = ['applyproject',]
     search_fields = ['applyproject',]
     

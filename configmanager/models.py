@@ -290,12 +290,12 @@ class Deployitem(models.Model):
         (TRUNK, '主干'),
         (BRANCH, '分支'),
     )
-    DEPLOYED = 'Y'
-    WAITFORDEPLOY = 'N'
-    deploy_status_CHOICES = (
-        (DEPLOYED, '已发布'),
-        (WAITFORDEPLOY, '待发布'),
-    )
+    # DEPLOYED = 'Y'
+    # WAITFORDEPLOY = 'N'
+    # deploy_status_CHOICES = (
+    #     (DEPLOYED, '已发布'),
+    #     (WAITFORDEPLOY, '待发布'),
+    # )
     
     applyproject = models.ForeignKey(Apply, on_delete=models.CASCADE)
     deployorderby = models.PositiveSmallIntegerField("发布顺序", null=True,blank=True)
@@ -307,15 +307,15 @@ class Deployitem(models.Model):
         default=TRUNK,
     ) 
     deploysite = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True, verbose_name="发布站点") 
-    deploy_status = models.CharField(
-        "发布状态",
-        max_length=1,
-        choices=deploy_status_CHOICES,
-        default=WAITFORDEPLOY,                                                                                                                    
-    )
+    # deploy_status = models.CharField(
+    #     "发布状态",
+    #     max_length=1,
+    #     choices=deploy_status_CHOICES,
+    #     default=WAITFORDEPLOY,
+    # )
     
     def __unicode__(self):
-        return self.deploy_status
+        return self.deploysite
     
 
 class DeployECS(models.Model):

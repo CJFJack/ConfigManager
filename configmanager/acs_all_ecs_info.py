@@ -13,7 +13,8 @@ import ConfigParser
 # AccessKeyId = config.get('acs', 'AccessKeyId')
 # AccessKeySecret = config.get('acs', 'AccessKeySecret')
 # RegionId = config.get('acs', 'RegionId')
-
+#
+# clt = client.AcsClient(AccessKeyId, AccessKeySecret, RegionId)
 clt = client.AcsClient('ZAL5Z3Ee8KhyZ2U1', 'afp7C6u1osEpCZSwVHcHkfcpJqoeEe', 'cn-hangzhou')
 
 

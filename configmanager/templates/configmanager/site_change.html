@@ -31,8 +31,8 @@
                 <th>所属ECS</th>
                 <td>
                     {% for ecs in ECSs %}
-                    <input type="checkbox" name="{{ ecs.name }}" value="{{ ecs.name }}" {% if ecs in site.ECSlists.all
-                           %}checked="checked" {% endif %}/>{{ ecs.name }}
+                    <input type="checkbox" name="{{ ecs.name }}" value="{{ ecs.name }}"
+                           {% if ecs in site.ECSlists.all %}checked{% endif %}/>{{ ecs.name }}
                     {% endfor %}
                 </td>
             </tr>
@@ -40,8 +40,8 @@
                 <th>所属站点族</th>
                 <td>
                     {% for race in Siteraces %}
-                    <input type="radio" name="optionsRadios" id="optionsRadios{{ race.id }}" value="{{ race.id }}" {% if
-                           site in race.site_set.all %}checked{% endif %}>{{ race.alias }}<br>
+                    <input type="radio" name="optionsRadios" id="optionsRadios{{ race.id }}" value="{{ race.id }}"
+                           {% if site in race.site_set.all %}checked{% endif %}>{{ race.alias }}<br>
                     {% endfor %}
                 </td>
             </tr>
@@ -57,10 +57,12 @@
                 <th>状态</th>
                 <td>
                     <select name="status" id="id_status">
-                        <option value="Y" {% if site.status==
-                        'Y' %}selected{% endif %}>启用</option>
-                        <option value="N" {% if site.status==
-                        'N' %}selected{% endif %}>禁用</option>
+                        <option value="Y"
+                                {% if site.status == "Y" %}selected{% endif %}>启用
+                        </option>
+                        <option value="N"
+                                {% if site.status == "N" %}selected{% endif %}>禁用
+                        </option>
                     </select>
                 </td>
             </tr>

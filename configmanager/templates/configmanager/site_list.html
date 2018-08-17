@@ -37,7 +37,7 @@
             <td>
                 &nbsp;<a class="btn btn-primary" href="{% url 'configmanager:sitechange' site.id %}">修改</a>&nbsp;
                 &nbsp;<a class="btn btn-danger" href="javascript:void(0)"
-                         onclick="Sitedelete('{{ site.id }}', '{{ site.fullname }}')">删除</a>&nbsp;
+                         onclick="Sitedelete('{{ site.id }}', '{{ site.fullname }}', '{{ page_obj.number }}')">删除</a>&nbsp;
             </td>
         </tr>
         {% endfor %}
@@ -56,15 +56,15 @@ $.ajaxSetup({
 });
 
 //主体刷新
-function WholePartialRefresh() {
-    var postUrl = "/site/wholerefresh/"
+function WholePartialRefresh(pagenumber) {
+    var postUrl = "/site/wholerefresh/"+pagenumber+"/";
     $.post(postUrl, function(data) {
         $('#whole').html(data)
     });
 }
 
 //删除Site
-function Sitedelete(siteid, sitename) {
+function Sitedelete(siteid, sitename, pagenumber) {
     var postUrl = "/site/"+siteid+"/delete/";
     var sitename = sitename
 
@@ -75,7 +75,7 @@ function Sitedelete(siteid, sitename) {
 
     $.post(postUrl, function (data) {
         if (data.success) {
-            WholePartialRefresh();
+            WholePartialRefresh(pagenumber);
             $("#alert-div").css("display", "");
             $("#alert-div").attr("class","alert alert-danger");
             $("#alert-div").text("成功！删除站点 "+sitename);

@@ -2,10 +2,9 @@
 {% block title %}添加站点 | {% endblock %}
 {% block content %}
 
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 <form class="form-horizontal" role="form" action="{% url 'configmanager:siteaddmethod' %}" method="post">
-{% csrf_token %}
+    {% csrf_token %}
     <div class="form-group">
         <label for="fullname" class="col-sm-1 control-label">站点名称</label>
         <div class="col-sm-8">
@@ -15,13 +14,13 @@
     <div class="form-group">
         <label for="shortname" class="col-sm-1 control-label">站点简称</label>
         <div class="col-sm-5">
-            <input type="text" class="form-control"  name="shortname" id="shortname" placeholder="请输入站点简称">
+            <input type="text" class="form-control" name="shortname" id="shortname" placeholder="请输入站点简称">
         </div>
     </div>
     <div class="form-group">
         <label for="configdirname" class="col-sm-1 control-label">配置文件夹名称</label>
         <div class="col-sm-5">
-            <input type="text" class="form-control"  name="configdirname" id="configdirname" placeholder="请输入配置文件夹名称">
+            <input type="text" class="form-control" name="configdirname" id="configdirname" placeholder="请输入配置文件夹名称">
         </div>
     </div>
     <div class="form-group">
@@ -35,7 +34,7 @@
         <div class="checkbox">
             <label>
                 {% for ecs in ECSs %}
-                    <input type="checkbox" name="{{ ecs.name }}" value="{{ ecs.name }}">{{ ecs.name }}<br>
+                <input type="checkbox" name="{{ ecs.name }}" value="{{ ecs.name }}">{{ ecs.name }}<br>
                 {% endfor %}
             </label>
         </div>
@@ -45,7 +44,8 @@
         <div class="radio">
             <label>
                 {% for race in Siteraces %}
-                    <input type="radio" name="optionsRadios" id="optionsRadios{{ race.id }}" value="{{ race.id }}" >{{ race.alias }}<br>
+                <input type="radio" name="optionsRadios" id="optionsRadios{{ race.id }}" value="{{ race.id }}">
+                {{ race.alias }}<br>
                 {% endfor %}
             </label>
         </div>
@@ -66,8 +66,8 @@
         <label for="status" class="col-sm-1 control-label">状态</label>
         <div class="col-sm-1">
             <select name="status" class="form-control">
-                <option value="Y" >启用</option>
-                <option value="N" >禁用</option>
+                <option value="Y">启用</option>
+                <option value="N">禁用</option>
             </select>
         </div>
     </div>
@@ -85,77 +85,11 @@
     </div>
     <div class="form-group">
         <div class="col-sm-offset-1 col-sm-5">
-            <button type="submit" class="btn btn-primary" name="site-save" >添加</button>
-            <button type="submit" class="btn btn-default" name="site-goback" >返回</button>
+            <button type="submit" class="btn btn-primary" name="site-add">添加</button>
+            <button type="submit" class="btn btn-primary" name="site-add-continue-add">添加并继续添加</button>
+            <button type="submit" class="btn btn-default" name="site-goback">返回</button>
         </div>
     </div>
-
-    <!--
-    <table class="table table-hover table-condensed">
-        <tbody>
-            <tr>
-                <th>站点名称</th>
-                <td><input type="text" name="fullname" value="" id="id_fullname"  maxlength="30"></td>
-            </tr>
-            <tr>
-                <th>站点简称</th>
-                <td><input type="text" name="shortname" value="" id="id_shortname"  maxlength="30"></td>
-            </tr>
-            <tr>
-                <th>配置文件夹名称</th>
-                <td><input type="text" name="configdirname" value="" id="id_configdirname"  maxlength="30"></td>
-            </tr>
-            <tr>
-                <th>配置文件</th>
-                <td><input type="text" name="configfiles" value="" id="id_configfiles"  maxlength="300" style="width:350px;"></td>
-            </tr>
-            <tr>
-                <th>所属ECS</th>
-                <td>
-                    {% for ecs in ECSs %}
-                        <span><input type="checkbox" name="{{ ecs.name }}" value="{{ ecs.name }}" />{{ ecs.name }}</span>
-                    {% endfor %}
-                </td>
-            </tr>
-            <tr>
-                <th>所属站点族</th>
-                <td>
-                {% for s in site_list %}
-                    <span><input type="checkbox" name="{{ s.fullname }}" value="{{ s.fullname }}" />{{ s.fullname }}</span>
-                {% endfor %}
-                </td>
-            </tr>
-            <tr>
-                <th>端口号</th>
-                <td><input type="text" name="port" value="" id="id_port"  maxlength="30"></td>
-            </tr>
-            <tr>
-                <th>测试页面</th>
-                <td><input type="text" name="testpage" value="" id="id_testpage" maxlength="30"></td>
-            </tr>
-            <tr>
-                <th>状态</th>
-                <td>
-                    <select name="status" id="id_status">
-                        <option value="Y" >启用</option>
-                        <option value="N" >禁用</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <th>研发负责人</th>
-                <td>
-                    <input type="text" name="devcharge" value="" id="id_devcharge" maxlength="30">
-                </td>
-            </tr>
-            <tr>
-                <th>发布注意事项</th>
-                <td>
-                    <textarea name="deployattention" id="id_deployattention" rows="15" cols="60"></textarea>
-                </td>
-            </tr>
-        </tbody>
-    </table>-->
 </form>
 
 

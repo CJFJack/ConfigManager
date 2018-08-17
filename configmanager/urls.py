@@ -22,7 +22,7 @@ urlpatterns = [
     url(r'^ecs/updateallinfo/$', views.update_allecs_info, name='updateallinfo'),
     url(r'^ecs/syncallecsinfo/$', views.sync_all_ecs_info, name='syncallecsinfo'),
     url(r'^ecs/addmethod/$', views.ecs_add, name='ecsaddmethod'),
-    url(r'^ecs/(?P<ecs_id>[0-9]+)/partrefresh/$', views.ecs_part_refresh, name='ecspartrefresh'),
+    url(r'^ecs/(?P<ecs_id>[0-9]+)/partrefresh/(?P<pagenumber>[0-9]+)/$', views.ecs_part_refresh, name='ecspartrefresh'),
     url(r'^ecs/wholerefresh/(?P<pagenumber>[0-9]+)/$', views.ecs_whole_refresh, name='ecswholerefresh'),
     # Site页面
     url(r'^site/$', views.SiteListView.as_view(), name='sitelist'),
@@ -31,7 +31,7 @@ urlpatterns = [
     url(r'^site/add/$', views.SiteAddView.as_view(), name='siteadd'),
     url(r'^site/addmethod/$', views.site_add, name='siteaddmethod'),
     url(r'^site/(?P<site_id>[0-9]+)/delete/$', views.site_delete, name='sitedelete'),
-    url(r'^site/wholerefresh/$', views.site_whole_refresh, name='sitewholerefresh'),
+    url(r'^site/wholerefresh/(?P<pagenumber>[0-9]+)/$', views.site_whole_refresh, name='sitewholerefresh'),
     # 站点族页面
     url(r'^race/$', views.RaceListView.as_view(), name='racelist'),
     url(r'^race/add/$', views.race_add, name='raceadd'),

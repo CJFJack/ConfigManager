@@ -34,7 +34,7 @@
         <td>CPU:{{ ecs.cpu }}核 内存:{{ ecs.memory }}G</td>
         <td>
             {% if ecs.status == 'Y' %}<span>启用</span>
-            {% else %}<span>禁用</span>
+            {% else %}<span class="text-danger"><strong>禁用</strong></span>
             {% endif %}
         </td>
         <td>{{ ecs.instancestatus }}</td>
@@ -45,18 +45,18 @@
         <td>{{ ecs.recently_diskusage }}</td>
         <td>
             <a type="button" class="btn btn-danger" href="javascript:void(0)"
-               onclick="ECSdelete('{{ ecs.id }}', '{{ ecs.name }}')">删除</a>
+               onclick="ECSdelete('{{ ecs.id }}', '{{ ecs.name }}', '{{ pagenumber }}')">删除</a>
             {% if ecs.status == "Y" %}
             <a type="button" class="btn btn-warning" href="javascript:void(0)"
-               onclick="ECSdisable('{{ ecs.id }}', '{{ ecs.name }}')">禁用</a>
+               onclick="ECSdisable('{{ ecs.id }}', '{{ ecs.name }}', '{{ pagenumber }}')">禁用</a>
             {% else %}
             <a type="button" class="btn btn-success" href="javascript:void(0)"
-               onclick="ECSenable('{{ ecs.id }}', '{{ ecs.name }}')">启用</a>
+               onclick="ECSenable('{{ ecs.id }}', '{{ ecs.name }}', '{{ pagenumber }}')">启用</a>
             {% endif %}
             <a type="button" class="btn btn-info" href="javascript:void(0)"
-               onclick="UpdateECSMonitor('{{ ecs.id }}', '{{ ecs.name }}')">刷新监控数据</a>
+               onclick="UpdateECSMonitor('{{ ecs.id }}', '{{ ecs.name }}', '{{ pagenumber }}')">刷新监控数据</a>
             <a type="button" class="btn btn-success" href="javascript:void(0)"
-               onclick="UpdateECSInfo('{{ ecs.id }}', '{{ ecs.name }}')">刷新基础信息</a>
+               onclick="UpdateECSInfo('{{ ecs.id }}', '{{ ecs.name }}', '{{ pagenumber }}')">刷新基础信息</a>
         </td>
     </tr>
     {% endfor %}

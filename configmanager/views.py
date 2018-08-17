@@ -30,6 +30,7 @@ from .acs_slb_backendserver_add import add_backendserver
 from .acs_all_ecs_info import query_all_ecs
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
 
 app_name = 'configmanager'
 
@@ -52,7 +53,9 @@ class ECSListView(generic.ListView):
         except:
             q = ''
         if (q != ''):
-            ECS_list = ECS.objects.filter(name__icontains=q).order_by('name')
+            ECS_list = ECS.objects.filter(
+                Q(name__icontains=q) |
+                Q(IP__icontains=q)).order_by('name')
         else:
             ECS_list = ECS.objects.order_by('name')
         return ECS_list
@@ -207,10 +210,9 @@ class SiteListView(generic.ListView):
         except:
             q = ''
         if (q != ''):
-            Site_list = Site.objects.filter(fullname__icontains=q).order_by('fullname')
+            Site_list = Site.objects.filter(Q(fullname__icontains=q) | Q(shortname__icontains=q)).order_by('fullname')
         else:
             Site_list = Site.objects.order_by('fullname')
-        return Site_list
         return Site_list
 
     def get_context_data(self, **kwargs):
@@ -257,17 +259,6 @@ def add_relation_ecs(request, site):
 
 
 @login_required(login_url='/login/')
-def add_relation_site(request, site):
-    try:
-        siterace = get_object_or_404(Siterace, pk=request.POST['optionsRadios'])
-    except:
-        pass
-    else:
-        site.siterace_id = siterace.id
-    site.save()
-
-
-@login_required(login_url='/login/')
 def site_save(request, site_id):
     if request.POST.has_key('site-save'):
         s = get_object_or_404(Site, pk=site_id)
@@ -280,6 +271,10 @@ def site_save(request, site_id):
         s.devcharge = request.POST['devcharge']
         s.deployattention = request.POST['deployattention']
         s.modified_user = request.user.username
+        try:
+            s.siterace_id = request.POST['optionsRadios']
+        except:
+            s.siterace_id = '99999'
         s.save()
 
         '''新增或删除关联配置文件'''
@@ -296,23 +291,6 @@ def site_save(request, site_id):
             if not request.POST.has_key(es.name):
                 s.ECSlists.remove(es)
 
-        '''减少关联站点'''
-        L = []
-        for key in request.POST:
-            try:
-                relation_s = Site.objects.get(fullname=key)
-            except:
-                pass
-            else:
-                L.append(relation_s.fullname)
-        if s.get_relation_sites():
-            for rs in s.get_relation_sites():
-                if rs not in L:
-                    rs_obj = Site.objects.get(fullname=rs)
-                    rs_obj.siterace_set.all().delete()
-
-        '''增加关联站点'''
-        add_relation_site(request, s)
         messages.success(request, "成功！修改站点 <a href=\'/site/" + str(site_id) + "/change/\'>" + s.fullname + "</a>")
         return HttpResponseRedirect(reverse('configmanager:sitelist'))
 
@@ -336,7 +314,7 @@ class SiteAddView(generic.ListView):
 
 @login_required(login_url='/login/')
 def site_add(request):
-    if request.POST.has_key('site-save'):
+    if request.POST.has_key('site-add') or request.POST.has_key('site-add-continue-add'):
         '''保存站点基础信息'''
         fullname = request.POST['fullname']
         shortname = request.POST['shortname']
@@ -349,20 +327,32 @@ def site_add(request):
         status = request.POST['status']
         devcharge = request.POST['devcharge']
         deployattention = request.POST['deployattention']
+        try:
+            siterace_id = request.POST['optionsRadios']
+        except:
+            siterace_id = '99999'
         modified_user = request.user.username
         site = Site(fullname=fullname, shortname=shortname, configdirname=configdirname, port=port, testpage=testpage,
-                    status=status, devcharge=devcharge, deployattention=deployattention, modified_user=modified_user)
+                    status=status, devcharge=devcharge, deployattention=deployattention, modified_user=modified_user,
+                    siterace_id=siterace_id)
         site.save()
         '''添加关联ECS'''
         add_relation_ecs(request, site)
-        '''添加所属站点族'''
-        add_relation_site(request, site)
+
         '''新增或删除关联配置文件'''
         post_filenames_list = []
         post_filenames = request.POST['configfiles']
         post_filenames_list = post_filenames.split(';')
         site.update_configfiles(post_filenames_list=post_filenames_list)
-    return HttpResponseRedirect(reverse('configmanager:sitelist'))
+        if request.POST.has_key('site-add-continue-add'):
+            ECSs = ECS.objects.all()
+            Siteraces = Siterace.objects.all()
+            return render(request, 'configmanager/site_add.html', {'ECSs': ECSs, 'Siteraces': Siteraces})
+        if request.POST.has_key('site-add'):
+            messages.success(request, "成功！添加站点 "+fullname)
+            return HttpResponseRedirect(reverse('configmanager:sitelist'))
+    else:
+        return HttpResponseRedirect(reverse('configmanager:sitelist'))
 
 
 @login_required(login_url='/login/')
@@ -419,7 +409,7 @@ def race_site_relation(request, race_id):
     if request.POST.has_key('save'):
         race = Siterace.objects.get(pk=race_id)
         for site in race.site_set.all():
-            site.siterace_id = 0
+            site.siterace_id = 99999
             site.save()
         race.alias = request.POST['alias']
         race.save()
@@ -1046,10 +1036,10 @@ def apply_part_refresh(request, site_id):
 
 
 @login_required(login_url='/login/')
-def ecs_part_refresh(request, ecs_id):
+def ecs_part_refresh(request, ecs_id, pagenumber):
     ecs = get_object_or_404(ECS, pk=ecs_id)
     template = 'configmanager/ecslist_part_template.html'
-    return render(request, template, {"ecs": ecs})
+    return render(request, template, {"ecs": ecs, 'pagenumber': pagenumber})
 
 
 @login_required(login_url='/login/')
@@ -1064,14 +1054,22 @@ def ecs_whole_refresh(request, pagenumber):
         ECS_list = paginator.page(1)
     except EmptyPage:
         ECS_list = paginator.page(paginator.num_pages)
-    return render(request, template, {'ECS_list': ECS_list})
+    return render(request, template, {'ECS_list': ECS_list, 'pagenumber': pagenumber})
 
 
 @login_required(login_url='/login/')
-def site_whole_refresh(request):
+def site_whole_refresh(request, pagenumber):
     Site_list = Site.objects.order_by('fullname')
     template = 'configmanager/sitelist_whole_template.html'
-    return render(request, template, {'Site_list': Site_list})
+    page = pagenumber
+    paginator = Paginator(Site_list, 10)
+    try:
+        Site_list = paginator.page(page)
+    except PageNotAnInteger:
+        Site_list = paginator.page(1)
+    except EmptyPage:
+        Site_list = paginator.page(paginator.num_pages)
+    return render(request, template, {'Site_list': Site_list, 'pagenumber': pagenumber})
 
 
 @login_required(login_url='/login/')

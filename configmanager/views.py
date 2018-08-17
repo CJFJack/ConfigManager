@@ -29,20 +29,14 @@ from .acs_slb_backendserver_remove import remove_backendserver
 from .acs_slb_backendserver_add import add_backendserver
 from .acs_all_ecs_info import query_all_ecs
 from django.utils import timezone
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 app_name = 'configmanager'
 
 
 @login_required(login_url='/login/')
 def index(request):
-    context = {}
-    return render(request, 'configmanager/index.html', context)
-
-
-@login_required(login_url='/login/')
-def nav_top(request):
-    context = {}
-    return render(request, 'configmanager/nav_top.html', context)
+    return render(request, 'configmanager/index.html')
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -208,11 +202,24 @@ class SiteListView(generic.ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Site.objects.order_by('fullname')
+        try:
+            q = self.request.GET['q']
+        except:
+            q = ''
+        if (q != ''):
+            Site_list = Site.objects.filter(fullname__icontains=q).order_by('fullname')
+        else:
+            Site_list = Site.objects.order_by('fullname')
+        return Site_list
+        return Site_list
 
     def get_context_data(self, **kwargs):
         context = super(SiteListView, self).get_context_data(**kwargs)
         context['configfile'] = Site.configfile_set
+        q = self.request.GET.get('q')
+        if q is None:
+            return context
+        context['q'] = q
         return context
 
     def get_paginate_by(self, queryset):
@@ -1046,9 +1053,17 @@ def ecs_part_refresh(request, ecs_id):
 
 
 @login_required(login_url='/login/')
-def ecs_whole_refresh(request):
+def ecs_whole_refresh(request, pagenumber):
     ECS_list = ECS.objects.order_by('name')
     template = 'configmanager/ecslist_whole_template.html'
+    page = pagenumber
+    paginator = Paginator(ECS_list, 10)
+    try:
+        ECS_list = paginator.page(page)
+    except PageNotAnInteger:
+        ECS_list = paginator.page(1)
+    except EmptyPage:
+        ECS_list = paginator.page(paginator.num_pages)
     return render(request, template, {'ECS_list': ECS_list})
 
 

@@ -84,32 +84,6 @@
     <p>No SLB are available.</p>
     {% endif %}
 
-    {% if is_paginated %}
-    <ul class="pagination">
-        <li>
-            <span>共有 {{ page_obj.paginator.count }} 条记录</span>&nbsp;&nbsp;
-            <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-        </li>
-        {% if page_obj.has_previous %}
-        <li><a href="?page={{ page_obj.previous_page_number }}">上一页</a></li>
-        {% else %}
-        <li class="disabled"><span>上一页</span></li>
-        {% endif %}
-        {% for i in paginator.page_range %}
-        {% if page_obj.number == i %}
-        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
-        {% else %}
-        <li><a href="?page={{ i }}">{{ i }}</a></li>
-        {% endif %}
-        {% endfor %}
-        {% if page_obj.has_next %}
-        <li><a href="?page={{ page_obj.next_page_number }}">下一页</a></li>
-        {% else %}
-        <li class="disabled"><span>下一页</span></li>
-        {% endif %}
-    </ul>
-    {% endif %}
-
 </div>
 
 

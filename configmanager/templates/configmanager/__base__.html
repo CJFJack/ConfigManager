@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 
+    <!--默认标题-->
     <title>{% block title %}{% endblock %}运维管理平台</title>
 
     <meta charset="utf-8">
@@ -24,10 +25,9 @@
 </head>
 <body>
 
+<!--loading样式-->
 <script src="https://cdn.bootcss.com/spin.js/2.3.2/spin.min.js"></script>
-
 <script>
-
 var opts = {
             lines: 13, // 花瓣数目
             length: 20, // 花瓣长度
@@ -49,8 +49,10 @@ var opts = {
         };
 var spinner = new Spinner(opts);
 
+
 </script>
 
+<!--页面导航-->
 <div class="container-fluid">
     <nav class="navbar navbar-static-top navbar-inverse" role="navigation">
         <div class="container-fluid">
@@ -112,10 +114,13 @@ var spinner = new Spinner(opts);
     </nav>
 </div>
 
+<!--页面遮盖层-->
 <div id="bgDiv"></div>
 
+<!--页面主体-->
 <div class="container-fluid" id="myspin">
 
+    <!--页面提示信息-->
     <div {% if messages %}style="display:;" {% else %}style="display:none;" {% endif %} id="alert-div"
          class="alert alert-info">
         <button type="button" class="close" data-dismiss="alert"
@@ -131,10 +136,50 @@ var spinner = new Spinner(opts);
         {% endif %}
     </div>
 
+    <!--搜索栏-->
+    <div class="container-fluid">
+        <form class="navbar-form navbar-left" role="search" method="get">
+            <div class="form-group">
+                <input type="text" size="40" class="form-control" placeholder="Search" name="q">
+            </div>
+            <button type="submit" class="btn btn-default">搜索</button>
+        </form>
+    </div>
+    <br>
+
     <!-- content -->
     {% block content %}
     {% endblock %}
     <!-- // content -->
+
+    <!--分页栏-->
+    <div class="container-fluid table-responsive">
+        {% if is_paginated %}
+        <ul class="pagination">
+            <li>
+                <span>共有 {{ page_obj.paginator.count }} 条记录</span>&nbsp;&nbsp;
+                <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </li>
+            {% if page_obj.has_previous %}
+            <li><a href="?q={{ q }}&page={{ page_obj.previous_page_number }}">上一页</a></li>
+            {% else %}
+            <li class="disabled"><span>上一页</span></li>
+            {% endif %}
+            {% for i in paginator.page_range %}
+            {% if page_obj.number == i %}
+            <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+            {% else %}
+            <li><a href="?q={{ q }}&page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li><a href="?q={{ q }}&page={{ page_obj.next_page_number }}">下一页</a></li>
+            {% else %}
+            <li class="disabled"><span>下一页</span></li>
+            {% endif %}
+        </ul>
+        {% endif %}
+    </div>
 
 </div>
 

@@ -23,7 +23,7 @@ urlpatterns = [
     url(r'^ecs/syncallecsinfo/$', views.sync_all_ecs_info, name='syncallecsinfo'),
     url(r'^ecs/addmethod/$', views.ecs_add, name='ecsaddmethod'),
     url(r'^ecs/(?P<ecs_id>[0-9]+)/partrefresh/$', views.ecs_part_refresh, name='ecspartrefresh'),
-    url(r'^ecs/wholerefresh/$', views.ecs_whole_refresh, name='ecswholerefresh'),
+    url(r'^ecs/wholerefresh/(?P<pagenumber>[0-9]+)/$', views.ecs_whole_refresh, name='ecswholerefresh'),
     # Site页面
     url(r'^site/$', views.SiteListView.as_view(), name='sitelist'),
     url(r'^site/(?P<pk>[0-9]+)/change/$', views.SiteChangeView.as_view(), name='sitechange'),

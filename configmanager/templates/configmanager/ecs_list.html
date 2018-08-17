@@ -2,19 +2,10 @@
 {% block title %}ECS管理 | {% endblock %}
 {% block content %}
 
-<div class="btn-toolbar container-fluid" role="toolbar">
-    <form id="changelist-search" method="get">
-        <div>
-            <label for="searchbar"><img src="/static/admin/img/search.svg" alt="Search"></label>
-            <input type="text" size="40" name="q" value="" id="searchbar" autofocus="">
-            <input type="submit" value="搜索">
-        </div>
-    </form>
-</div><br>
 
 <div class="btn-toolbar container-fluid" role="toolbar">
     <div class="btn-group">
-        <a href="javascript:void(0);" onclick="SyncAllECS()" type="button"
+        <a href="javascript:void(0);" onclick="SyncAllECS('{{ page_obj.number }}')" type="button"
            class="btn btn-default btn-primary">同步所有ECS</a>
         <a href="javascript:void(0);" onclick="UpdateAllECSInfo()" type="button" class="btn btn-default btn-info">刷新所有ECS基础信息</a>
         <a href="javascript:void(0);" onclick="UpdateAllECSHealth()" type="button" class="btn btn-default btn-success">刷新所有ECS监控数据</a>
@@ -46,7 +37,7 @@
         <tbody>
         {% for ecs in ECS_list %}
         <tr id="tr_{{ ecs.id }}"
-            class="{% if 80 < ecs.recently_cpu or 80 < ecs.recently_memory or 80 < ecs.recently_diskusage %}danger{% elif 70 < ecs.recently_cpu or 70 < ecs.recently_memory or 70 < ecs.recently_diskusage %}warning{% endif %}class=">
+            class="{% if 80 < ecs.recently_cpu or 80 < ecs.recently_memory or 80 < ecs.recently_diskusage %}danger{% elif 70 < ecs.recently_cpu or 70 < ecs.recently_memory or 70 < ecs.recently_diskusage %}warning{% endif %}">
             <td>{{ ecs.regionId }}</td>
             <td>{{ ecs.networktype }}</td>
             <td>{{ ecs.name }}</td>
@@ -90,32 +81,6 @@
     <p>No ECS are available.</p>
     {% endif %}
 
-    {% if is_paginated %}
-    <ul class="pagination">
-        <li>
-            <span>共有 {{ page_obj.paginator.count }} 条记录</span>&nbsp;&nbsp;
-            <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-        </li>
-        {% if page_obj.has_previous %}
-        <li><a href="?q={{ q }}&page={{ page_obj.previous_page_number }}">上一页</a></li>
-        {% else %}
-        <li class="disabled"><span>上一页</span></li>
-        {% endif %}
-        {% for i in paginator.page_range %}
-        {% if page_obj.number == i %}
-        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
-        {% else %}
-        <li><a href="?q={{ q }}&page={{ i }}">{{ i }}</a></li>
-        {% endif %}
-        {% endfor %}
-        {% if page_obj.has_next %}
-        <li><a href="?q={{ q }}&page={{ page_obj.next_page_number }}">下一页</a></li>
-        {% else %}
-        <li class="disabled"><span>下一页</span></li>
-        {% endif %}
-    </ul>
-    {% endif %}
-
 </div>
 
 
@@ -126,23 +91,24 @@ $.ajaxSetup({
 
 //局部刷新
 function PartialRefresh(ecsid) {
-    var postUrl = "/ecs/"+ecsid+"/partrefresh/"
+    var postUrl = "/ecs/"+ecsid+"/partrefresh/";
     $.post(postUrl, function(data) {
         $('#tr_'+ecsid).html(data)
     });
 }
 
 //主体刷新
-function WholePartialRefresh() {
-    var postUrl = "/ecs/wholerefresh/"
+function WholePartialRefresh(pagenumber) {
+    var postUrl = "/ecs/wholerefresh/"+pagenumber+"/";
     $.post(postUrl, function(data) {
         $('#whole').html(data)
     });
 }
 
 //同步所有ECS
-function SyncAllECS() {
+function SyncAllECS(pagenumber) {
     var postUrl = "/ecs/syncallecsinfo/";
+    var pagenumber = pagenumber;
 
     target = $("#myspin").get(0);
     var bgDiv = document.getElementById("bgDiv");
@@ -151,7 +117,7 @@ function SyncAllECS() {
 
     $.post(postUrl, function (data) {
         if (data.success) {
-            WholePartialRefresh();
+            WholePartialRefresh(pagenumber);
             $("#alert-div").css("display", "");
             $("#alert-div").attr("class","alert alert-success");
             $("#alert-div").text("成功！同步所有ECS");
@@ -368,25 +334,6 @@ function UpdateECSInfo(ecsid, ecsname) {
         },300);
     });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

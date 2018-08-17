@@ -29,8 +29,6 @@ from .acs_slb_backendserver_remove import remove_backendserver
 from .acs_slb_backendserver_add import add_backendserver
 from .acs_all_ecs_info import query_all_ecs
 from django.utils import timezone
-import pytz
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 app_name = 'configmanager'
 
@@ -49,12 +47,29 @@ def nav_top(request):
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class ECSListView(generic.ListView):
+    model = ECS
     template_name = 'configmanager/ecs_list.html'
     context_object_name = 'ECS_list'
     paginate_by = 10
 
     def get_queryset(self):
-        return ECS.objects.order_by('name')
+        try:
+            q = self.request.GET['q']
+        except:
+            q = ''
+        if (q != ''):
+            ECS_list = ECS.objects.filter(name__icontains=q).order_by('name')
+        else:
+            ECS_list = ECS.objects.order_by('name')
+        return ECS_list
+
+    def get_context_data(self, **kwargs):
+        context = super(ECSListView, self).get_context_data(**kwargs)
+        q = self.request.GET.get('q')
+        if q is None:
+            return context
+        context['q'] = q
+        return context
 
     def get_paginate_by(self, queryset):
         return self.request.GET.get('paginate_by', self.paginate_by)
@@ -328,7 +343,8 @@ def site_add(request):
         devcharge = request.POST['devcharge']
         deployattention = request.POST['deployattention']
         modified_user = request.user.username
-        site = Site(fullname=fullname, shortname=shortname, configdirname=configdirname, port=port, testpage=testpage, status=status, devcharge=devcharge, deployattention=deployattention, modified_user=modified_user)
+        site = Site(fullname=fullname, shortname=shortname, configdirname=configdirname, port=port, testpage=testpage,
+                    status=status, devcharge=devcharge, deployattention=deployattention, modified_user=modified_user)
         site.save()
         '''添加关联ECS'''
         add_relation_ecs(request, site)

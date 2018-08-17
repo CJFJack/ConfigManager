@@ -576,6 +576,7 @@ class ApplyListView(generic.ListView):
 class UndeployApplyListView(generic.ListView):
     template_name = 'configmanager/apply_list.html'
     context_object_name = 'apply_list'
+    paginate_by = 10
 
     def get_queryset(self):
         return Apply.objects.filter(status='WD').order_by('-wishdeploy_time').order_by('-apply_time')

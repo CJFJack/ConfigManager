@@ -55,7 +55,8 @@ class ECSListView(generic.ListView):
         if (q != ''):
             ECS_list = ECS.objects.filter(
                 Q(name__icontains=q) |
-                Q(IP__icontains=q)).order_by('name')
+                Q(IP__icontains=q) |
+                Q(instanceid__icontains=q)).order_by('name')
         else:
             ECS_list = ECS.objects.order_by('name')
         return ECS_list
@@ -210,7 +211,9 @@ class SiteListView(generic.ListView):
         except:
             q = ''
         if (q != ''):
-            Site_list = Site.objects.filter(Q(fullname__icontains=q) | Q(shortname__icontains=q)).order_by('fullname')
+            Site_list = Site.objects.filter(Q(fullname__icontains=q) |
+                                            Q(shortname__icontains=q) |
+                                            Q(port__icontains=q)).order_by('fullname')
         else:
             Site_list = Site.objects.order_by('fullname')
         return Site_list
@@ -369,7 +372,23 @@ class RaceListView(generic.ListView):
     paginate_by = 5
 
     def get_queryset(self):
-        return Siterace.objects.order_by('raceid')
+        try:
+            q = self.request.GET['q']
+        except:
+            q = ''
+        if (q != ''):
+            Race_list = Siterace.objects.filter(Q(alias__icontains=q)).order_by('raceid')
+        else:
+            Race_list = Siterace.objects.order_by('raceid')
+        return Race_list
+
+    def get_context_data(self, **kwargs):
+        context = super(RaceListView, self).get_context_data(**kwargs)
+        q = self.request.GET.get('q')
+        if q is None:
+            return context
+        context['q'] = q
+        return context
 
     def get_paginate_by(self, queryset):
         return self.request.GET.get('paginate_by', self.paginate_by)

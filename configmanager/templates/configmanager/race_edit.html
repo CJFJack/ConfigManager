@@ -1,5 +1,6 @@
 {% extends 'configmanager/__base__.html' %}
 {% block title %}编辑站点族 | {% endblock %}
+{% block search_display %}none{% endblock %}
 {% block content %}
 
 <form class="form-horizontal" role="form" action="{% url 'configmanager:racesiterelation' siterace.id %}" method="post">

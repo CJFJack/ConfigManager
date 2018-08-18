@@ -7,6 +7,7 @@ from django.utils.html import format_html
 
 # Create your models here.
 
+
 class ECS(models.Model):
     ENABLE = 'Y'
     DISABLE = 'N'

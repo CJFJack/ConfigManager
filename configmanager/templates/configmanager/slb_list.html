@@ -1,12 +1,13 @@
 {% extends 'configmanager/__base__.html' %}
 {% block title %}SLB管理 | {% endblock %}
+{% block search_notice %}请输入 SLB实例ID / 实例别名 / IP地址{% endblock %}
 {% block content %}
 
 
 <div class="btn-toolbar container-fluid" role="toolbar">
     <div class="btn-group">
-        <a href="javascript:void(0);" onclick="AllSLBinfoUpdate()" type="button" class="btn btn-default btn-info">同步SLB基本信息</a>
-        <a href="javascript:void(0);" onclick="AllSLBHealthUpdate()" type="button" class="btn btn-default btn-success">刷新所有SLB健康信息</a>
+        <a href="javascript:void(0);" onclick="AllSLBinfoUpdate('{{ page_obj.number }}')" type="button" class="btn btn-default btn-info">同步SLB基本信息</a>
+        <a href="javascript:void(0);" onclick="AllSLBHealthUpdate('{{ page_obj.number }}')" type="button" class="btn btn-default btn-success">刷新所有SLB健康信息</a>
     </div>
 </div><br>
 <div id="whole" class="container-fluid table-responsive">
@@ -101,8 +102,8 @@ function PartialRefresh(slbid) {
 }
 
 //主体刷新
-function WholePartialRefresh() {
-    var postUrl = "/slb/wholerefresh/"
+function WholePartialRefresh(pagenumber) {
+    var postUrl = "/slb/wholerefresh/"+pagenumber+"/";
     $.post(postUrl, function(data) {
         $('#whole').html(data)
     });
@@ -196,7 +197,7 @@ function AddBackendServer(slbid, slbinstanceid, serverid, servername) {
 
 
 //同步所有SLB基本信息
-function AllSLBinfoUpdate() {                                                                                           
+function AllSLBinfoUpdate(pagenumber) {
     var postUrl = "/slb/allinfoupdate/";
                                                                                                                                           
     target = $("#myspin").get(0);                                                                                                         
@@ -206,7 +207,7 @@ function AllSLBinfoUpdate() {
                                                                                                                                           
     $.post(postUrl, function (data) {                                                                                                     
         if (data.success) {                                                                                                               
-            WholePartialRefresh();
+            WholePartialRefresh(pagenumber);
             $("#alert-div").css("display", "");
             $("#alert-div").attr("class","alert alert-success");
             $("#alert-div").text("成功！同步所有SLB基本信息");
@@ -225,7 +226,7 @@ function AllSLBinfoUpdate() {
 
 
 //刷新所有SLB健康信息
-function AllSLBHealthUpdate() {                                                                                           
+function AllSLBHealthUpdate(pagenumber) {
     var postUrl = "/slb/allslbhealthupdate/";
                                                                                                                                           
     target = $("#myspin").get(0);                                                                                                         
@@ -235,7 +236,7 @@ function AllSLBHealthUpdate() {
                                                                                                                                           
     $.post(postUrl, function (data) {                                                                                                     
         if (data.success) {                                                                                                               
-            WholePartialRefresh();
+            WholePartialRefresh(pagenumber);
             $("#alert-div").css("display", "");
             $("#alert-div").attr("class","alert alert-success");
             $("#alert-div").text("成功！刷新所有SLB健康信息");

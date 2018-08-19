@@ -1,5 +1,6 @@
 {% extends 'configmanager/__base__.html' %}
 {% block title %}发布申请详情 | {% endblock %}
+{% block search_display %}none{% endblock %}
 {% block content %}
 
 {% load systemmanager %}
@@ -56,13 +57,6 @@ var pageObject = {
  }
 }
 
-
-
-
-
-
-
-
 </script>
 
 <div id="whole" class="container-fluid table-responsive">
@@ -81,7 +75,9 @@ var pageObject = {
             <tr>
                 <th>期望发布时间</th>
                 {% if apply.status == "WC" %}
-                <td>{{ apply_form.wishdeploy_time }}</td>
+                <td>
+                    <input type="date" name="wishdeploy_time" id="id_wishdeploy_time" size="10" value="{{ apply.wishdeploy_time|date:'Y-m-d' }}" />
+                </td>
                 {% else %}
                 <td>{{ apply.wishdeploy_time }}</td>
                 {% endif %}

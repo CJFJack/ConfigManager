@@ -597,7 +597,24 @@ class ApplyListView(generic.ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Apply.objects.order_by('-apply_time')
+        try:
+            q = self.request.GET['q']
+        except:
+            q = ''
+        print q
+        if (q != ''):
+            apply_list = Apply.objects.filter(Q(applyproject__icontains=q)).order_by('-apply_time')
+        else:
+            apply_list = Apply.objects.order_by('-apply_time')
+        return apply_list
+
+    def get_context_data(self, **kwargs):
+        context = super(ApplyListView, self).get_context_data(**kwargs)
+        q = self.request.GET.get('q')
+        if q is None:
+            return context
+        context['q'] = q
+        return context
 
     def get_paginate_by(self, queryset):
         return self.request.GET.get('paginate_by', self.paginate_by)
@@ -610,7 +627,23 @@ class UndeployApplyListView(generic.ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Apply.objects.filter(status='WD').order_by('-wishdeploy_time').order_by('-apply_time')
+        try:
+            q = self.request.GET['q']
+        except:
+            q = ''
+        if (q != ''):
+            apply_list = Apply.objects.filter(Q(applyproject__icontains=q)).filter(status='WD').order_by('-wishdeploy_time').order_by('-apply_time')
+        else:
+            apply_list = Apply.objects.filter(status='WD').order_by('-wishdeploy_time').order_by('-apply_time')
+        return apply_list
+
+    def get_context_data(self, **kwargs):
+        context = super(UndeployApplyListView, self).get_context_data(**kwargs)
+        q = self.request.GET.get('q')
+        if q is None:
+            return context
+        context['q'] = q
+        return context
 
     def get_paginate_by(self, queryset):
         return self.request.GET.get('paginate_by', self.paginate_by)
@@ -635,12 +668,15 @@ class ApplyChangeView(UpdateView):
 
 @login_required(login_url='/login/')
 def apply_save(request, obj):
-    time_str = request.POST['wishdeploy_time']
-    time = datetime.strptime(time_str, '%Y/%m/%d')
-    obj.wishdeploy_time = time.strftime('%Y-%m-%d')
-    obj.confamendexplain = request.POST['confamendexplain']
-    obj.remarkexplain = request.POST['remarkexplain']
-    obj.save()
+    try:
+        if request.POST['wishdeploy_time']:
+            obj.wishdeploy_time = request.POST['wishdeploy_time']
+        obj.confamendexplain = request.POST['confamendexplain']
+        obj.remarkexplain = request.POST['remarkexplain']
+    except:
+        pass
+    else:
+        obj.save()
     if request.method == 'POST':
         formset = DeployitemFormSet(request.POST, request.FILES, instance=obj)
         if formset.is_valid():
@@ -755,7 +791,7 @@ class ApplyAdd(CreateView):
         form_class = self.get_form_class()
         apply_form = self.get_form(form_class)
         deployitem_form = DeployitemFormSet(self.request.POST)
-        if (apply_form.is_valid() and deployitem_form.is_valid()):
+        if (apply_form.is_valid() or deployitem_form.is_valid()):
             messages.success(request, "成功！创建发布申请单")
             return self.form_valid(apply_form, deployitem_form)
         else:
@@ -766,12 +802,16 @@ class ApplyAdd(CreateView):
         self.object = apply_form.save()
         deployitem_form.instance = self.object
         for form in deployitem_form:
-            site_id = form.cleaned_data['deploysite'].id
-            for ecs in form.cleaned_data['deploysite'].ECSlists.all():
-                ecs_id = ecs.id
-                d = DeployECS(applyproject_id=apply_form.instance.id, ECS_id=ecs_id, site_id=site_id)
-                d.save()
-        deployitem_form.save()
+            try:
+                site_id = form.cleaned_data['deploysite'].id
+            except:
+                pass
+            else:
+                for ecs in form.cleaned_data['deploysite'].ECSlists.all():
+                    ecs_id = ecs.id
+                    d = DeployECS(applyproject_id=apply_form.instance.id, ECS_id=ecs_id, site_id=site_id)
+                    d.save()
+                deployitem_form.save()
         return HttpResponseRedirect(reverse('configmanager:applylist'))
 
     def form_invalid(self, apply_form, deployitem_form):
@@ -783,6 +823,7 @@ class ApplyAdd(CreateView):
 def apply_delete(request, apply_id):
     a = get_object_or_404(Apply, pk=apply_id)
     a.delete()
+    messages.success(request, '成功！删除发布申请单')
     return HttpResponseRedirect(reverse('configmanager:applylist'))
 
 
@@ -799,7 +840,25 @@ class SLBListView(generic.ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return SLB.objects.order_by('name')
+        try:
+            q = self.request.GET['q']
+        except:
+            q = ''
+        if (q != ''):
+            slb_list = SLB.objects.filter(Q(name__icontains=q) |
+                                          Q(instanceid__icontains=q) |
+                                          Q(ip__icontains=q)).order_by('name')
+        else:
+            slb_list = SLB.objects.order_by('name')
+        return slb_list
+
+    def get_context_data(self, **kwargs):
+        context = super(SLBListView, self).get_context_data(**kwargs)
+        q = self.request.GET.get('q')
+        if q is None:
+            return context
+        context['q'] = q
+        return context
 
     def get_paginate_by(self, queryset):
         return self.request.GET.get('paginate_by', self.paginate_by)
@@ -1026,10 +1085,17 @@ def slb_part_refresh(request, slb_id):
 
 
 @login_required(login_url='/login/')
-def slb_whole_refresh(request):
-    slb_list = SLB.objects.all()
+def slb_whole_refresh(request, pagenumber):
+    slb_list = SLB.objects.order_by('name')
     template = 'configmanager/slbwhole_health_template.html'
-    return render(request, template, {"slb_list": slb_list})
+    paginator = Paginator(slb_list, 10)
+    try:
+        slb_list = paginator.page(pagenumber)
+    except PageNotAnInteger:
+        slb_list = paginator.page(1)
+    except EmptyPage:
+        slb_list = paginator.page(paginator.num_pages)
+    return render(request, template, {'slb_list': slb_list, 'pagenumber': pagenumber})
 
 
 @login_required(login_url='/login/')

@@ -379,7 +379,7 @@ class ConfigmanagerHistoricalconfigfile(models.Model):
 class SLB(models.Model):
     instanceid = models.CharField(max_length=50)
     name = models.CharField(max_length=30)
-    status = models.CharField(max_length=10)
+    status = models.CharField(max_length=30)
     ip = models.GenericIPAddressField(protocol='IPv4')
     networktype = models.CharField(max_length=10, null=True, blank=True)
     addresstype = models.CharField(max_length=10)

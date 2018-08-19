@@ -410,7 +410,6 @@ class RaceEditView(generic.DetailView):
 def race_add(request):
     L = []
     randomraceid = int(round(time() * 1000))
-    print randomraceid
     siterace = Siterace(raceid=randomraceid)
     siterace.save()
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
@@ -1065,10 +1064,9 @@ def ecs_part_refresh(request, ecs_id, pagenumber):
 def ecs_whole_refresh(request, pagenumber):
     ECS_list = ECS.objects.order_by('name')
     template = 'configmanager/ecslist_whole_template.html'
-    page = pagenumber
     paginator = Paginator(ECS_list, 10)
     try:
-        ECS_list = paginator.page(page)
+        ECS_list = paginator.page(pagenumber)
     except PageNotAnInteger:
         ECS_list = paginator.page(1)
     except EmptyPage:
@@ -1080,19 +1078,33 @@ def ecs_whole_refresh(request, pagenumber):
 def site_whole_refresh(request, pagenumber):
     Site_list = Site.objects.order_by('fullname')
     template = 'configmanager/sitelist_whole_template.html'
-    page = pagenumber
     paginator = Paginator(Site_list, 10)
     try:
-        Site_list = paginator.page(page)
+        Site_list = paginator.page(pagenumber)
     except PageNotAnInteger:
         Site_list = paginator.page(1)
+        return render(request, template, {'Site_list': Site_list, 'pagenumber': pagenumber})
     except EmptyPage:
-        Site_list = paginator.page(paginator.num_pages)
-    return render(request, template, {'Site_list': Site_list, 'pagenumber': pagenumber})
+        print paginator.num_pages
+        return HttpResponse(json.dumps({'empty': True, 'pagenumber': paginator.num_pages}), content_type="application/json")
+    else:
+        return render(request, template, {'success': True, 'Site_list': Site_list, 'pagenumber': pagenumber})
 
 
 @login_required(login_url='/login/')
-def race_wholerefresh(request):
+def race_wholerefresh(request, pagenumber):
     Race_list = Siterace.objects.order_by('raceid')
     template = 'configmanager/racelist_whole_template.html'
-    return render(request, template, {'Race_list': Race_list})
+    paginator = Paginator(Race_list, 5)
+    try:
+        Race_list = paginator.page(pagenumber)
+    except PageNotAnInteger:
+        Race_list = paginator.page(1)
+        return render(request, template, {'Race_list': Race_list, 'pagenumber': pagenumber})
+    except EmptyPage:
+        print paginator.num_pages
+        return HttpResponse(json.dumps({'empty': True, 'pagenumber': paginator.num_pages}), content_type="application/json")
+    else:
+        print 3
+        return render(request, template, {'success': True, 'Race_list': Race_list, 'pagenumber': pagenumber})
+

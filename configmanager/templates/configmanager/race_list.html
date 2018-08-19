@@ -7,7 +7,7 @@
 <div style="display:none;" id="alert-div" class="alert"></div>
 
 <div class="container-fluid btn-group">
-    <a href="javascript:void(0);" onclick="RaceAdd()" type="button" class="btn btn-default btn-success">新增站点族</a>
+    <a href="javascript:void(0);" onclick="RaceAdd('{{ page_obj.number }}')" type="button" class="btn btn-default btn-success">新增站点族</a>
 </div><br><br>
 
 <div id="whole" class="container-fluid table-responsive">
@@ -31,7 +31,7 @@
             </td>
             <td>
                 <a href="{% url 'configmanager:raceedit' race.id %}" type="button" class="btn btn-info">编辑</a>
-                <a href="javascript:void(0);" onclick="RaceDelete('{{ race.id }}', '{{ race.alias }}')" type="button"
+                <a href="javascript:void(0);" onclick="RaceDelete('{{ race.id }}', '{{ race.alias }}', '{{ page_obj.number }}')" type="button"
                    class="btn btn-danger">删除</a>
             </td>
         </tr>
@@ -50,15 +50,21 @@
     });
 
     //主体刷新
-    function WholePartialRefresh() {
-        var postUrl = "/race/wholerefresh/"
+    function WholePartialRefresh(pagenumber) {
+        var postUrl = "/race/wholerefresh/"+pagenumber+"/";
+
         $.post(postUrl, function(data) {
-            $('#whole').html(data)
+            if (data.empty) {
+                window.location.replace("/race/?q=&page="+data.pagenumber);
+            }
+            else {
+                $('#whole').html(data);
+            }
         });
     }
 
     // 新增站点族
-    function RaceAdd() {
+    function RaceAdd(pagenumber) {
     var postUrl = "/race/add/";
 
     target = $("#myspin").get(0);
@@ -68,9 +74,9 @@
 
     $.post(postUrl, function (data) {
         if (data.success) {
-            WholePartialRefresh();
+            WholePartialRefresh(pagenumber);
             $("#alert-div").css("display", "");
-            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").attr("class", "alert alert-success");
             $("#alert-div").text("成功！新增站点族");
             setTimeout(function () {
                 $("#alert-div").fadeOut();
@@ -86,7 +92,7 @@
     }
 
     // 删除站点族
-    function RaceDelete(race_id, race_alias) {
+    function RaceDelete(race_id, race_alias, pagenumber) {
     var postUrl = "/race/"+race_id+"/delete/";
     var race_alias = race_alias;
 
@@ -97,10 +103,10 @@
 
     $.post(postUrl, function (data) {
         if (data.success) {
-            WholePartialRefresh();
-            $("#alert-div").css("display", "");
-            $("#alert-div").attr("class","alert alert-danger");
+            WholePartialRefresh(pagenumber);
+            $("#alert-div").attr("class", "alert alert-danger");
             $("#alert-div").text("成功！删除站点族 "+race_alias);
+            $("#alert-div").css("display", "");
             setTimeout(function () {
                 $("#alert-div").fadeOut();
             },20000);

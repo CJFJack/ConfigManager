@@ -59,8 +59,14 @@ $.ajaxSetup({
 //主体刷新
 function WholePartialRefresh(pagenumber) {
     var postUrl = "/site/wholerefresh/"+pagenumber+"/";
+
     $.post(postUrl, function(data) {
-        $('#whole').html(data)
+        if (data.empty) {
+            window.location.replace("/site/?q=&page="+data.pagenumber);
+        }
+        else {
+            $('#whole').html(data);
+        }
     });
 }
 

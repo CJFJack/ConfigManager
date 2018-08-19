@@ -50,12 +50,15 @@
     });
 
     //主体刷新
-    function WholePartialRefresh(pagenumber) {
-        var postUrl = "/race/wholerefresh/"+pagenumber+"/";
+    function WholePartialRefresh(pagenumber, type) {
+        var postUrl = "/race/wholerefresh/"+pagenumber+"/"+type+"/";
 
         $.post(postUrl, function(data) {
             if (data.empty) {
                 window.location.replace("/race/?q=&page="+data.pagenumber);
+            }
+            if (data.add) {
+                 window.location.replace("/race/?q=&page="+data.pagenumber);
             }
             else {
                 $('#whole').html(data);
@@ -95,6 +98,7 @@
     function RaceDelete(race_id, race_alias, pagenumber) {
     var postUrl = "/race/"+race_id+"/delete/";
     var race_alias = race_alias;
+    var type = "delete"
 
     target = $("#myspin").get(0);
     var bgDiv = document.getElementById("bgDiv");
@@ -103,7 +107,7 @@
 
     $.post(postUrl, function (data) {
         if (data.success) {
-            WholePartialRefresh(pagenumber);
+            WholePartialRefresh(pagenumber,type);
             $("#alert-div").attr("class", "alert alert-danger");
             $("#alert-div").text("成功！删除站点族 "+race_alias);
             $("#alert-div").css("display", "");

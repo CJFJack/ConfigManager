@@ -1092,19 +1092,22 @@ def site_whole_refresh(request, pagenumber):
 
 
 @login_required(login_url='/login/')
-def race_wholerefresh(request, pagenumber):
+def race_wholerefresh(request, pagenumber, type):
     Race_list = Siterace.objects.order_by('raceid')
     template = 'configmanager/racelist_whole_template.html'
     paginator = Paginator(Race_list, 5)
-    try:
-        Race_list = paginator.page(pagenumber)
-    except PageNotAnInteger:
-        Race_list = paginator.page(1)
-        return render(request, template, {'Race_list': Race_list, 'pagenumber': pagenumber})
-    except EmptyPage:
-        print paginator.num_pages
-        return HttpResponse(json.dumps({'empty': True, 'pagenumber': paginator.num_pages}), content_type="application/json")
+    if type == 'delete':
+        try:
+            Race_list = paginator.page(pagenumber)
+        except PageNotAnInteger:
+            Race_list = paginator.page(1)
+            return render(request, template, {'Race_list': Race_list, 'pagenumber': pagenumber})
+        except EmptyPage:
+            print paginator.num_pages
+            return HttpResponse(json.dumps({'empty': True, 'pagenumber': paginator.num_pages}), content_type="application/json")
+        else:
+            return render(request, template, {'Race_list': Race_list, 'pagenumber': pagenumber})
     else:
-        print 3
-        return render(request, template, {'success': True, 'Race_list': Race_list, 'pagenumber': pagenumber})
+        return HttpResponse(json.dumps({'add': True, 'pagenumber': pagenumber}), content_type="application/json")
+
 

@@ -3,6 +3,53 @@
 {% block search_notice %}请输入 ECS名称 / IP地址 / 实例ID{% endblock %}
 {% block content %}
 
+<style>
+/* Custom Styles */
+    ul.nav-tabs{
+        width: 140px;
+        margin-top: 20px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
+    }
+    ul.nav-tabs li{
+        margin: 0;
+        border-top: 1px solid #ddd;
+    }
+    ul.nav-tabs li:first-child{
+        border-top: none;
+    }
+    ul.nav-tabs li a{
+        margin: 0;
+        padding: 8px 16px;
+        border-radius: 0;
+    }
+    ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover{
+        color: #fff;
+        background: #0088cc;
+        border: 1px solid #0088cc;
+    }
+    ul.nav-tabs li:first-child a{
+        border-radius: 4px 4px 0 0;
+    }
+    ul.nav-tabs li:last-child a{
+        border-radius: 0 0 4px 4px;
+    }
+    ul.nav-tabs.affix{
+        top: 30px; /* Set the top position of pinned element */
+    }
+</style>
+<script>
+$(document).ready(function(){
+    $("#myNav").affix({
+        offset: {
+            top: 125
+      }
+    });
+});
+</script>
+
+
 <div class="btn-toolbar container-fluid" role="toolbar">
     <div class="btn-group">
         <a href="javascript:void(0);" onclick="SyncAllECS('{{ page_obj.number }}')" type="button"
@@ -15,74 +62,86 @@
 </div><br>
 
 <div id="whole" class="container-fluid table-responsive">
-    {% if ECS_list %}
-    <table class="table table-striped table-hover table-condensed">
-        <thead>
-        <th>区域</th>
-        <th>网络类型</th>
-        <th>ECS名称</th>
-        <th>实例ID</th>
-        <th>系统类型</th>
-        <th>系统版本</th>
-        <th>内网IP地址</th>
-        <th>外网IP地址</th>
-        <th>配置规格</th>
-        <th>使用状态</th>
-        <th>运行状态</th>
-        <th>过期时间</th>
-        <th>修改日期</th>
-        <th>CPU使用率</th>
-        <th>内存使用率</th>
-        <th>磁盘使用率</th>
-        <th>操作</th>
-        </thead>
-        <tbody>
-        {% for ecs in ECS_list %}
-        <tr id="tr_{{ ecs.id }}"
-            class="{% if 80 < ecs.recently_cpu or 80 < ecs.recently_memory or 80 < ecs.recently_diskusage %}danger{% elif 70 < ecs.recently_cpu or 70 < ecs.recently_memory or 70 < ecs.recently_diskusage %}warning{% endif %}">
-            <td>{{ ecs.regionId }}</td>
-            <td>{{ ecs.networktype }}</td>
-            <td>{{ ecs.name }}</td>
-            <td>{{ ecs.instanceid }}</td>
-            <td>{{ ecs.ostype }}</td>
-            <td>{{ ecs.osname }}</td>
-            <td>{{ ecs.IP }}</td>
-            <td>{{ ecs.publicipaddress }}</td>
-            <td>CPU:{{ ecs.cpu }}核 内存:{{ ecs.memory }}G</td>
-            <td>
-                {% if ecs.status == 'Y' %}<span>启用</span>
-                {% else %}<span class="text-danger"><strong>禁用</strong></span>
-                {% endif %}
-            </td>
-            <td>{{ ecs.instancestatus }}</td>
-            <td>{{ ecs.expiredtime }}</td>
-            <td>{{ ecs.modified_time }}</td>
-            <td>{{ ecs.recently_cpu }}</td>
-            <td>{{ ecs.recently_memory }}</td>
-            <td>{{ ecs.recently_diskusage }}</td>
-            <td>
-                <a class="btn btn-danger" href="{% url 'configmanager:ecsdelete' ecs.id %}"
-                   onclick="return confirm('Are you sure you want to delete this?')">删除</a>
-                {% if ecs.status == "Y" %}
-                <a type="button" class="btn btn-warning" href="javascript:void(0)"
-                   onclick="ECSdisable('{{ ecs.id }}', '{{ ecs.name }}', '{{ page_obj.number }}')">禁用</a>
-                {% else %}
-                <a type="button" class="btn btn-success" href="javascript:void(0)"
-                   onclick="ECSenable('{{ ecs.id }}', '{{ ecs.name }}', '{{ page_obj.number }}')">启用</a>
-                {% endif %}
-                <a type="button" class="btn btn-info" href="javascript:void(0)"
-                   onclick="UpdateECSMonitor('{{ ecs.id }}', '{{ ecs.name }}', '{{ page_obj.number }}')">刷新监控数据</a>
-                <a type="button" class="btn btn-success" href="javascript:void(0)"
-                   onclick="UpdateECSInfo('{{ ecs.id }}', '{{ ecs.name }}', '{{ page_obj.number }}')">刷新基础信息</a>
-            </td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>No ECS are available.</p>
-    {% endif %}
-
+    <div class="row">
+        <div class="col-xs-3" id="myScrollspy">
+            <ul class="nav nav-tabs nav-stacked" data-spy="affix" data-offset-top="125">
+                <li><a href="#section-1">第一部分</a></li>
+                <li><a href="#section-2">第二部分</a></li>
+                <li><a href="#section-3">第三部分</a></li>
+                <li><a href="#section-4">第四部分</a></li>
+                <li><a href="#section-5">第五部分</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-xs-9">
+        {% if ECS_list %}
+        <table class="table table-striped table-hover table-condensed">
+            <thead>
+            <th>区域</th>
+            <th>网络类型</th>
+            <th>ECS名称</th>
+            <th>实例ID</th>
+            <th>系统类型</th>
+            <th>系统版本</th>
+            <th>内网IP地址</th>
+            <th>外网IP地址</th>
+            <th>配置规格</th>
+            <th>使用状态</th>
+            <th>运行状态</th>
+            <th>过期时间</th>
+            <th>修改日期</th>
+            <th>CPU使用率</th>
+            <th>内存使用率</th>
+            <th>磁盘使用率</th>
+            <th>操作</th>
+            </thead>
+            <tbody>
+            {% for ecs in ECS_list %}
+            <tr id="tr_{{ ecs.id }}"
+                class="{% if 80 < ecs.recently_cpu or 80 < ecs.recently_memory or 80 < ecs.recently_diskusage %}danger{% elif 70 < ecs.recently_cpu or 70 < ecs.recently_memory or 70 < ecs.recently_diskusage %}warning{% endif %}">
+                <td>{{ ecs.regionId }}</td>
+                <td>{{ ecs.networktype }}</td>
+                <td>{{ ecs.name }}</td>
+                <td>{{ ecs.instanceid }}</td>
+                <td>{{ ecs.ostype }}</td>
+                <td>{{ ecs.osname }}</td>
+                <td>{{ ecs.IP }}</td>
+                <td>{{ ecs.publicipaddress }}</td>
+                <td>CPU:{{ ecs.cpu }}核 内存:{{ ecs.memory }}G</td>
+                <td>
+                    {% if ecs.status == 'Y' %}<span>启用</span>
+                    {% else %}<span class="text-danger"><strong>禁用</strong></span>
+                    {% endif %}
+                </td>
+                <td>{{ ecs.instancestatus }}</td>
+                <td>{{ ecs.expiredtime }}</td>
+                <td>{{ ecs.modified_time }}</td>
+                <td>{{ ecs.recently_cpu }}</td>
+                <td>{{ ecs.recently_memory }}</td>
+                <td>{{ ecs.recently_diskusage }}</td>
+                <td>
+                    <a class="btn btn-danger" href="{% url 'configmanager:ecsdelete' ecs.id %}"
+                       onclick="return confirm('Are you sure you want to delete this?')">删除</a>
+                    {% if ecs.status == "Y" %}
+                    <a type="button" class="btn btn-warning" href="javascript:void(0)"
+                       onclick="ECSdisable('{{ ecs.id }}', '{{ ecs.name }}', '{{ page_obj.number }}')">禁用</a>
+                    {% else %}
+                    <a type="button" class="btn btn-success" href="javascript:void(0)"
+                       onclick="ECSenable('{{ ecs.id }}', '{{ ecs.name }}', '{{ page_obj.number }}')">启用</a>
+                    {% endif %}
+                    <a type="button" class="btn btn-info" href="javascript:void(0)"
+                       onclick="UpdateECSMonitor('{{ ecs.id }}', '{{ ecs.name }}', '{{ page_obj.number }}')">刷新监控数据</a>
+                    <a type="button" class="btn btn-success" href="javascript:void(0)"
+                       onclick="UpdateECSInfo('{{ ecs.id }}', '{{ ecs.name }}', '{{ page_obj.number }}')">刷新基础信息</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No ECS are available.</p>
+        {% endif %}
+    </div>
 </div>
 
 
@@ -337,6 +396,7 @@ function UpdateECSInfo(ecsid, ecsname, pagenumber) {
         },300);
     });
 }
+
 
 
 

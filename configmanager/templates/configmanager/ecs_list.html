@@ -7,8 +7,10 @@
     <div class="btn-group">
         <a href="javascript:void(0);" onclick="SyncAllECS('{{ page_obj.number }}')" type="button"
            class="btn btn-default btn-primary">同步所有ECS</a>
-        <a href="javascript:void(0);" onclick="UpdateAllECSInfo('{{ page_obj.number }}')" type="button" class="btn btn-default btn-info">刷新所有ECS基础信息</a>
-        <a href="javascript:void(0);" onclick="UpdateAllECSHealth('{{ page_obj.number }}')" type="button" class="btn btn-default btn-success">刷新所有ECS监控数据</a>
+        <a href="javascript:void(0);" onclick="UpdateAllECSInfo('{{ page_obj.number }}')" type="button"
+           class="btn btn-default btn-info">刷新所有ECS基础信息</a>
+        <a href="javascript:void(0);" onclick="UpdateAllECSHealth('{{ page_obj.number }}')" type="button"
+           class="btn btn-default btn-success">刷新所有ECS监控数据</a>
     </div>
 </div><br>
 
@@ -59,8 +61,8 @@
             <td>{{ ecs.recently_memory }}</td>
             <td>{{ ecs.recently_diskusage }}</td>
             <td>
-                <a type="button" class="btn btn-danger" href="javascript:void(0)"
-                   onclick="ECSdelete('{{ ecs.id }}', '{{ ecs.name }}', '{{ page_obj.number }}')">删除</a>
+                <a class="btn btn-danger" href="{% url 'configmanager:ecsdelete' ecs.id %}"
+                   onclick="return confirm('Are you sure you want to delete this?')">删除</a>
                 {% if ecs.status == "Y" %}
                 <a type="button" class="btn btn-warning" href="javascript:void(0)"
                    onclick="ECSdisable('{{ ecs.id }}', '{{ ecs.name }}', '{{ page_obj.number }}')">禁用</a>
@@ -249,34 +251,34 @@ function ECSenable(ecsid, ecsname, pagenumber) {
     });
 }
 
-//删除ECS
-function ECSdelete(ecsid, ecsname, pagenumber) {
-    var postUrl = "/ecs/"+ecsid+"/delete/";
-    var ecsname = ecsname
+<!--//删除ECS-->
+<!--function ECSdelete(ecsid, ecsname, pagenumber) {-->
+    <!--var postUrl = "/ecs/"+ecsid+"/delete/";-->
+    <!--var ecsname = ecsname-->
 
-    target = $("#myspin").get(0);
-    var bgDiv = document.getElementById("bgDiv");
-    bgDiv.style.display = "block";
-    spinner.spin(target);
+    <!--target = $("#myspin").get(0);-->
+    <!--var bgDiv = document.getElementById("bgDiv");-->
+    <!--bgDiv.style.display = "block";-->
+    <!--spinner.spin(target);-->
 
-    $.post(postUrl, function (data) {
-        if (data.success) {
-            WholePartialRefresh(pagenumber);
-            $("#alert-div").css("display", "");
-            $("#alert-div").attr("class","alert alert-danger");
-            $("#alert-div").text("成功！删除ECS "+ecsname);
-            setTimeout(function () {
-                $("#alert-div").fadeOut();
-            },30000);
-        } else {
-            alert("操作失败！"+data.message);
-        }
-        setTimeout(function () {
-            spinner.spin();
-            bgDiv.style.display = "none";
-        },300);
-    });
-}
+    <!--$.post(postUrl, function (data) {-->
+        <!--if (data.success) {-->
+            <!--WholePartialRefresh(pagenumber);-->
+            <!--$("#alert-div").css("display", "");-->
+            <!--$("#alert-div").attr("class","alert alert-danger");-->
+            <!--$("#alert-div").text("成功！删除ECS "+ecsname);-->
+            <!--setTimeout(function () {-->
+                <!--$("#alert-div").fadeOut();-->
+            <!--},30000);-->
+        <!--} else {-->
+            <!--alert("操作失败！"+data.message);-->
+        <!--}-->
+        <!--setTimeout(function () {-->
+            <!--spinner.spin();-->
+            <!--bgDiv.style.display = "none";-->
+        <!--},300);-->
+    <!--});-->
+<!--}-->
 
 //刷新ECS监控数据
 function UpdateECSMonitor(ecsid, ecsname, pagenumber) {
@@ -335,6 +337,9 @@ function UpdateECSInfo(ecsid, ecsname, pagenumber) {
         },300);
     });
 }
+
+
+
 
 
 

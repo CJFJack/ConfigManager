@@ -50,8 +50,10 @@ var opts = {
 var spinner = new Spinner(opts);
 
 
+
 </script>
 
+{% load systemmanager %}
 <!--页面导航-->
 <div class="container-fluid">
     <nav class="navbar navbar-static-top navbar-inverse" role="navigation">
@@ -68,8 +70,8 @@ var spinner = new Spinner(opts);
             </div>
             <div class="collapse navbar-collapse" id="example-navbar-collapse">
                 <ul class="nav navbar-nav">
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <li class="dropdown {% if request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}">
+                        <a href="#" class="dropdown-toggle {% if request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}" data-toggle="dropdown">
                             系统管理 <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu">
@@ -93,8 +95,8 @@ var spinner = new Spinner(opts);
                         </a>
                         <ul class="dropdown-menu">
                             <li role="presentation" class="dropdown-header">配置管理</li>
-                            <li><a href="{% url 'configmanager:configlist' %}">配置修改</a></li>
-                            <li><a href="{% url 'configmanager:undeployconfiglist' %}">待生效配置</a></li>
+                            <li class="{% if request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}"><a href="{% url 'configmanager:configlist' %}">配置修改</a></li>
+                            <li class="{% if request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}"><a href="{% url 'configmanager:configlist' %}"><a href="{% url 'configmanager:undeployconfiglist' %}">待生效配置</a></li>
                             <li role="presentation" class="divider"></li>
                             <li role="presentation" class="dropdown-header">发布申请</li>
                             <li><a href="{% url 'configmanager:undeployapplylist' %}">待发布申请</a></li>
@@ -140,7 +142,8 @@ var spinner = new Spinner(opts);
     <div style="display:{% block search_display %}{% endblock %}" class="container-fluid">
         <form class="navbar-form navbar-left" role="search" method="get">
             <div class="form-group">
-                <input type="text" size="40" class="form-control" placeholder="{% block search_notice %}{% endblock %}" name="q">
+                <input type="text" size="40" class="form-control" placeholder="{% block search_notice %}{% endblock %}"
+                       name="q">
             </div>
             <button type="submit" class="btn btn-default">搜索</button>
         </form>

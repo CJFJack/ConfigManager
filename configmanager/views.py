@@ -40,11 +40,23 @@ def index(request):
     return render(request, 'configmanager/index.html')
 
 
+class SafePaginator(Paginator):
+    def validate_number(self, number):
+        try:
+            return super(SafePaginator, self).validate_number(number)
+        except EmptyPage:
+            if number > 1:
+                return self.num_pages
+            else:
+                raise
+
+
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
 class ECSListView(generic.ListView):
     model = ECS
     template_name = 'configmanager/ecs_list.html'
     context_object_name = 'ECS_list'
+    paginator_class = SafePaginator
     paginate_by = 10
 
     def get_queryset(self):
@@ -109,7 +121,8 @@ def ecs_disable(request, ecs_id):
 def ecs_delete(request, ecs_id):
     ecs = get_object_or_404(ECS, pk=ecs_id)
     ecs.delete()
-    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+    messages.success(request, '成功！删除ECS '+ecs.name)
+    return HttpResponseRedirect(reverse('configmanager:ecslist'))
 
 
 @login_required(login_url='/login/')
@@ -362,7 +375,7 @@ def site_add(request):
 def site_delete(request, site_id):
     site = get_object_or_404(Site, pk=site_id)
     site.delete()
-    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+    return HttpResponseRedirect(reverse('configmanager:sitelist'))
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')

@@ -27,7 +27,7 @@ def query_ecs_info(instanceids):
     # 发起请求
     response = clt.do_action(request)
     json_response = json.loads(response)
-    #print json_response['Instances']['Instance'][0]
+    print json_response
     
     # 获取实例区域
     RegionId = json_response['Instances']['Instance'][0]['RegionId']

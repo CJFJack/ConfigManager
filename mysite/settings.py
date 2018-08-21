@@ -181,3 +181,7 @@ CORS_ALLOW_HEADERS = (
     'x-requested-with',
     'Pragma',
 )
+
+CRONJOBS = [
+    ('*/1 * * * *', 'configmanager.cron.my_scheduled_job')
+]

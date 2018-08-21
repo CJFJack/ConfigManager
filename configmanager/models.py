@@ -15,28 +15,32 @@ class ECS(models.Model):
         (ENABLE, 'enable'),
         (DISABLE, 'disable'),
     )
-    name = models.CharField(max_length=100, null=True, blank=True)
-    instanceid = models.CharField(max_length=30)
-    IP = models.GenericIPAddressField(protocol='IPv4', null=True, blank=True)
+    name = models.CharField(max_length=100, null=True, blank=True, verbose_name=u'ECS名称')
+    instanceid = models.CharField(max_length=30, verbose_name=u'实例ID')
+    IP = models.GenericIPAddressField(protocol='IPv4', null=True, blank=True, verbose_name=u'IP地址')
     status = models.CharField(
         max_length=1,
         choices=status_CHOICES,
         default=ENABLE,
     )
-    modified_time = models.DateTimeField(auto_now=True)
-    recently_cpu = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    recently_memory = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    recently_diskusage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    regionId = models.CharField(max_length=20, null=True, blank=True)
-    expiredtime = models.DateTimeField(null=True, blank=True)
-    memory = models.CharField(max_length=10, null=True, blank=True)
-    ostype = models.CharField(max_length=20, null=True, blank=True)
-    instancestatus = models.CharField(max_length=20, null=True, blank=True)
-    networktype = models.CharField(max_length=20, null=True, blank=True)
-    cpu = models.CharField(max_length=5, null=True, blank=True)
-    publicipaddress = models.GenericIPAddressField(protocol='IPv4', null=True, blank=True)
-    osname = models.CharField(max_length=200, null=True, blank=True)
-    
+    modified_time = models.DateTimeField(auto_now=True, verbose_name=u'修改时间')
+    recently_cpu = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, verbose_name=u'最近CPU使用率')
+    recently_memory = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, verbose_name=u'最近内存使用率')
+    recently_diskusage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, verbose_name=u'最近磁盘使用率')
+    regionId = models.CharField(max_length=20, null=True, blank=True, verbose_name=u'所在区域')
+    expiredtime = models.DateTimeField(null=True, blank=True, verbose_name=u'过期时间')
+    memory = models.CharField(max_length=10, null=True, blank=True, verbose_name=u'内存大小')
+    ostype = models.CharField(max_length=20, null=True, blank=True, verbose_name=u'操作系统类型')
+    instancestatus = models.CharField(max_length=20, null=True, blank=True, verbose_name=u'实例状态')
+    networktype = models.CharField(max_length=20, null=True, blank=True, verbose_name=u'网络类型')
+    cpu = models.CharField(max_length=5, null=True, blank=True, verbose_name=u'CPU核数')
+    publicipaddress = models.GenericIPAddressField(protocol='IPv4', null=True, blank=True, verbose_name=u'公网IP')
+    osname = models.CharField(max_length=200, null=True, blank=True, verbose_name=u'操作系统名称')
+
+    class Meta:
+        verbose_name = u'ECS信息表'
+        verbose_name_plural = verbose_name
+
     def __unicode__(self):
         return self.name
 

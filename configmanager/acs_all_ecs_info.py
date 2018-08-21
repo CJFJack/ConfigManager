@@ -36,6 +36,6 @@ def query_all_ecs(RegionId):
         list.append(instance['InstanceId'])
     return list
 
-# if __name__=='__main__':
-#     result = query_all_ecs(RegionId='cn-hangzhou')
-#     print result
+if __name__=='__main__':
+    result = query_all_ecs(RegionId='cn-hangzhou')
+    print result

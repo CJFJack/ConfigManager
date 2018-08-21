@@ -16,6 +16,8 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from apscheduler.schedulers.background import BackgroundScheduler
+from configmanager import cron
 
 urlpatterns = [
     url(r'^', include('configmanager.urls')),
@@ -24,3 +26,14 @@ urlpatterns = [
     url(r'^login/$', auth_views.login, name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
 ]
+
+
+scheduler = BackgroundScheduler()
+
+
+@scheduler.scheduled_job("interval", seconds=60, id="job")
+def my_schedule_task():
+    cron.get_Aliyun_ECS_API()
+
+
+scheduler.start()

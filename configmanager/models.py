@@ -409,3 +409,37 @@ class SLBhealthstatus(models.Model):
     
     def __unicode__(self):
         return self.healthstatus
+
+
+class RDS(models.Model):
+    instance_id = models.CharField(max_length=100, verbose_name=u'实例ID')
+    instance_alias = models.CharField(max_length=100, null=True, blank=True, verbose_name=u'实例别名')
+    network_type = models.CharField(max_length=20, verbose_name=u'网络类型')
+    engine = models.CharField(max_length=30, verbose_name=u'引擎类型')
+    engine_version = models.CharField(max_length=50, verbose_name=u'引擎版本')
+    status = models.CharField(max_length=30, verbose_name=u'状态')
+    expire_time = models.DateTimeField(verbose_name=u'过期时间')
+
+    class Meta:
+        verbose_name = u'RDS信息表'
+        verbose_name_plural = verbose_name
+
+    def __unicode__(self):
+        return self.instance_alias
+
+
+class RDS_Usage_Record(models.Model):
+    rds = models.ForeignKey(RDS, on_delete=models.CASCADE, verbose_name=u'所属RDS')
+    cpu_usage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, verbose_name=u'CPU使用率')
+    io_usage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, verbose_name=u'IOPS使用率')
+    disk_usage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, verbose_name=u'磁盘使用率')
+    add_time = models.DateTimeField(auto_now_add=True, verbose_name=u'添加时间')
+
+    class Meta:
+        verbose_name = u'RDS资源使用率记录表'
+        verbose_name_plural = verbose_name
+
+    def __unicode__(self):
+        return self.rds
+
+

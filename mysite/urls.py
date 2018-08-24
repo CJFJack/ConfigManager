@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from apscheduler.schedulers.background import BackgroundScheduler
 from configmanager import cron
+import logging
 
 urlpatterns = [
     url(r'^', include('configmanager.urls')),
@@ -31,9 +32,12 @@ urlpatterns = [
 scheduler = BackgroundScheduler()
 
 
-@scheduler.scheduled_job("interval", seconds=60, id="job")
+@scheduler.scheduled_job("interval", seconds=3, id="job")
 def my_schedule_task():
-    cron.get_Aliyun_ECS_API()
+    # cron.save_rds_info()
+    # print 'Update RDS Info'
+    cron.get_rds_monitor()
+    print 'get_rds_monitor'
 
 
 scheduler.start()

@@ -42,11 +42,13 @@ def index(request):
     last_rds_resource = RDS_Usage_Record.objects.order_by('-add_time')[:1]
     for rds in RDS_Usage_Record.objects.order_by('-add_time')[:1]:
         rds_instance_id = rds.rds
-
-    context['rds_instance_id'] = rds_instance_id
+    try:
+        context['rds_instance_id'] = rds_instance_id
+    except:
+        pass
 
     context['recently_rds_cpu'] = [q.cpu_usage for q in recently_rds_resource]
-    add_time_list = [(q.add_time.strftime)('%Y-%m-%d %H:%M') for q in recently_rds_resource]
+    add_time_list = [q.add_time.strftime('%Y-%m-%d %H:%M') for q in recently_rds_resource]
     add_time_list.sort()
     context['add_time'] = add_time_list
 

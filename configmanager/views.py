@@ -41,7 +41,9 @@ def index(request):
     # 获取最近8次rds资源
     recently_rds_resource = RDS_Usage_Record.objects.order_by('-add_time')[:8]
     # 获取最近8次add_time的list
-    context['add_time'] = [q.add_time.strftime('%Y-%m-%d %H:%M') for q in recently_rds_resource]
+    add_time_list = [q.add_time.strftime('%Y-%m-%d %H:%M') for q in recently_rds_resource]
+    add_time_list.sort()
+    context['add_time'] = add_time_list
     # 获取最后一次rds资源
     last_rds_resource = RDS_Usage_Record.objects.order_by('-add_time')[:1]
     # 获取rds实例id

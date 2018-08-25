@@ -5,7 +5,7 @@ from django.urls import reverse
 from time import time
 from datetime import datetime
 from django.core.files import File
-import os, json, ConfigParser, time
+import os, json, ConfigParser, time, datetime
 from django.contrib import messages
 
 # Create your views here.
@@ -38,24 +38,36 @@ app_name = 'configmanager'
 @login_required(login_url='/login/')
 def index(request):
     context = {}
+    # 获取最近8次rds资源
     recently_rds_resource = RDS_Usage_Record.objects.order_by('-add_time')[:8]
+    # 获取最近8次add_time的list
+    context['add_time'] = [q.add_time.strftime('%Y-%m-%d %H:%M') for q in recently_rds_resource]
+    # 获取最后一次rds资源
     last_rds_resource = RDS_Usage_Record.objects.order_by('-add_time')[:1]
+    # 获取rds实例id
     for rds in RDS_Usage_Record.objects.order_by('-add_time')[:1]:
         rds_instance_id = rds.rds
     try:
         context['rds_instance_id'] = rds_instance_id
     except:
         pass
-
+    # 获取最近8次rds的CPU使用率list
     context['recently_rds_cpu'] = [q.cpu_usage for q in recently_rds_resource]
-    add_time_list = [q.add_time.strftime('%Y-%m-%d %H:%M') for q in recently_rds_resource]
-    add_time_list.sort()
-    context['add_time'] = add_time_list
-
+    # 获取最后一次rds资源使用率list
     context['last_rds_cpu'] = [q.cpu_usage for q in last_rds_resource]
     context['last_rds_io'] = [q.io_usage for q in last_rds_resource]
     context['last_rds_disk'] = [q.disk_usage for q in last_rds_resource]
-
+    # 获取趋势图时间间隔横坐标（默认为1分钟间隔）
+    # add_time_list = []
+    # for q in last_rds_resource:
+    #     last_add_time = q.add_time
+    # past_add_time = last_add_time + datetime.timedelta(minutes=-5)
+    # add_time_list.append(last_add_time.strftime('%Y-%m-%d %H:%M'))
+    # for n in range(1, 8):
+    #     past_add_time = past_add_time + datetime.timedelta(minutes=-5)
+    #     add_time_list.append(past_add_time.strftime('%Y-%m-%d %H:%M'))
+    # add_time_list.sort()
+    # context['add_time'] = add_time_list
     return render(request, 'configmanager/index.html', context)
 
 

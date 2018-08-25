@@ -40,7 +40,7 @@ def my_schedule_task():
     print 'Update RDS Info'
 
 
-@scheduler.scheduled_job("interval", seconds=300, id="job")
+@scheduler.scheduled_job("interval", seconds=60, id="job")
 def my_schedule_task():
     cron.get_rds_monitor()
     print 'get_rds_monitor'

@@ -32,10 +32,10 @@ urlpatterns = [
 scheduler = BackgroundScheduler()
 
 
-@scheduler.scheduled_job("interval", seconds=3, id="job")
+@scheduler.scheduled_job("interval", seconds=300, id="job")
 def my_schedule_task():
-    # cron.save_rds_info()
-    # print 'Update RDS Info'
+    cron.save_rds_info()
+    print 'Update RDS Info'
     cron.get_rds_monitor()
     print 'get_rds_monitor'
 

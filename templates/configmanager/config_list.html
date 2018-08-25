@@ -1,0 +1,238 @@
+{% extends 'configmanager/__base__.html' %}
+{% block title %}配置管理 | {% endblock %}
+{% block search_notice %}请输入 站点名称 / 站点端口{% endblock %}
+{% block content %}
+
+<div id="whole" class="container-fluid table-responsive">
+    {% if site_list %}
+    <table class="table table-striped table-hover table-condensed table-bordered">
+        <th>站点名称</th>
+        <th>发布注意事项</th>
+        <th class="text-center">配置文件</th>
+        <th class="text-center">所属ECS&nbsp;&nbsp;&nbsp;配置状态&nbsp;&nbsp;&nbsp;操作</th>
+        <th class="text-center">所属ECS&nbsp;&nbsp;&nbsp;SLB状态&nbsp;&nbsp;&nbsp;健康状态&nbsp;&nbsp;&nbsp;操作</th>
+        <th>健康检查</th>
+        <th>配置修改人</th>
+        <th>修改日期</th>
+        {% for site in site_list %}
+        <tr>
+            <td>
+                <a href="{% url 'configmanager:sitechange' site.id %}" target="_blank">{{ site.fullname }}</a>
+            </td>
+            <td>{{ site.deployattention }}</td>
+            <td align="right">
+                {% for configfile in site.configfile_set.all %}
+                <p>
+                    {{ configfile.filename }}&nbsp;
+                    <a class="btn btn-danger" href="{% url 'configmanager:configchange' configfile.id %}">修改</a>&nbsp;
+                    <a class="btn btn-primary" href="{% url 'configmanager:confighistory' configfile.id %}">历史记录</a>&nbsp;
+                </p>
+                {% endfor %}
+            </td>
+            <td align="right" id="td_ecs_{{ site.id }}">
+                {% for r in site.release_set.all %}
+                {% if r.ECS.name in site.get_ECSlists_list %}
+                <p>
+                    {{ r.ECS }}&nbsp;
+                    {% if r.status == "N" %}
+                    <span class="text-danger">待生效</span>&nbsp;&nbsp;&nbsp;<a class="btn btn-success"
+                                                                             href="javascript:void(0);"
+                                                                             onclick="DeployConfig('{{ r.id }}', '{{ r.ECS.name }}', '{{ site.id }}', '{{ site.fullname }}')">发布</a>&nbsp;
+                    {% endif %}
+                    {% if r.status == "Y" %}
+                    <span class="text-success">已生效</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% endif %}
+                </p>
+                {% endif %}
+                {% endfor %}
+            </td>
+            <td align="right" id=td_slb_{{ site.id }}>
+                {% for ecs in site.get_one_slb.slbhealthstatus_set.all %}
+                <p>
+                    <span>{{ ecs.ECS }}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                    {% if ecs.SLBstatus == "added" %}<span class="text-success">已添加</span>{% else %}<span
+                        class="text-danger">已移除</span>{% endif %}&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span>
+                                {% if ecs.SLBstatus == "added" %}
+                                    {% if ecs.healthstatus == "normal" %}<span class="text-success">正常</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    {% elif ecs.healthstatus == "abnormal" %}<span class="text-danger">异常</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    {% else %}<span class="text-danger">正在检查</span>&nbsp;&nbsp;
+                                    {% endif %}
+                                {% else %}
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                {% endif %}
+                            </span>
+                    <span>
+                                {% if ecs.SLBstatus == "added" %}<a class="btn btn-warning" href="javascript:void(0)"
+                                                                    onclick="SiteRemoveBackendServer('{{ site.id }}', '{{ site.fullname}}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')">移除</a>{% endif %}
+                                {% if ecs.SLBstatus == "removed" %}<a class="btn btn-success" href="javascript:void(0)"
+                                                                      onclick="SiteAddBackendServer('{{ site.id }}', '{{ site.fullname}}', '{{ ecs.ECS_id }}', '{{ ecs.ECS.name }}')">添加</a>{% endif %}
+                            </span>
+                </p>
+                {% endfor %}
+            </td>
+            <td><a class="btn btn-info" href="javascript:void(0);"
+                   onclick="MoreHealthRefresh('{{ site.id }}', '{{ site.fullname }}')">刷新</a></td>
+            <td>
+                {% for config in site.configfile_set.all %}
+                <p>{{ config.modified_user }}</p>
+                {% endfor %}
+            </td>
+            <td>
+                {% for config in site.configfile_set.all %}
+                <p>{{ config.modified_time }}</p>
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No Sites are available.</p>
+    {% endif %}
+
+</div>
+
+
+<script>
+$.ajaxSetup({
+    data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+});
+
+//SLB状态局部刷新
+function SLBPartialRefresh(siteid) {
+    var postUrl = "/config/"+siteid+"/slbpartrefresh/"
+    $.post(postUrl, function(data) {
+        $('#td_slb_'+siteid).html(data)
+    });
+}
+
+//ECS状态局部刷新
+function ECSPartialRefresh(siteid) {
+    var postUrl = "/config/"+siteid+"/ecspartrefresh/"
+    $.post(postUrl, function(data) {
+        $('#td_ecs_'+siteid).html(data)
+    });
+}
+
+//刷新SLB健康状态
+function MoreHealthRefresh(siteid, sitename) {
+    var postUrl = "/slb/"+siteid+"/moreslbhealthupdate/";
+
+    target = $("#myspin").get(0);                                                                                 
+    var bgDiv = document.getElementById("bgDiv");                                                                 
+    bgDiv.style.display = "block";                                                                                
+    spinner.spin(target);  
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            SLBPartialRefresh(siteid);
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！刷新 "+sitename+" 关联SLB健康状态");
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
+        } else {
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-warning");
+            $("#alert-div").text("失败！站点 "+sitename+" 没有关联SLB，请移步SLB管理页面进行关联");
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
+        }
+        setTimeout(function () {
+            spinner.spin();                                                                                           
+            bgDiv.style.display = "none";  
+        },800);
+    });
+}
+
+//移除站点所属SLB后端服务器
+function SiteRemoveBackendServer(siteid, sitename, serverid, servername) {
+    var postUrl = "/slb/"+siteid+"/siteremovebackendserver/"+serverid+"/";
+
+    target = $("#myspin").get(0);                                                                                 
+    var bgDiv = document.getElementById("bgDiv");                                                                 
+    bgDiv.style.display = "block";                                                                                
+    spinner.spin(target);  
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            SLBPartialRefresh(siteid);
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！移除站点 "+sitename+" 关联SLB的后端服务器 "+servername);
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();                                                                                           
+            bgDiv.style.display = "none";  
+        },300);
+    });
+}
+
+
+//添加站点所属SLB后端服务器
+function SiteAddBackendServer(siteid, sitename, serverid, servername) {
+    var postUrl = "/slb/"+siteid+"/siteaddbackendserver/"+serverid+"/";
+
+    target = $("#myspin").get(0);                                                                                 
+    var bgDiv = document.getElementById("bgDiv");                                                                 
+    bgDiv.style.display = "block";                                                                                
+    spinner.spin(target);  
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            SLBPartialRefresh(siteid);
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！新增站点 "+sitename+" 关联SLB的后端服务器 "+servername);
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();                                                                                           
+            bgDiv.style.display = "none";  
+        },300);
+    });
+}
+
+//发布配置文件
+function DeployConfig(release_id, ecs_name, site_id, site_fullname) {
+    var postUrl = "/config/"+release_id+"/deploy/";
+
+    target = $("#myspin").get(0);
+    var bgDiv = document.getElementById("bgDiv");
+    bgDiv.style.display = "block";
+    spinner.spin(target);
+
+    $.post(postUrl, function (data) {
+        if (data.success) {
+            ECSPartialRefresh(site_id);
+            $("#alert-div").css("display", "");
+            $("#alert-div").attr("class","alert alert-success");
+            $("#alert-div").text("成功！发布 "+ecs_name+" 站点 "+site_fullname+" "+"配置文件");
+            setTimeout(function () {
+                $("#alert-div").fadeOut();
+            },20000);
+        } else {
+            alert("操作失败！"+data.message);
+        }
+        setTimeout(function () {
+            spinner.spin();
+            bgDiv.style.display = "none";
+        },800);
+    });
+}
+
+</script>
+
+
+{% endblock %}

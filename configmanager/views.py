@@ -5,7 +5,7 @@ from django.urls import reverse
 from time import time
 from datetime import datetime
 from django.core.files import File
-import os, json, ConfigParser
+import os, json, ConfigParser, time
 from django.contrib import messages
 
 # Create your views here.
@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem, SLB, \
-    SLBhealthstatus, DeployECS
+    SLBhealthstatus, DeployECS, RDS, RDS_Usage_Record
 from .forms import ApplyForm, DeployitemFormSet, SLBForm, SLBsiteFormSet
 from django.http import HttpResponse
 from django.views import generic
@@ -37,7 +37,24 @@ app_name = 'configmanager'
 
 @login_required(login_url='/login/')
 def index(request):
-    return render(request, 'configmanager/index.html')
+    context = {}
+    recently_rds_resource = RDS_Usage_Record.objects.order_by('-add_time')[:8]
+    last_rds_resource = RDS_Usage_Record.objects.order_by('-add_time')[:1]
+    for rds in RDS_Usage_Record.objects.order_by('-add_time')[:1]:
+        rds_instance_id = rds.rds
+
+    context['rds_instance_id'] = rds_instance_id
+
+    context['recently_rds_cpu'] = [q.cpu_usage for q in recently_rds_resource]
+    add_time_list = [(q.add_time.strftime)('%Y-%m-%d %H:%M') for q in recently_rds_resource]
+    add_time_list.sort()
+    context['add_time'] = add_time_list
+
+    context['last_rds_cpu'] = [q.cpu_usage for q in last_rds_resource]
+    context['last_rds_io'] = [q.io_usage for q in last_rds_resource]
+    context['last_rds_disk'] = [q.disk_usage for q in last_rds_resource]
+
+    return render(request, 'configmanager/index.html', context)
 
 
 class SafePaginator(Paginator):
@@ -463,7 +480,25 @@ class ConfigListView(generic.ListView):
     paginate_by = 5
 
     def get_queryset(self):
-        return Site.objects.order_by('fullname')
+        try:
+            q = self.request.GET['q']
+        except:
+            q = ''
+        if (q != ''):
+            Site_list = Site.objects.filter(Q(fullname__icontains=q) |
+                                            Q(shortname__icontains=q) |
+                                            Q(port__icontains=q)).order_by('fullname')
+        else:
+            Site_list = Site.objects.order_by('fullname')
+        return Site_list
+
+    def get_context_data(self, **kwargs):
+        context = super(ConfigListView, self).get_context_data(**kwargs)
+        q = self.request.GET.get('q')
+        if q is None:
+            return context
+        context['q'] = q
+        return context
 
     def get_paginate_by(self, queryset):
         return self.request.GET.get('paginate_by', self.paginate_by)
@@ -478,9 +513,20 @@ class UndeployConfigListView(generic.ListView):
 
     def get_queryset(self):
         L = []
-        for site in Site.objects.all():
-            if site.have_undeploy_config_or_not():
-                L.append(site)
+        try:
+            q = self.request.GET['q']
+        except:
+            q = ''
+        if (q != ''):
+            for site in Site.objects.filter(Q(fullname__icontains=q) |
+                                                Q(shortname__icontains=q) |
+                                                Q(port__icontains=q)).order_by('fullname'):
+                if site.have_undeploy_config_or_not():
+                    L.append(site)
+        else:
+            for site in Site.objects.all():
+                if site.have_undeploy_config_or_not():
+                    L.append(site)
         return L
 
     def get_paginate_by(self, queryset):
@@ -577,7 +623,7 @@ def apply_config_deploy(request, deployecs_id, release_id):
 def config_history(request, configfile_id):
     confighistory_list = ConfigmanagerHistoricalconfigfile.objects.filter(id=configfile_id).order_by('-modified_time')
     template_name = 'configmanager/config_history.html'
-    return render_to_response(template_name, {'confighistory_list': confighistory_list})
+    return render(request, template_name, {'confighistory_list': confighistory_list})
 
 
 @method_decorator(login_required(login_url='/login/'), name='dispatch')
@@ -1164,7 +1210,6 @@ def site_whole_refresh(request, pagenumber):
         Site_list = paginator.page(1)
         return render(request, template, {'Site_list': Site_list, 'pagenumber': pagenumber})
     except EmptyPage:
-        print paginator.num_pages
         return HttpResponse(json.dumps({'empty': True, 'pagenumber': paginator.num_pages}), content_type="application/json")
     else:
         return render(request, template, {'success': True, 'Site_list': Site_list, 'pagenumber': pagenumber})

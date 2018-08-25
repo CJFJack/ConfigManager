@@ -425,14 +425,14 @@ class RDS(models.Model):
         verbose_name_plural = verbose_name
 
     def __unicode__(self):
-        return self.instance_alias
+        return self.instance_id
 
 
 class RDS_Usage_Record(models.Model):
     rds = models.ForeignKey(RDS, on_delete=models.CASCADE, verbose_name=u'所属RDS')
-    cpu_usage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, verbose_name=u'CPU使用率')
-    io_usage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, verbose_name=u'IOPS使用率')
-    disk_usage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, verbose_name=u'磁盘使用率')
+    cpu_usage = models.FloatField(null=True, blank=True, verbose_name=u'CPU使用率')
+    io_usage = models.FloatField(null=True, blank=True, verbose_name=u'IOPS使用率')
+    disk_usage = models.FloatField(null=True, blank=True, verbose_name=u'磁盘使用率')
     add_time = models.DateTimeField(auto_now_add=True, verbose_name=u'添加时间')
 
     class Meta:
@@ -440,6 +440,6 @@ class RDS_Usage_Record(models.Model):
         verbose_name_plural = verbose_name
 
     def __unicode__(self):
-        return self.rds
+        return str(self.add_time)
 
 

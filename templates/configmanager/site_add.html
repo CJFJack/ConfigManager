@@ -1,0 +1,103 @@
+{% extends 'configmanager/__base__.html' %}
+{% block title %}添加站点 | {% endblock %}
+{% block search_display %}none{% endblock %}
+{% block content %}
+
+    <ol class="breadcrumb">
+        <li><a href="{% url 'configmanager:sitelist' %}">站点列表</a></li>
+        <li class="active">添加站点</li>
+    </ol><br>
+
+    <form class="form-horizontal" role="form" action="{% url 'configmanager:siteaddmethod' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="fullname" class="col-sm-1 control-label">站点名称</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" name="fullname" id="fullname" placeholder="请输入站点名称">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="shortname" class="col-sm-1 control-label">站点简称</label>
+            <div class="col-sm-5">
+                <input type="text" class="form-control" name="shortname" id="shortname" placeholder="请输入站点简称">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="configdirname" class="col-sm-1 control-label">配置文件夹名称</label>
+            <div class="col-sm-5">
+                <input type="text" class="form-control" name="configdirname" id="configdirname"
+                       placeholder="请输入配置文件夹名称">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="configfiles" class="col-sm-1 control-label">配置文件</label>
+            <div class="col-sm-5">
+                <input type="text" class="form-control" name="configfiles" id="configfiles"
+                       placeholder="请输入配置文件,以分号;隔开">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-1 control-label">所属ECS</label>
+            <div class="checkbox">
+                <label>
+                    {% for ecs in ECSs %}
+                        <input type="checkbox" name="{{ ecs.name }}" value="{{ ecs.name }}">{{ ecs.name }}<br>
+                    {% endfor %}
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-1 control-label">所属站点族</label>
+            <div class="radio">
+                <label>
+                    {% for race in Siteraces %}
+                        <input type="radio" name="optionsRadios" id="optionsRadios{{ race.id }}" value="{{ race.id }}">
+                        {{ race.alias }}<br>
+                    {% endfor %}
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="port" class="col-sm-1 control-label">端口号</label>
+            <div class="col-sm-1">
+                <input type="text" class="form-control" name="port" id="port" placeholder="请输入端口号">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="testpage" class="col-sm-1 control-label">测试页面</label>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" name="testpage" id="testpage" placeholder="请输入测试页面">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="status" class="col-sm-1 control-label">状态</label>
+            <div class="col-sm-1">
+                <select name="status" class="form-control">
+                    <option value="Y">启用</option>
+                    <option value="N">禁用</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="devcharge" class="col-sm-1 control-label">研发负责人</label>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" name="devcharge" id="devcharge" placeholder="请输入研发负责人">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="deployattention" class="col-sm-1 control-label">发布注意事项</label>
+            <div class="col-sm-5">
+                <textarea class="form-control" rows="10" name="deployattention" placeholder="请输入发布注意事项"></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-1 col-sm-5">
+                <button type="submit" class="btn btn-primary" name="site-add">添加</button>
+                <button type="submit" class="btn btn-primary" name="site-add-continue-add">添加并继续添加</button>
+                <button type="submit" class="btn btn-default" name="site-goback">返回</button>
+            </div>
+        </div>
+    </form>
+
+
+{% endblock %}

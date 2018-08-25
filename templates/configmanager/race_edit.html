@@ -1,0 +1,47 @@
+{% extends 'configmanager/__base__.html' %}
+{% block title %}编辑站点族 | {% endblock %}
+{% block search_display %}none{% endblock %}
+{% block content %}
+
+    <ol class="breadcrumb">
+        <li><a href="{% url 'configmanager:racelist' %}">站点族列表</a></li>
+        <li class="active">编辑站点族</li>
+    </ol><br>
+
+    <form class="form-horizontal" role="form" action="{% url 'configmanager:racesiterelation' siterace.id %}"
+          method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="raceid" class="col-sm-1 control-label">站点族编号</label>
+            <div class="col-sm-5">
+                <p class="form-control-static" id="raceid">{{ siterace.raceid }}</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="alias" class="col-sm-1 control-label">简称</label>
+            <div class="col-sm-5">
+                <input type="text" class="form-control" value="{{ siterace.alias }}" name="alias" id="alias"
+                       placeholder="请输入站点族简称">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-1 control-label">关联站点</label>
+            <div class="checkbox">
+                <label>
+                    {% for s in site_list %}
+                        <input type="checkbox" name="{{ s.fullname }}" value="{{ s.fullname }}"
+                               {% if s in siterace.site_set.all %}checked{% endif %}/>{{ s.fullname }}<br>
+                    {% endfor %}
+                </label>
+            </div>
+        </div>
+        <br>
+        <div class="form-group">
+            <div class="col-sm-offset-1 col-sm-12">
+                <button type="submit" class="btn btn-primary" name="save">保存</button>
+                <button type="submit" class="btn btn-default" name="back">返回</button>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}

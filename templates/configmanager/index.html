@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+{% extends 'configmanager/__base__.html' %}
+{% block search_display %}none{% endblock %}
+
+{% block content %}
+
+    <!-- 每30s刷新一次页面 -->
+    <meta http-equiv="refresh" content="30">
+
+
+    <ul id="myTab" class="nav nav-tabs">
+        <li class="active">
+            <a href="#RDS" data-toggle="tab">RDS-统计报表</a>
+        </li>
+        <li>
+            <a href="#ECS" data-toggle="tab">ECS-统计报表</a>
+        </li>
+    </ul>
+
+    <div id="myTabContent" class="tab-content">
+        <div class="tab-pane fade in active" id="RDS">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+
+                        {#RDS资源使用率饼图#}
+                        <div class="col-lg-4">
+                            <div id="pie_rds_cpu" style="min-height:300px;"></div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div id="pie_rds_io" style="min-height:300px;"></div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div id="pie_rds_disk" style="min-height:300px;"></div>
+                        </div>
+
+                    </div>
+                    <br><br><br>
+
+                    <div class="row">
+
+                        <div class="col-lg-8">
+                            <div id="line_rds_cpu" style="min-height:300px; margin-left:-50px; width:1200px;"></div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <select class="form-control" id="type-project-list" style="width:150px;margin-left:250px">
+                            </select>
+                            <div id="fms_type_history" style="min-height:300px;"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="ECS">
+
+        </div>
+    </div>
+
+
+
+
+    {#    JS部分#}
+
+    {#    标签页js#}
+    <script>
+        $(function () {
+            $('#myTab li:eq(0) a').tab('show');
+        });
+    </script>
+
+
+    <script type="text/javascript">
+
+        {#     RDS_CPU-line图#}
+        // 基于准备好的dom，初始化echarts实例
+        var myChart_RDS_CPU_line = echarts.init(document.getElementById('line_rds_cpu'));
+
+        // 指定图表的配置项和数据
+        var option = {
+            title: {
+                text: 'CPU使用率趋势',
+                subtext: '{{ rds_instance_id }}',
+                x: 'center'
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: {{ add_time|safe }}
+            },
+            yAxis: [
+                {
+                    type: 'value',
+                    axisLabel: {
+                        show: true,
+                        interval: 'auto',
+                        formatter: '{value} %'
+                    },
+                    show: true
+                }
+            ],
+            series: [{
+                data: {{ recently_rds_cpu|safe }},
+                type: 'line',
+                areaStyle: {}
+            }]
+        };
+        {#    显示RDS-CPU-line图。#}
+        myChart_RDS_CPU_line.setOption(option);
+
+
+        {#RDS_CPU饼图#}
+
+        var myChart_RDS_CPU_pie = echarts.init(document.getElementById('pie_rds_cpu'));
+
+        var option = {
+            title: {
+                text: 'CPU使用率',
+                subtext: '{{ rds_instance_id }}',
+                x: 'center'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}:\n{c}%'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                data: ['已使用', '未使用']
+            },
+            series: [
+                {
+                    name: '',
+                    type: 'pie',
+                    radius: '55%',
+                    center: ['50%', '60%'],
+                    data: [
+                        {value: {{ last_rds_cpu }}, name: '已使用'},
+                        {value: 100 -{{ last_rds_cpu }}, name: '未使用'},
+                    ],
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        {#    显示RDS-CPU饼图#}
+        myChart_RDS_CPU_pie.setOption(option);
+
+
+        {#RDS_IO饼图#}
+
+        var myChart_RDS_IO_pie = echarts.init(document.getElementById('pie_rds_io'));
+
+        var option = {
+            title: {
+                text: 'I/O使用率',
+                subtext: '{{ rds_instance_id }}',
+                x: 'center'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}:\n{c}%'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                data: ['已使用', '未使用']
+            },
+            series: [
+                {
+                    name: '',
+                    type: 'pie',
+                    radius: '55%',
+                    center: ['50%', '60%'],
+                    data: [
+                        {value: {{ last_rds_io }}, name: '已使用'},
+                        {value: 100 -{{ last_rds_io }}, name: '未使用'},
+                    ],
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        {#显示RDS-I/O饼图#}
+        myChart_RDS_IO_pie.setOption(option);
+
+
+        {#RDS_disk饼图#}
+
+        var myChart_RDS_disk_pie = echarts.init(document.getElementById('pie_rds_disk'));
+
+        var option = {
+            title: {
+                text: '磁盘使用率',
+                subtext: '{{ rds_instance_id }}',
+                x: 'center'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}:\n{c}%'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                data: ['已使用', '未使用']
+            },
+            series: [
+                {
+                    name: '',
+                    type: 'pie',
+                    radius: '55%',
+                    center: ['50%', '60%'],
+                    data: [
+                        {value: {{ last_rds_disk }}, name: '已使用'},
+                        {value: 100 -{{ last_rds_disk }}, name: '未使用'},
+                    ],
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        {#显示RDS-磁盘使用率饼图#}
+        myChart_RDS_disk_pie.setOption(option);
+
+
+    </script>
+
+{% endblock %}

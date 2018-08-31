@@ -21,14 +21,15 @@ def query_rds_monitor(instanceId, metric):
     # 发起请求
     response = clt.do_action(request)
     json_response = json.loads(response)
-    return json.loads(json_response['Datapoints'].encode('utf-8'))[0]['Average']
+    return json.loads(json_response['Datapoints'])[0]['Average']
 
 
 # 调用函数
 if __name__=='__main__':
-    result = query_rds_monitor(instanceId="rdsmaqvrzazju6n", metric="CpuUsage")
+    instance_id = "rdsmaqvrzazju6n"
+    result = query_rds_monitor(instanceId=instance_id, metric="CpuUsage")
     print result
-    result = query_rds_monitor(instanceId="rdsmaqvrzazju6n", metric="IOPSUsage")
+    result = query_rds_monitor(instanceId=instance_id, metric="IOPSUsage")
     print result
-    result = query_rds_monitor(instanceId="rdsmaqvrzazju6n", metric="DiskUsage")
+    result = query_rds_monitor(instanceId=instance_id, metric="DiskUsage")
     print result

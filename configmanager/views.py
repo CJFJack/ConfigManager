@@ -7,13 +7,14 @@ from datetime import datetime
 from django.core.files import File
 import os, json, ConfigParser, time, datetime
 from django.contrib import messages
+from django.db.models import Q, Count
 
 # Create your views here.
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem, SLB, \
-    SLBhealthstatus, DeployECS, RDS, RDS_Usage_Record
+    SLBhealthstatus, DeployECS, RDS_Usage_Record, Alarm_Histroy
 from .forms import ApplyForm, DeployitemFormSet, SLBForm, SLBsiteFormSet
 from django.http import HttpResponse
 from django.views import generic
@@ -30,7 +31,7 @@ from configmanager.acs_api.acs_slb_backendserver_add import add_backendserver
 from configmanager.acs_api.acs_all_ecs_info import query_all_ecs
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Q
+
 
 app_name = 'configmanager'
 
@@ -38,38 +39,97 @@ app_name = 'configmanager'
 @login_required(login_url='/login/')
 def index(request):
     context = {}
-    # 获取最近8次rds资源
-    recently_rds_resource = RDS_Usage_Record.objects.order_by('-add_time')[:8]
-    # 获取最近8次add_time的list
+
+    # 默认横坐标间隔
+    context['rds_range_default'] = u'1小时'
+    select_count = 12
+    # 获取横坐标请求时间间隔
+    if request.method == 'POST':
+        range = request.POST['select_range']
+        if range == u'1小时':
+            select_count = 12
+        if range == u'6小时':
+            select_count = 72
+        if range == u'12小时':
+            select_count = 144
+        if range == u'1天':
+            select_count = 288
+        if range == u'3天':
+            select_count = 864
+        if range == u'7天':
+            select_count = 2016
+        if range == u'14天':
+            select_count = 4032
+        context['rds_range_default'] = range
+
+    # 获取最近12次rds资源, 默认5分钟为间隔
+    recently_rds_resource = RDS_Usage_Record.objects.order_by('-add_time')[:select_count]
+    # 获取最近12次add_time的list
     add_time_list = [q.add_time.strftime('%Y-%m-%d %H:%M') for q in recently_rds_resource]
     add_time_list.sort()
     context['add_time'] = add_time_list
+    # 获取最近12次rds的CPU使用率list
+    context['recently_rds_cpu'] = [q.cpu_usage for q in recently_rds_resource]
+    # 获取最近12次rds的I/O使用率list
+    context['recently_rds_io'] = [q.io_usage for q in recently_rds_resource]
+    # 获取最近12次rds的disk使用率list
+    context['recently_rds_disk'] = [q.disk_usage for q in recently_rds_resource]
+
     # 获取最后一次rds资源
     last_rds_resource = RDS_Usage_Record.objects.order_by('-add_time')[:1]
-    # 获取rds实例id
-    for rds in RDS_Usage_Record.objects.order_by('-add_time')[:1]:
-        rds_instance_id = rds.rds
-    try:
-        context['rds_instance_id'] = rds_instance_id
-    except:
-        pass
-    # 获取最近8次rds的CPU使用率list
-    context['recently_rds_cpu'] = [q.cpu_usage for q in recently_rds_resource]
     # 获取最后一次rds资源使用率list
-    context['last_rds_cpu'] = [q.cpu_usage for q in last_rds_resource]
-    context['last_rds_io'] = [q.io_usage for q in last_rds_resource]
-    context['last_rds_disk'] = [q.disk_usage for q in last_rds_resource]
-    # 获取趋势图时间间隔横坐标（默认为1分钟间隔）
-    # add_time_list = []
-    # for q in last_rds_resource:
-    #     last_add_time = q.add_time
-    # past_add_time = last_add_time + datetime.timedelta(minutes=-5)
-    # add_time_list.append(last_add_time.strftime('%Y-%m-%d %H:%M'))
-    # for n in range(1, 8):
-    #     past_add_time = past_add_time + datetime.timedelta(minutes=-5)
-    #     add_time_list.append(past_add_time.strftime('%Y-%m-%d %H:%M'))
-    # add_time_list.sort()
-    # context['add_time'] = add_time_list
+    context['last_rds_cpu'] = [q.cpu_usage for q in last_rds_resource][0]
+    context['last_rds_io'] = [q.io_usage for q in last_rds_resource][0]
+    context['last_rds_disk'] = [q.disk_usage for q in last_rds_resource][0]
+
+    # 获取rds实例id
+    context['rds_instance_id'] = [q.rds for q in last_rds_resource][0]
+
+    # 获取alarm记录（默认为最近30天）60*60*24*30=2592000
+    now_time = time.time()
+    last_alarm_record = Alarm_Histroy.objects.filter(alarm_time__gte=(now_time-2592000)*1000)
+    # 按alarm产品类型统计
+    alarm = Alarm_Histroy.objects.values('namespace').annotate(Count("id"))
+    product_type_list = []
+    for i in alarm:
+        product_type_list.append(str(i['namespace']))
+    context['product_type_list'] = product_type_list
+    product_type_alarm_list= []
+    for i in alarm:
+        product_type_dict = {}
+        product_type_dict[str('value')] = i['id__count']
+        product_type_dict[str('name')] = str(i['namespace'])
+        product_type_alarm_list.append(product_type_dict)
+    context['product_type_alarm_list'] = product_type_alarm_list
+    # 按alarm监控项类型统计
+    alarm = Alarm_Histroy.objects.values('metric_name').annotate(Count("id"))
+    metric_type_list = []
+    for i in alarm:
+        metric_type_list.append(str(i['metric_name']))
+    context['metric_type_list'] = metric_type_list
+    metric_type_alarm_list= []
+    for i in alarm:
+        metric_type_dict = {}
+        metric_type_dict[str('value')] = i['id__count']
+        metric_type_dict[str('name')] = str(i['metric_name'])
+        metric_type_alarm_list.append(metric_type_dict)
+    context['metric_type_alarm_list'] = metric_type_alarm_list
+    # 按alarm实例比例统计
+    alarm = Alarm_Histroy.objects.values('instance_name').annotate(Count("id"))
+    instance_list = []
+    for i in alarm:
+        instance_list.append(i['instance_name'])
+    instance_list = json.dumps(instance_list)
+    context['instance_list'] = instance_list
+    instance_alarm_list = []
+    for i in alarm:
+        instance_dict = {}
+        instance_dict['value'] = i['id__count']
+        instance_dict['name'] = i['instance_name']
+        instance_dict = json.dumps(instance_dict)
+        instance_alarm_list.append(instance_dict)
+    context['instance_alarm_list'] = instance_alarm_list
+
     return render(request, 'configmanager/index.html', context)
 
 

@@ -443,10 +443,10 @@ class RDS_Usage_Record(models.Model):
         return str(self.add_time)
 
 
-class Alarm_Histroy(models.Model):
+class Alarm_History(models.Model):
     name = models.CharField(max_length=50, verbose_name=u'告警规则名称')
     namespace = models.CharField(max_length=30, verbose_name=u'告警产品名称')
-    alarm_time = models.BigIntegerField(default='', verbose_name=u'告警时间')
+    alarm_time = models.DateTimeField(null=True, blank=True, verbose_name=u'告警时间')
     value = models.CharField(max_length=10, verbose_name=u'告警的当前值')
     instance_name = models.CharField(max_length=50, verbose_name=u'告警实例名称')
     metric_name = models.CharField(max_length=50, verbose_name=u'监控项名称')

@@ -34,20 +34,20 @@ urlpatterns = [
 scheduler = BackgroundScheduler()
 
 
-@scheduler.scheduled_job("interval", seconds=600, id="job")
-def my_schedule_task():
+@scheduler.scheduled_job("interval", seconds=600, id="get_rds_info")
+def get_rds_info():
     cron.save_rds_info()
     print 'Update RDS Info'
 
 
-@scheduler.scheduled_job("interval", seconds=3, id="job")
-def my_schedule_task():
+@scheduler.scheduled_job("interval", seconds=300, id="get_rds_monitor")
+def get_rds_monitor():
     cron.get_rds_monitor()
     print 'get_rds_monitor'
 
 
-@scheduler.scheduled_job("interval", seconds=300, id="job")
-def my_schedule_task():
+@scheduler.scheduled_job("interval", seconds=500, id="get_alram_history")
+def get_alram_history():
     cron.get_alram_history_list()
     print 'get_alarm_history'
 

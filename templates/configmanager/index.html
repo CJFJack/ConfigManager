@@ -40,6 +40,45 @@
                     </div>
                     <br><br>
 
+                    {# 报警数量折线图#}
+                    <div class="row">
+                        <div class="col-md-2">
+                            <form action="" method="post" id="alarm_line" role="form">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <select onchange="submitForm_ALARM_range();" class="form-control"
+                                            style="width: 100%;" name="select_range">
+                                        <option selected="selected">{{ rds_range_default }}</option>
+                                        <option style="{% if rds_range_default == '1小时' %}display: none{% endif %}">
+                                            1小时
+                                        </option>
+                                        <option style="{% if rds_range_default == '6小时' %}display: none{% endif %}">
+                                            6小时
+                                        </option>
+                                        <option style="{% if rds_range_default == '12小时' %}display: none{% endif %}">
+                                            12小时
+                                        </option>
+                                        <option style="{% if rds_range_default == '1天' %}display: none{% endif %}">
+                                            1天
+                                        </option>
+                                        <option style="{% if rds_range_default == '3天' %}display: none{% endif %}">
+                                            3天
+                                        </option>
+                                        <option style="{% if rds_range_default == '7天' %}display: none{% endif %}">
+                                            7天
+                                        </option>
+                                        <option style="{% if rds_range_default == '14天' %}display: none{% endif %}">
+                                            14天
+                                        </option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-lg-12">
+                            <div id="line_alarm" style="min-height:300px;"></div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -279,7 +318,8 @@
                     label: {
                         backgroundColor: '#6a7985'
                     }
-                }
+                },
+                formatter: '{b}\nCPU使用率:{c}%'
             },
             legend: {
                 data: ['CPU使用率(单位:%)']
@@ -355,7 +395,8 @@
                     label: {
                         backgroundColor: '#6a7985'
                     }
-                }
+                },
+                formatter: '{b}\nI/O使用率:{c}%'
             },
             legend: {
                 data: ['I/O使用率(单位:%)']
@@ -431,7 +472,8 @@
                     label: {
                         backgroundColor: '#6a7985'
                     }
-                }
+                },
+                formatter: '{b}\n磁盘使用率:{c}%'
             },
             legend: {
                 data: ['磁盘使用率(单位:%)']
@@ -608,16 +650,85 @@
         myChart_ALARM_INSTANCE_pie.setOption(option);
 
 
-        window.onresize = myChart_RDS_CPU_pie.resize;
-        window.onresize = myChart_RDS_IO_pie.resize;
-        window.onresize = myChart_RDS_disk_pie.resize;
-        window.onresize = myChart_RDS_CPU_line.resize;
-        window.onresize = myChart_RDS_IO_line.resize;
+        {#     ALARM-line图#}
+        var myChart_ALARM_line = echarts.init(document.getElementById('line_alarm'));
+        var option = {
+            title: {
+                text: '报警数量趋势（单位：个）'
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#6a7985'
+                    }
+                },
+                formatter: '第{b}天报警数量:\n{c}次'
+            },
+            legend: {
+                data: ['报警数量趋势（单位：个）']
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: {{ alarm_num_x|safe }},
+                    axisLabel: {
+                        interval: 'auto',
+                    }
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    axisLabel: {
+                        show: true,
+                        interval: 'auto',
+                        formatter: '{value}% '
+                    },
+                    show: true
+                }
+            ],
+            series: [{
+                data: {{ alarm_num_y|safe }},
+                type: 'line',
+                itemStyle: {
+                    normal: {
+                        color: '#0099cc',  //圈圈的颜色
+                        lineStyle: {
+                            color: '#0099cc'  //线的颜色
+                        }
+                    }
+                },
+                areaStyle: {}
+            }]
+        };
+        {#    显示RDS-CPU-line图。#}
+        myChart_ALARM_line.setOption(option);
+
 
 
         //表单提交
         function submitForm_RDS_range() {
             var form_net = document.getElementById("rds_line");
+            form_net.submit();
+        }
+
+        //表单提交
+        function submitForm_ALARM_range() {
+            var form_net = document.getElementById("alarm_line");
             form_net.submit();
         }
 

@@ -3,8 +3,8 @@
 from configmanager.acs_api import acs_rds_info
 from configmanager.acs_api import acs_rds_monitor
 from configmanager.acs_api import acs_alarm_history
-from .models import RDS, RDS_Usage_Record, Alarm_Histroy
-import datetime
+from .models import RDS, RDS_Usage_Record, Alarm_History
+import datetime, time
 
 
 def save_rds_info():
@@ -41,12 +41,13 @@ def get_alram_history_list():
             name = h['Name']
             namespace = h['Namespace']
             alarm_time = h['AlarmTime']
+            alarm_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(alarm_time/1000))
             value = h['Value']
             instance_name = h['InstanceName']
             metric_name = h['MetricName']
             dimension = h['Dimension']
-            if Alarm_Histroy.objects.filter(alarm_time=alarm_time).count() == 0:
-                alarm = Alarm_Histroy(name=name, namespace=namespace, alarm_time=alarm_time, value=value,
+            if Alarm_History.objects.filter(alarm_time=alarm_time).count() == 0:
+                alarm = Alarm_History(name=name, namespace=namespace, alarm_time=alarm_time, value=value,
                                       instance_name=instance_name, metric_name=metric_name, dimension=dimension)
                 alarm.save()
 

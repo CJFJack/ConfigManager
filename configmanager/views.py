@@ -8,13 +8,14 @@ from django.core.files import File
 import os, json, ConfigParser, time, datetime
 from django.contrib import messages
 from django.db.models import Q, Count
+from django.db import connection
 
 # Create your views here.
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem, SLB, \
-    SLBhealthstatus, DeployECS, RDS_Usage_Record, Alarm_Histroy
+    SLBhealthstatus, DeployECS, RDS_Usage_Record, Alarm_History
 from .forms import ApplyForm, DeployitemFormSet, SLBForm, SLBsiteFormSet
 from django.http import HttpResponse
 from django.views import generic
@@ -85,11 +86,10 @@ def index(request):
     # 获取rds实例id
     context['rds_instance_id'] = [q.rds for q in last_rds_resource][0]
 
-    # 获取alarm记录（默认为最近30天）60*60*24*30=2592000
-    now_time = time.time()
-    last_alarm_record = Alarm_Histroy.objects.filter(alarm_time__gte=(now_time-2592000)*1000)
-    # 按alarm产品类型统计
-    alarm = Alarm_Histroy.objects.values('namespace').annotate(Count("id"))
+    now = datetime.datetime.now()
+    ever = now - datetime.timedelta(days=30)
+    # 按alarm产品类型统计（默认为最近30天）
+    alarm = Alarm_History.objects.filter(alarm_time__gt=ever).values('namespace').annotate(Count("id"))
     product_type_list = []
     for i in alarm:
         product_type_list.append(str(i['namespace']))
@@ -101,8 +101,8 @@ def index(request):
         product_type_dict[str('name')] = str(i['namespace'])
         product_type_alarm_list.append(product_type_dict)
     context['product_type_alarm_list'] = product_type_alarm_list
-    # 按alarm监控项类型统计
-    alarm = Alarm_Histroy.objects.values('metric_name').annotate(Count("id"))
+    # 按alarm监控项类型统计（默认为最近30天）
+    alarm = Alarm_History.objects.filter(alarm_time__gt=ever).values('metric_name').annotate(Count("id"))
     metric_type_list = []
     for i in alarm:
         metric_type_list.append(str(i['metric_name']))
@@ -114,8 +114,8 @@ def index(request):
         metric_type_dict[str('name')] = str(i['metric_name'])
         metric_type_alarm_list.append(metric_type_dict)
     context['metric_type_alarm_list'] = metric_type_alarm_list
-    # 按alarm实例比例统计
-    alarm = Alarm_Histroy.objects.values('instance_name').annotate(Count("id"))
+    # 按alarm实例比例统计（默认为最近30天）
+    alarm = Alarm_History.objects.filter(alarm_time__gt=ever).values('instance_name').annotate(Count("id"))
     instance_list = []
     for i in alarm:
         instance_list.append(i['instance_name'])
@@ -129,6 +129,18 @@ def index(request):
         instance_dict = json.dumps(instance_dict)
         instance_alarm_list.append(instance_dict)
     context['instance_alarm_list'] = instance_alarm_list
+    # 按天统计
+    select = {'day': connection.ops.date_trunc_sql('day', 'add_time')}
+    alarm = Alarm_History.objects.extra(select={'day': 'day(alarm_time)'}).values('day').annotate(number=Count('id'))
+    alarm_num_x = []
+    alarm_num_y = []
+    for a in alarm:
+        alarm_num_x.append(int(a['day']))
+        alarm_num_y.append(a['number'])
+    alarm_num_x.sort()
+    alarm_num_y.sort()
+    context['alarm_num_x'] = alarm_num_x
+    context['alarm_num_y'] = alarm_num_y
 
     return render(request, 'configmanager/index.html', context)
 

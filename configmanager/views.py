@@ -85,12 +85,18 @@ def index(request):
     # 获取最后一次rds资源
     last_rds_resource = RDS_Usage_Record.objects.order_by('-add_time')[:1]
     # 获取最后一次rds资源使用率list
-    context['last_rds_cpu'] = [q.cpu_usage for q in last_rds_resource][0]
-    context['last_rds_io'] = [q.io_usage for q in last_rds_resource][0]
-    context['last_rds_disk'] = [q.disk_usage for q in last_rds_resource][0]
+    try:
+        context['last_rds_cpu'] = [q.cpu_usage for q in last_rds_resource][0]
+        context['last_rds_io'] = [q.io_usage for q in last_rds_resource][0]
+        context['last_rds_disk'] = [q.disk_usage for q in last_rds_resource][0]
+    except:
+        pass
 
     # 获取rds实例id
-    context['rds_instance_id'] = [q.rds for q in last_rds_resource][0]
+    try:
+        context['rds_instance_id'] = [q.rds for q in last_rds_resource][0]
+    except:
+        pass
 
     now = datetime.datetime.now()
     ever = now - datetime.timedelta(days=30)
@@ -135,9 +141,10 @@ def index(request):
         instance_dict = json.dumps(instance_dict)
         instance_alarm_list.append(instance_dict)
     context['instance_alarm_list'] = instance_alarm_list
-    # 按天统计
-    select = {'day': connection.ops.date_trunc_sql('day', 'add_time')}
-    alarm = Alarm_History.objects.extra(select={'day': 'day(alarm_time)'}).values('day').annotate(number=Count('id'))
+    # 按天统计(默认为本月)
+    start = str(datetime.datetime.now() - datetime.timedelta(days=30))[:7]+'-01'
+    end = str(datetime.datetime.now() - datetime.timedelta(days=30) + datetime.timedelta(days=31))[:7]+'-01'
+    alarm = Alarm_History.objects.filter(alarm_time__gt=start).filter(alarm_time__lt=end).extra(select={'day': 'day(alarm_time)'}).values('day').annotate(number=Count('id'))
     alarm_num_x = []
     alarm_num_y = []
     for a in alarm:
@@ -530,8 +537,8 @@ class RaceEditView(generic.DetailView):
 
 @login_required(login_url='/login/')
 def race_add(request):
-    L = []
-    randomraceid = int(round(time() * 1000))
+    randomraceid = int(round(time.time() * 1000))
+    print randomraceid
     siterace = Siterace(raceid=randomraceid)
     siterace.save()
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")

@@ -3,8 +3,7 @@
 
 from aliyunsdkcore import client
 from aliyunsdkrds.request.v20140815 import DescribeDBInstancesRequest
-from aliyunsdkcore.profile import region_provider
-import json
+import json, time
 
 clt = client.AcsClient('ZAL5Z3Ee8KhyZ2U1', 'afp7C6u1osEpCZSwVHcHkfcpJqoeEe', 'cn-hangzhou')
 
@@ -21,11 +20,11 @@ def query_rds_list(RegionId):
 
 
 # 调用函数
-if __name__=='__main__':
+if __name__ == '__main__':
     result = query_rds_list(RegionId="cn-hangzhou")
     print 'DBInstanceId = ' + result['DBInstanceId']
     print 'network_type = ' + result['InstanceNetworkType']
     print 'engine = ' + result['Engine']
     print 'engine_version = ' + result['EngineVersion']
     print 'status = ' + result['DBInstanceStatus']
-    print 'expire_time = ' + result['ExpireTime']
+    print 'expire_time = ' + result['ExpireTime'].replace("Z", "").replace("T", " ")

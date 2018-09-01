@@ -119,10 +119,7 @@
         function HealthRefresh(slbid, slbinstanceid) {
             var postUrl = "/slb/" + slbid + "/slbhealthupdate/";
 
-            target = $("#myspin").get(0);
-            var bgDiv = document.getElementById("bgDiv");
-            bgDiv.style.display = "block";
-            spinner.spin(target);
+            jQuery('#body').showLoading();
 
             $.post(postUrl, function (data) {
                 if (data.success) {
@@ -137,8 +134,7 @@
                     alert("操作失败！" + data.message);
                 }
                 setTimeout(function () {
-                    spinner.spin();
-                    bgDiv.style.display = "none";
+                    jQuery('#body').hideLoading();
                 }, 800);
             });
         }
@@ -148,10 +144,7 @@
         function RemoveBackendServer(slbid, slbinstanceid, serverid, servername) {
             var postUrl = "/slb/" + slbid + "/removebackendserver/" + serverid + "/";
 
-            target = $("#myspin").get(0);
-            var bgDiv = document.getElementById("bgDiv");
-            bgDiv.style.display = "block";
-            spinner.spin(target);
+            jQuery('#body').showLoading();
 
             $.post(postUrl, function (data) {
                 if (data.success) {
@@ -166,8 +159,7 @@
                     alert("操作失败！" + data.message);
                 }
                 setTimeout(function () {
-                    spinner.spin();
-                    bgDiv.style.display = "none";
+                    jQuery('#body').hideLoading();
                 }, 300);
             });
         }
@@ -177,10 +169,7 @@
         function AddBackendServer(slbid, slbinstanceid, serverid, servername) {
             var postUrl = "/slb/" + slbid + "/addbackendserver/" + serverid + "/";
 
-            target = $("#myspin").get(0);
-            var bgDiv = document.getElementById("bgDiv");
-            bgDiv.style.display = "block";
-            spinner.spin(target);
+            jQuery('#body').showLoading();
 
             $.post(postUrl, function (data) {
                 if (data.success) {
@@ -195,8 +184,7 @@
                     alert("操作失败！" + data.message);
                 }
                 setTimeout(function () {
-                    spinner.spin();
-                    bgDiv.style.display = "none";
+                    jQuery('#body').hideLoading();
                 }, 300);
             });
         }
@@ -206,10 +194,7 @@
         function AllSLBinfoUpdate(pagenumber) {
             var postUrl = "/slb/allinfoupdate/";
 
-            target = $("#myspin").get(0);
-            var bgDiv = document.getElementById("bgDiv");
-            bgDiv.style.display = "block";
-            spinner.spin(target);
+            jQuery('#body').showLoading();
 
             $.post(postUrl, function (data) {
                 if (data.success) {
@@ -224,8 +209,7 @@
                     alert("操作失败！" + data.message);
                 }
                 setTimeout(function () {
-                    spinner.spin();
-                    bgDiv.style.display = "none";
+                    jQuery('#body').hideLoading();
                 }, 300);
             });
         }
@@ -235,10 +219,7 @@
         function AllSLBHealthUpdate(pagenumber) {
             var postUrl = "/slb/allslbhealthupdate/";
 
-            target = $("#myspin").get(0);
-            var bgDiv = document.getElementById("bgDiv");
-            bgDiv.style.display = "block";
-            spinner.spin(target);
+            jQuery('#body').showLoading();
 
             $.post(postUrl, function (data) {
                 if (data.success) {
@@ -253,8 +234,7 @@
                     alert("操作失败！" + data.message);
                 }
                 setTimeout(function () {
-                    spinner.spin();
-                    bgDiv.style.display = "none";
+                    jQuery('#body').hideLoading();
                 }, 300);
             });
         }

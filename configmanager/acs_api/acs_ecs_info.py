@@ -56,9 +56,9 @@ def query_ecs_info(instanceids):
     OSName = json_response['Instances']['Instance'][0]['OSName']
 
     # 存入字典
-    dict={}
+    dict = {}
     dict['RegionId'] = RegionId
-    dict['ExpiredTime'] = ExpiredTime
+    dict['ExpiredTime'] = ExpiredTime.replace("Z", "").replace("T", " ")
     dict['Memory'] = Memory
     dict['OSType'] = OSType
     dict['Status'] = Status

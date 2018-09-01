@@ -70,10 +70,7 @@
     function RaceAdd(pagenumber) {
     var postUrl = "/race/add/";
 
-    target = $("#myspin").get(0);
-    var bgDiv = document.getElementById("bgDiv");
-    bgDiv.style.display = "block";
-    spinner.spin(target);
+    jQuery('#body').showLoading();
 
     $.post(postUrl, function (data) {
         if (data.success) {
@@ -88,8 +85,7 @@
             alert("操作失败！"+data.message);
         }
         setTimeout(function () {
-            spinner.spin();
-            bgDiv.style.display = "none";
+            jQuery('#body').hideLoading();
         },300);
     });
     }

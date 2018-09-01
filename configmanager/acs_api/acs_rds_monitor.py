@@ -15,7 +15,7 @@ def query_rds_monitor(instanceId, metric):
 
     request.add_query_param('Project', 'acs_rds_dashboard')
     request.add_query_param('Metric', metric)
-    request.add_query_param('Dimensions', {'instanceId':instanceId})
+    request.add_query_param('Dimensions', {'instanceId': instanceId})
     request.add_query_param('Period', '300')
 
     # 发起请求

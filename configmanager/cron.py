@@ -12,7 +12,7 @@ def save_rds_info():
     if RDS.objects.filter(instance_id=result['DBInstanceId']).count() == 0:
         rds = RDS(instance_id=result['DBInstanceId'], network_type=result['InstanceNetworkType'],
                   engine=result['Engine'], engine_version=result['EngineVersion'], status=result['DBInstanceStatus'],
-                  expire_time=result['ExpireTime'])
+                  expire_time=result['ExpireTime'].replace("Z", "").replace("T", " "))
         rds.save()
 
 
@@ -35,7 +35,9 @@ def get_rds_monitor():
 
 
 def get_alram_history_list():
-    result = acs_alarm_history.acs_alarm_history(starttime='2018-08-29 00:00:00', endtime='2018-09-01 00:00:00')
+    start_time = str(datetime.datetime.now() - datetime.timedelta(days=7))[:19]
+    end_time = str(datetime.datetime.now())[:19]
+    result = acs_alarm_history.acs_alarm_history(starttime=start_time, endtime=end_time)
     for h in result:
         if h['Status'] == 0:
             name = h['Name']

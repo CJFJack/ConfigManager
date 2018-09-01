@@ -3,60 +3,6 @@
 {% block search_notice %}请输入 ECS名称 / IP地址 / 实例ID{% endblock %}
 {% block content %}
 
-    <!--suppress ALL -->
-    <style>
-        /* Custom Styles */
-        ul.nav-tabs {
-            width: 140px;
-            margin-top: 20px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
-        }
-
-        ul.nav-tabs li {
-            margin: 0;
-            border-top: 1px solid #ddd;
-        }
-
-        ul.nav-tabs li:first-child {
-            border-top: none;
-        }
-
-        ul.nav-tabs li a {
-            margin: 0;
-            padding: 8px 16px;
-            border-radius: 0;
-        }
-
-        ul.nav-tabs li.active a, ul.nav-tabs li.active a:hover {
-            color: #fff;
-            background: #0088cc;
-            border: 1px solid #0088cc;
-        }
-
-        ul.nav-tabs li:first-child a {
-            border-radius: 4px 4px 0 0;
-        }
-
-        ul.nav-tabs li:last-child a {
-            border-radius: 0 0 4px 4px;
-        }
-
-        ul.nav-tabs.affix {
-            top: 30px; /* Set the top position of pinned element */
-        }
-    </style>
-    <script>
-        $(document).ready(function () {
-            $("#myNav").affix({
-                offset: {
-                    top: 125
-                }
-            });
-        });
-    </script>
-
 
     <div class="btn-toolbar container-fluid" role="toolbar">
         <div class="btn-group">
@@ -143,6 +89,8 @@
 
 
     <script>
+
+
         $.ajaxSetup({
             data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
         });
@@ -168,10 +116,7 @@
             var postUrl = "/ecs/syncallecsinfo/";
             var pagenumber = pagenumber;
 
-            target = $("#myspin").get(0);
-            var bgDiv = document.getElementById("bgDiv");
-            bgDiv.style.display = "block";
-            spinner.spin(target);
+            jQuery('#body').showLoading();
 
             $.post(postUrl, function (data) {
                 if (data.success) {
@@ -186,8 +131,7 @@
                     alert("操作失败！" + data.message);
                 }
                 setTimeout(function () {
-                    spinner.spin();
-                    bgDiv.style.display = "none";
+                    jQuery('#body').hideLoading();
                 }, 300);
             });
         }
@@ -197,10 +141,7 @@
             var postUrl = "/ecs/updateallinfo/";
             var pagenumber = pagenumber;
 
-            target = $("#myspin").get(0);
-            var bgDiv = document.getElementById("bgDiv");
-            bgDiv.style.display = "block";
-            spinner.spin(target);
+            jQuery('#body').showLoading();
 
             $.post(postUrl, function (data) {
                 if (data.success) {
@@ -215,8 +156,7 @@
                     alert("操作失败！" + data.message);
                 }
                 setTimeout(function () {
-                    spinner.spin();
-                    bgDiv.style.display = "none";
+                    jQuery('#body').hideLoading();
                 }, 300);
             });
         }
@@ -225,10 +165,7 @@
         function UpdateAllECSHealth(pagenumber) {
             var postUrl = "/ecs/updateallmonitor/";
 
-            target = $("#myspin").get(0);
-            var bgDiv = document.getElementById("bgDiv");
-            bgDiv.style.display = "block";
-            spinner.spin(target);
+            jQuery('#body').showLoading();
 
             $.post(postUrl, function (data) {
                 if (data.success) {
@@ -243,8 +180,7 @@
                     alert("操作失败！" + data.message);
                 }
                 setTimeout(function () {
-                    spinner.spin();
-                    bgDiv.style.display = "none";
+                    jQuery('#body').hideLoading();
                 }, 300);
             });
         }
@@ -254,10 +190,7 @@
             var postUrl = "/ecs/" + ecsid + "/disable/";
             var ecsname = ecsname
 
-            target = $("#myspin").get(0);
-            var bgDiv = document.getElementById("bgDiv");
-            bgDiv.style.display = "block";
-            spinner.spin(target);
+            jQuery('#body').showLoading();
 
             $.post(postUrl, function (data) {
                 if (data.success) {
@@ -272,8 +205,7 @@
                     alert("操作失败！" + data.message);
                 }
                 setTimeout(function () {
-                    spinner.spin();
-                    bgDiv.style.display = "none";
+                    jQuery('#body').hideLoading();
                 }, 300);
             });
         }
@@ -283,10 +215,7 @@
             var postUrl = "/ecs/" + ecsid + "/enable/";
             var ecsname = ecsname
 
-            target = $("#myspin").get(0);
-            var bgDiv = document.getElementById("bgDiv");
-            bgDiv.style.display = "block";
-            spinner.spin(target);
+            jQuery('#body').showLoading();
 
             $.post(postUrl, function (data) {
                 if (data.success) {
@@ -301,8 +230,7 @@
                     alert("操作失败！" + data.message);
                 }
                 setTimeout(function () {
-                    spinner.spin();
-                    bgDiv.style.display = "none";
+                    jQuery('#body').hideLoading();
                 }, 300);
             });
         }
@@ -313,10 +241,7 @@
             var postUrl = "/ecs/" + ecsid + "/updatemonitor/";
             var ecsname = ecsname
 
-            target = $("#myspin").get(0);
-            var bgDiv = document.getElementById("bgDiv");
-            bgDiv.style.display = "block";
-            spinner.spin(target);
+            jQuery('#body').showLoading();
 
             $.post(postUrl, function (data) {
                 if (data.success) {
@@ -331,8 +256,7 @@
                     alert("操作失败！" + data.message);
                 }
                 setTimeout(function () {
-                    spinner.spin();
-                    bgDiv.style.display = "none";
+                    jQuery('#body').hideLoading();
                 }, 300);
             });
         }
@@ -342,10 +266,7 @@
             var postUrl = "/ecs/" + ecsid + "/updateinfo/";
             var ecsname = ecsname
 
-            target = $("#myspin").get(0);
-            var bgDiv = document.getElementById("bgDiv");
-            bgDiv.style.display = "block";
-            spinner.spin(target);
+            jQuery('#body').showLoading();
 
             $.post(postUrl, function (data) {
                 if (data.success) {
@@ -360,8 +281,7 @@
                     alert("操作失败！" + data.message);
                 }
                 setTimeout(function () {
-                    spinner.spin();
-                    bgDiv.style.display = "none";
+                    jQuery('#body').hideLoading();
                 }, 300);
             });
         }
@@ -369,5 +289,8 @@
 
     </script>
 
-
 {% endblock %}
+
+
+
+

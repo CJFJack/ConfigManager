@@ -42,7 +42,7 @@ def query_slb_info(regionid):
         LoadBalancerStatus = slb['LoadBalancerStatus']
         Address = slb['Address']
         AddressType = slb['AddressType']
-        CreateTime = slb['CreateTime']
+        CreateTime = slb['CreateTime'].replace("Z", "").replace("T", " ")
         slbdict={}
         slbdict['LoadBalancerId'] = LoadBalancerId
         slbdict['LoadBalancerName'] = LoadBalancerName

@@ -70,11 +70,17 @@ def index(request):
     add_time_list.sort()
     context['add_time'] = add_time_list
     # 获取最近12次rds的CPU使用率list
-    context['recently_rds_cpu'] = [q.cpu_usage for q in recently_rds_resource]
+    recently_rds_cpu = [q.cpu_usage for q in recently_rds_resource]
+    recently_rds_cpu.reverse()
+    context['recently_rds_cpu'] = recently_rds_cpu
     # 获取最近12次rds的I/O使用率list
-    context['recently_rds_io'] = [q.io_usage for q in recently_rds_resource]
+    recently_rds_io = [q.io_usage for q in recently_rds_resource]
+    recently_rds_io.reverse()
+    context['recently_rds_io'] = recently_rds_io
     # 获取最近12次rds的disk使用率list
-    context['recently_rds_disk'] = [q.disk_usage for q in recently_rds_resource]
+    recently_rds_disk = [q.disk_usage for q in recently_rds_resource]
+    recently_rds_disk.reverse()
+    context['recently_rds_disk'] = recently_rds_disk
 
     # 获取最后一次rds资源
     last_rds_resource = RDS_Usage_Record.objects.order_by('-add_time')[:1]
@@ -137,8 +143,6 @@ def index(request):
     for a in alarm:
         alarm_num_x.append(int(a['day']))
         alarm_num_y.append(a['number'])
-    alarm_num_x.sort()
-    alarm_num_y.sort()
     context['alarm_num_x'] = alarm_num_x
     context['alarm_num_y'] = alarm_num_y
 

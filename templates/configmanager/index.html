@@ -42,38 +42,6 @@
 
                     {# 报警数量折线图#}
                     <div class="row">
-                        <div class="col-md-2">
-                            <form action="" method="post" id="alarm_line" role="form">
-                                {% csrf_token %}
-                                <div class="form-group">
-                                    <select onchange="submitForm_ALARM_range();" class="form-control"
-                                            style="width: 100%;" name="select_range">
-                                        <option selected="selected">{{ rds_range_default }}</option>
-                                        <option style="{% if rds_range_default == '1小时' %}display: none{% endif %}">
-                                            1小时
-                                        </option>
-                                        <option style="{% if rds_range_default == '6小时' %}display: none{% endif %}">
-                                            6小时
-                                        </option>
-                                        <option style="{% if rds_range_default == '12小时' %}display: none{% endif %}">
-                                            12小时
-                                        </option>
-                                        <option style="{% if rds_range_default == '1天' %}display: none{% endif %}">
-                                            1天
-                                        </option>
-                                        <option style="{% if rds_range_default == '3天' %}display: none{% endif %}">
-                                            3天
-                                        </option>
-                                        <option style="{% if rds_range_default == '7天' %}display: none{% endif %}">
-                                            7天
-                                        </option>
-                                        <option style="{% if rds_range_default == '14天' %}display: none{% endif %}">
-                                            14天
-                                        </option>
-                                    </select>
-                                </div>
-                            </form>
-                        </div>
                         <div class="col-lg-12">
                             <div id="line_alarm" style="min-height:300px;"></div>
                         </div>
@@ -726,11 +694,6 @@
             form_net.submit();
         }
 
-        //表单提交
-        function submitForm_ALARM_range() {
-            var form_net = document.getElementById("alarm_line");
-            form_net.submit();
-        }
 
 
     </script>

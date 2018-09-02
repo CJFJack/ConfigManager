@@ -89,14 +89,14 @@ def index(request):
         context['last_rds_cpu'] = [q.cpu_usage for q in last_rds_resource][0]
         context['last_rds_io'] = [q.io_usage for q in last_rds_resource][0]
         context['last_rds_disk'] = [q.disk_usage for q in last_rds_resource][0]
-    except:
-        pass
+    except Exception, e:
+        print e
 
     # 获取rds实例id
     try:
         context['rds_instance_id'] = [q.rds for q in last_rds_resource][0]
-    except:
-        pass
+    except Exception, e:
+        print e
 
     now = datetime.datetime.now()
     ever = now - datetime.timedelta(days=30)
@@ -149,11 +149,18 @@ def index(request):
     alarm_num_x = []
     alarm_num_y = []
     this_year = str(datetime.datetime.now())[:4]
-    for m in range(1, 13):
+    for m in xrange(1, 13):
         this_date = this_year + '-' + str(m)
         alarm_num_x.append(this_date)
-    for a in alarm:
-        alarm_num_y.append(a['number'])
+    alarm_num_x = json.dumps(alarm_num_x)
+    for m in xrange(1, 13):
+        try:
+            dict_index = [int(a['month']) for a in alarm].index(m)
+        except Exception, e:
+            alarm_num_y.append(0)
+            print e
+        else:
+            alarm_num_y.append([a for a in alarm][dict_index]['number'])
     context['alarm_num_x'] = alarm_num_x
     context['alarm_num_y'] = alarm_num_y
 

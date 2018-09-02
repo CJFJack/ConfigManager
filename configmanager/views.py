@@ -141,14 +141,18 @@ def index(request):
         instance_dict = json.dumps(instance_dict)
         instance_alarm_list.append(instance_dict)
     context['instance_alarm_list'] = instance_alarm_list
-    # 按天统计(默认为本月)
-    start = str(datetime.datetime.now() - datetime.timedelta(days=30))[:7]+'-01'
-    end = str(datetime.datetime.now() - datetime.timedelta(days=30) + datetime.timedelta(days=31))[:7]+'-01'
-    alarm = Alarm_History.objects.filter(alarm_time__gt=start).filter(alarm_time__lt=end).extra(select={'day': 'day(alarm_time)'}).values('day').annotate(number=Count('id'))
+    # 按月份统计(默认为本年)
+    start = str(datetime.datetime.now())[:4]+'-01-01'
+    end = str(datetime.datetime.now())[:4]+'-12-31'
+    alarm = Alarm_History.objects.filter(alarm_time__gt=start).filter(alarm_time__lt=end).\
+        extra(select={'month': 'month(alarm_time)'}).values('month').annotate(number=Count('id'))
     alarm_num_x = []
     alarm_num_y = []
+    this_year = str(datetime.datetime.now())[:4]
+    for m in range(1, 13):
+        this_date = this_year + '-' + str(m)
+        alarm_num_x.append(this_date)
     for a in alarm:
-        alarm_num_x.append(int(a['day']))
         alarm_num_y.append(a['number'])
     context['alarm_num_x'] = alarm_num_x
     context['alarm_num_y'] = alarm_num_y

@@ -541,7 +541,7 @@
         var option = {
             title: {
                 text: '产品类型报警比例',
-                subtext: 'ALARM',
+                subtext: '近30天',
                 x: 'center'
             },
             tooltip: {
@@ -579,7 +579,7 @@
         var option = {
             title: {
                 text: '监控项报警比例',
-                subtext: 'ALARM',
+                subtext: '近30天',
                 x: 'center'
             },
             tooltip: {
@@ -617,7 +617,7 @@
         var option = {
             title: {
                 text: '实例报警比例',
-                subtext: 'ALARM',
+                subtext: '近30天',
                 x: 'center'
             },
             tooltip: {
@@ -654,7 +654,8 @@
         var myChart_ALARM_line = echarts.init(document.getElementById('line_alarm'));
         var option = {
             title: {
-                text: '报警数量趋势（单位：个）'
+                text: '报警数量趋势（单位：次）',
+                subtext: '今年内'
             },
             tooltip: {
                 trigger: 'axis',
@@ -664,10 +665,10 @@
                         backgroundColor: '#6a7985'
                     }
                 },
-                formatter: '第{b}天报警数量:\n{c}次'
+                formatter: '{b}月份报警数量:\n{c}次'
             },
             legend: {
-                data: ['报警数量趋势（单位：个）']
+                data: ['报警数量趋势（单位：次）']
             },
             toolbox: {
                 feature: {

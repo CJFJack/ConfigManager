@@ -142,9 +142,37 @@ def index(request):
         instance_alarm_list.append(instance_dict)
     context['instance_alarm_list'] = instance_alarm_list
     # 按月份统计(默认为本年)
-    start = str(datetime.datetime.now())[:4]+'-01-01'
-    end = str(datetime.datetime.now())[:4]+'-12-31'
-    alarm = Alarm_History.objects.filter(alarm_time__gt=start).filter(alarm_time__lt=end).\
+    # start = str(datetime.datetime.now())[:4]+'-01-01'
+    # end = str(datetime.datetime.now())[:4]+'-12-31'
+    # alarm = Alarm_History.objects.filter(alarm_time__gt=start).filter(alarm_time__lt=end).\
+    #     extra(select={'month': 'month(alarm_time)'}).values('month').annotate(number=Count('id'))
+    # alarm_num_x = []
+    # alarm_num_y = []
+    # this_year = str(datetime.datetime.now())[:4]
+    # for m in xrange(1, 13):
+    #     this_date = this_year + '-' + str(m)
+    #     alarm_num_x.append(this_date)
+    # alarm_num_x = json.dumps(alarm_num_x)
+    # for m in xrange(1, 13):
+    #     try:
+    #         dict_index = [int(a['month']) for a in alarm].index(m)
+    #     except Exception, e:
+    #         alarm_num_y.append(0)
+    #         print e
+    #     else:
+    #         alarm_num_y.append([a for a in alarm][dict_index]['number'])
+    # context['alarm_num_x'] = alarm_num_x
+    # context['alarm_num_y'] = alarm_num_y
+
+    return render(request, 'configmanager/index.html', context)
+
+
+@login_required(login_url='/login/')
+def index_alarm_line(request):
+    context = {}
+    start = str(datetime.datetime.now())[:4] + '-01-01'
+    end = str(datetime.datetime.now())[:4] + '-12-31'
+    alarm = Alarm_History.objects.filter(alarm_time__gt=start).filter(alarm_time__lt=end). \
         extra(select={'month': 'month(alarm_time)'}).values('month').annotate(number=Count('id'))
     alarm_num_x = []
     alarm_num_y = []
@@ -152,7 +180,6 @@ def index(request):
     for m in xrange(1, 13):
         this_date = this_year + '-' + str(m)
         alarm_num_x.append(this_date)
-    alarm_num_x = json.dumps(alarm_num_x)
     for m in xrange(1, 13):
         try:
             dict_index = [int(a['month']) for a in alarm].index(m)
@@ -161,10 +188,8 @@ def index(request):
             print e
         else:
             alarm_num_y.append([a for a in alarm][dict_index]['number'])
-    context['alarm_num_x'] = alarm_num_x
-    context['alarm_num_y'] = alarm_num_y
 
-    return render(request, 'configmanager/index.html', context)
+    return HttpResponse(json.dumps({'success': True, 'alarm_num_x': alarm_num_x, 'alarm_num_y': alarm_num_y}), content_type="application/json")
 
 
 class SafePaginator(Paginator):

@@ -9,6 +9,8 @@ urlpatterns = [
     # 主体页面
     url(r'^$', views.index, name='index'),
     url(r'^index/$', views.index, name='index'),
+    # dashboard页面
+    url(r'^index/alarm/line/$', views.index_alarm_line, name='index_alarm_line'),
     # ECS页面
     url(r'^ecs/$', views.ECSListView.as_view(), name='ecslist'),
     url(r'^ecs/(?P<pk>[0-9]+)/change/$', views.ECSChangeView.as_view(), name='ecschange'),

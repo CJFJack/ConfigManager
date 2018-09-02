@@ -41,7 +41,7 @@
                     <br><br>
 
                     {# 报警数量折线图#}
-                    <div class="row">
+                    <div class="row" id="alarm_line">
                         <div class="col-lg-12">
                             <div id="line_alarm" style="min-height:300px;"></div>
                         </div>
@@ -148,7 +148,10 @@
 
 
     <script type="text/javascript">
-
+        {#django安全认证机制#}
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+        });
 
         {#RDS_CPU饼图#}
         var myChart_RDS_CPU_pie = echarts.init(document.getElementById('pie_rds_cpu'));
@@ -620,72 +623,94 @@
 
         {#     ALARM-line图#}
         var myChart_ALARM_line = echarts.init(document.getElementById('line_alarm'));
-        var option = {
-            title: {
-                text: '报警数量趋势（单位：次）',
-                subtext: '今年内'
-            },
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'cross',
-                    label: {
-                        backgroundColor: '#6a7985'
-                    }
-                },
-                formatter: '{b}月份报警数量:\n{c}次'
-            },
-            legend: {
-                data: ['报警数量趋势（单位：次）']
-            },
-            toolbox: {
-                feature: {
-                    saveAsImage: {}
-                }
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
-            xAxis: [
-                {
-                    type: 'category',
-                    boundaryGap: false,
-                    data: {{ alarm_num_x|safe }},
-                    axisLabel: {
-                        interval: 'auto',
-                    }
-                }
-            ],
-            yAxis: [
-                {
-                    type: 'value',
-                    axisLabel: {
-                        show: true,
-                        interval: 'auto',
-                        formatter: '{value}'
-                    },
-                    show: true
-                }
-            ],
-            series: [{
-                data: {{ alarm_num_y|safe }},
-                type: 'line',
-                itemStyle: {
-                    normal: {
-                        color: '#0099cc',  //圈圈的颜色
-                        lineStyle: {
-                            color: '#0099cc'  //线的颜色
-                        }
-                    }
-                },
-                areaStyle: {}
-            }]
-        };
+        {#显示loading加载样式#}
+        jQuery('#alarm_line').showLoading();
         {#    显示RDS-CPU-line图。#}
-        myChart_ALARM_line.setOption(option);
+        $.ajax({
+            type: "post",
+            async: true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+            url: "{% url 'configmanager:index_alarm_line' %}",    //请求发送到TestServlet处
+            dataType: "json",        //返回数据形式为json
+            success: function (result) {
+                var alarm_num_x = result['alarm_num_x'];
+                var alarm_num_y = result['alarm_num_y'];
+                var option = {
+                    title: {
+                        text: '报警数量趋势（单位：次）',
+                        subtext: '今年内'
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'cross',
+                            label: {
+                                backgroundColor: '#6a7985'
+                            }
+                        },
+                        formatter: '{b}月份报警数量:\n{c}次'
+                    },
+                    legend: {
+                        data: ['报警数量趋势（单位：次）']
+                    },
+                    toolbox: {
+                        feature: {
+                            saveAsImage: {},
+                            magicType: {
+                                type: ['line', 'bar']
+                            }
+                        }
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: [
+                        {
+                            type: 'category',
+                            boundaryGap: false,
+                            data: alarm_num_x,
+                            axisLabel: {
+                                interval: 'auto',
+                            }
+                        }
+                    ],
+                    yAxis: [
+                        {
+                            type: 'value',
+                            axisLabel: {
+                                show: true,
+                                interval: 'auto',
+                                formatter: '{value}'
+                            },
+                            show: true
+                        }
+                    ],
+                    series: [{
+                        data: alarm_num_y,
+                        type: 'bar',
+                        itemStyle: {
+                            normal: {
+                                color: '#0099cc',  //圈圈的颜色
+                                lineStyle: {
+                                    color: '#0099cc'  //线的颜色
+                                }
+                            }
+                        },
+                        areaStyle: {}
+                    }]
+                };
+                myChart_ALARM_line.setOption(option);
+                jQuery('#alarm_line').hideLoading();
+            },
+            error: function (errorMsg) {
+                //请求失败时执行该函数
+                alert("图表请求数据失败!");
+                jQuery('#body').hideLoading();
+            }
+        });
+
 
 
         //表单提交
@@ -693,7 +718,6 @@
             var form_net = document.getElementById("rds_line");
             form_net.submit();
         }
-
 
 
     </script>

@@ -41,10 +41,9 @@ app_name = 'configmanager'
 def index(request):
     context = {}
 
-    # 默认横坐标间隔
+    # 默认rds-line图横坐标间隔
     context['rds_range_default'] = u'1小时'
-    select_count = 12
-    # 获取横坐标请求时间间隔
+    # 选择rds-line图横坐标间隔
     if request.method == 'POST':
         range = request.POST['select_range']
         if range == u'1小时':
@@ -62,25 +61,6 @@ def index(request):
         if range == u'14天':
             select_count = 4032
         context['rds_range_default'] = range
-
-    # 获取最近12次rds资源, 默认5分钟为间隔
-    recently_rds_resource = RDS_Usage_Record.objects.order_by('-add_time')[:select_count]
-    # 获取最近12次add_time的list
-    add_time_list = [q.add_time.strftime('%Y-%m-%d %H:%M') for q in recently_rds_resource]
-    add_time_list.sort()
-    context['add_time'] = add_time_list
-    # 获取最近12次rds的CPU使用率list
-    recently_rds_cpu = [q.cpu_usage for q in recently_rds_resource]
-    recently_rds_cpu.reverse()
-    context['recently_rds_cpu'] = recently_rds_cpu
-    # 获取最近12次rds的I/O使用率list
-    recently_rds_io = [q.io_usage for q in recently_rds_resource]
-    recently_rds_io.reverse()
-    context['recently_rds_io'] = recently_rds_io
-    # 获取最近12次rds的disk使用率list
-    recently_rds_disk = [q.disk_usage for q in recently_rds_resource]
-    recently_rds_disk.reverse()
-    context['recently_rds_disk'] = recently_rds_disk
 
     # 按alarm产品类型统计（默认为最近30天）
     now = datetime.datetime.now()
@@ -125,8 +105,7 @@ def index(request):
         instance_dict = json.dumps(instance_dict)
         instance_alarm_list.append(instance_dict)
     context['instance_alarm_list'] = instance_alarm_list
-
-    return render(request, 'configmanager/index.html', context)
+    return render(request, "configmanager/index.html", context)
 
 
 @login_required(login_url='/login/')
@@ -166,6 +145,47 @@ def index_rds_disk_pie(request):
         print e
 
     return HttpResponse(json.dumps({'success': True, 'last_rds_disk': last_rds_disk}), content_type="application/json")
+
+
+@login_required(login_url='/login/')
+def index_rds_line(request):
+    # 默认横坐标间隔
+    select_count = 12
+    range = request.POST['select_range']
+    if range == u'1小时':
+        select_count = 12
+    if range == u'6小时':
+        select_count = 72
+    if range == u'12小时':
+        select_count = 144
+    if range == u'1天':
+        select_count = 288
+    if range == u'3天':
+        select_count = 864
+    if range == u'7天':
+        select_count = 2016
+    if range == u'14天':
+        select_count = 4032
+
+    # 获取最近12次rds资源, 默认5分钟为间隔
+    recently_rds_resource = RDS_Usage_Record.objects.order_by('-add_time')[:select_count]
+    # 获取最近12次add_time的list
+    add_time_list = [q.add_time.strftime('%Y-%m-%d %H:%M') for q in recently_rds_resource]
+    add_time_list.sort()
+    add_time = add_time_list
+    # 获取最近12次rds的CPU使用率list
+    recently_rds_cpu = [q.cpu_usage for q in recently_rds_resource]
+    recently_rds_cpu.reverse()
+    # 获取最近12次rds的I/O使用率list
+    recently_rds_io = [q.io_usage for q in recently_rds_resource]
+    recently_rds_io.reverse()
+    # 获取最近12次rds的disk使用率list
+    recently_rds_disk = [q.disk_usage for q in recently_rds_resource]
+    recently_rds_disk.reverse()
+
+    return HttpResponse(json.dumps({'success': True, 'add_time': add_time,
+                                    'recently_rds_cpu':recently_rds_cpu, 'recently_rds_io':recently_rds_io,
+                                    'recently_rds_disk':recently_rds_disk}), content_type="application/json")
 
 
 @login_required(login_url='/login/')

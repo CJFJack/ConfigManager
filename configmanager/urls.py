@@ -10,9 +10,10 @@ urlpatterns = [
     url(r'^index/$', views.index, name='index'),
     # dashboard页面
     url(r'^index/alarm/line/$', views.index_alarm_line, name='index_alarm_line'),
-    url(r'^index/rds/cpu_pie/$', views.index_rds_cpu_pie, name='index_rds_cpu_pie'),
-    url(r'^index/rds/io_pie/$', views.index_rds_io_pie, name='index_rds_io_pie'),
-    url(r'^index/rds/disk_pie/$', views.index_rds_disk_pie, name='index_rds_disk_pie'),
+    url(r'^index/rds/cpu/pie/$', views.index_rds_cpu_pie, name='index_rds_cpu_pie'),
+    url(r'^index/rds/io/pie/$', views.index_rds_io_pie, name='index_rds_io_pie'),
+    url(r'^index/rds/disk/pie/$', views.index_rds_disk_pie, name='index_rds_disk_pie'),
+    url(r'^index/rds/line/$', views.index_rds_line, name='index_rds_line'),
     # ECS页面
     url(r'^ecs/$', views.ECSListView.as_view(), name='ecslist'),
     url(r'^ecs/(?P<pk>[0-9]+)/change/$', views.ECSChangeView.as_view(), name='ecschange'),

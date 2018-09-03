@@ -70,34 +70,6 @@ function WholePartialRefresh(pagenumber) {
     });
 }
 
-<!--//删除Site-->
-<!--function Sitedelete(siteid, sitename, pagenumber) {-->
-    <!--var postUrl = "/site/"+siteid+"/delete/";-->
-    <!--var sitename = sitename-->
-
-    <!--target = $("#myspin").get(0);-->
-    <!--var bgDiv = document.getElementById("bgDiv");-->
-    <!--bgDiv.style.display = "block";-->
-    <!--spinner.spin(target);-->
-
-    <!--$.post(postUrl, function (data) {-->
-        <!--if (data.success) {-->
-            <!--WholePartialRefresh(pagenumber);-->
-            <!--$("#alert-div").css("display", "");-->
-            <!--$("#alert-div").attr("class","alert alert-danger");-->
-            <!--$("#alert-div").text("成功！删除站点 "+sitename);-->
-            <!--setTimeout(function () {-->
-                <!--$("#alert-div").fadeOut();-->
-            <!--},30000);-->
-        <!--} else {-->
-            <!--alert("操作失败！"+data.message);-->
-        <!--}-->
-        <!--setTimeout(function () {-->
-            <!--spinner.spin();-->
-            <!--bgDiv.style.display = "none";-->
-        <!--},300);-->
-    <!--});-->
-<!--}-->
 
 
 

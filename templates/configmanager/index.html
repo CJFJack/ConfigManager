@@ -59,13 +59,13 @@
                     {#RDS资源使用率饼图#}
                     <div class="row">
                         <div class="col-lg-4">
-                            <div id="pie_rds_cpu" style="min-height:300px;"></div>
+                            <div id="rds_cpu_pie" style="min-height:300px;"></div>
                         </div>
                         <div class="col-lg-4">
-                            <div id="pie_rds_io" style="min-height:300px;"></div>
+                            <div id="rds_io_pie" style="min-height:300px;"></div>
                         </div>
                         <div class="col-lg-4">
-                            <div id="pie_rds_disk" style="min-height:300px;"></div>
+                            <div id="rds_disk_pie" style="min-height:300px;"></div>
                         </div>
                     </div>
                     <br><br>
@@ -105,7 +105,7 @@
                             </form>
                         </div>
                         <div class="col-lg-12">
-                            <div id="line_rds_cpu" style="min-height:300px;"></div>
+                            <div id="rds_cpu_line" style="min-height:300px;"></div>
                         </div>
                     </div>
                     <br><br><br>
@@ -154,203 +154,263 @@
         });
 
         {#RDS_CPU饼图#}
-        var myChart_RDS_CPU_pie = echarts.init(document.getElementById('pie_rds_cpu'));
-        var option = {
-            title: {
-                text: 'CPU使用率',
-                subtext: '{{ rds_instance_id }}',
-                x: 'center'
-            },
-            tooltip: {
-                trigger: 'item',
-                formatter: '{b}:\n{c}%'
-            },
-            legend: {
-                orient: 'vertical',
-                left: 'left',
-                data: ['已使用', '未使用']
-            },
-            series: [
-                {
-                    name: '',
-                    type: 'pie',
-                    radius: '55%',
-                    center: ['50%', '60%'],
-                    data: [
-                        {value: {{ last_rds_cpu }}, name: '已使用'},
-                        {value: 100 -{{ last_rds_cpu }}, name: '未使用'},
-                    ],
-                    itemStyle: {
-                        emphasis: {
-                            shadowBlur: 10,
-                            shadowOffsetX: 0,
-                            shadowColor: 'rgba(0, 0, 0, 0.5)'
-                        }
-                    }
-                }
-            ]
-        };
+        var myChart_RDS_CPU_pie = echarts.init(document.getElementById('rds_cpu_pie'));
+        jQuery('#rds_cpu_pie').showLoading();
         {#    显示RDS-CPU饼图#}
-        myChart_RDS_CPU_pie.setOption(option);
+        $.ajax({
+            type: "post",
+            async: true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+            url: "{% url 'configmanager:index_rds_cpu_pie' %}",    //请求发送到TestServlet处
+            dataType: "json",        //返回数据形式为json
+            success: function (result) {
+                var last_rds_cpu = result['last_rds_cpu'];
+                var option = {
+                    title: {
+                        text: 'CPU使用率',
+                        subtext: '最近5分钟',
+                        x: 'center'
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{b}:\n{c}%'
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 'left',
+                        data: ['已使用', '未使用']
+                    },
+                    series: [
+                        {
+                            name: '',
+                            type: 'pie',
+                            radius: '55%',
+                            center: ['50%', '60%'],
+                            data: [
+                                {value: last_rds_cpu, name: '已使用'},
+                                {value: 100 - last_rds_cpu, name: '未使用'},
+                            ],
+                            itemStyle: {
+                                emphasis: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+                myChart_RDS_CPU_pie.setOption(option);
+                jQuery('#rds_cpu_pie').hideLoading();
+            },
+            error: function (errorMsg) {
+                //请求失败时执行该函
+                jQuery('#rds_cpu_pie').hideLoading();
+            }
+        });
 
 
         {#RDS_IO饼图#}
-        var myChart_RDS_IO_pie = echarts.init(document.getElementById('pie_rds_io'));
-        var option = {
-            title: {
-                text: 'I/O使用率',
-                subtext: '{{ rds_instance_id }}',
-                x: 'center'
-            },
-            tooltip: {
-                trigger: 'item',
-                formatter: '{b}:\n{c}%'
-            },
-            legend: {
-                orient: 'vertical',
-                left: 'left',
-                data: ['已使用', '未使用']
-            },
-            series: [
-                {
-                    name: '',
-                    type: 'pie',
-                    radius: '55%',
-                    center: ['50%', '60%'],
-                    data: [
-                        {value: {{ last_rds_io }}, name: '已使用'},
-                        {value: 100 -{{ last_rds_io }}, name: '未使用'},
-                    ],
-                    itemStyle: {
-                        emphasis: {
-                            shadowBlur: 10,
-                            shadowOffsetX: 0,
-                            shadowColor: 'rgba(0, 0, 0, 0.5)'
-                        }
-                    }
-                }
-            ]
-        };
+        var myChart_RDS_IO_pie = echarts.init(document.getElementById('rds_io_pie'));
+        jQuery('#rds_io_pie').showLoading();
         {#显示RDS-I/O饼图#}
-        myChart_RDS_IO_pie.setOption(option);
+        $.ajax({
+            type: "post",
+            async: true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+            url: "{% url 'configmanager:index_rds_io_pie' %}",    //请求发送到TestServlet处
+            dataType: "json",        //返回数据形式为json
+            success: function (result) {
+                var last_rds_io = result['last_rds_io']
+                var option = {
+                    title: {
+                        text: 'I/O使用率',
+                        subtext: '最近5分钟',
+                        x: 'center'
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{b}:\n{c}%'
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 'left',
+                        data: ['已使用', '未使用']
+                    },
+                    series: [
+                        {
+                            name: '',
+                            type: 'pie',
+                            radius: '55%',
+                            center: ['50%', '60%'],
+                            data: [
+                                {value: last_rds_io, name: '已使用'},
+                                {value: 100 - last_rds_io, name: '未使用'},
+                            ],
+                            itemStyle: {
+                                emphasis: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+                myChart_RDS_IO_pie.setOption(option);
+                jQuery('#rds_io_pie').hideLoading();
+            },
+            error: function (errorMsg) {
+                //请求失败时执行该函
+                jQuery('#rds_io_pie').hideLoading();
+            }
+        });
 
 
         {#RDS_disk饼图#}
-        var myChart_RDS_disk_pie = echarts.init(document.getElementById('pie_rds_disk'));
-        var option = {
-            title: {
-                text: '磁盘使用率',
-                subtext: '{{ rds_instance_id }}',
-                x: 'center'
-            },
-            tooltip: {
-                trigger: 'item',
-                formatter: '{b}:\n{c}%'
-            },
-            legend: {
-                orient: 'vertical',
-                left: 'left',
-                data: ['已使用', '未使用']
-            },
-            series: [
-                {
-                    name: '',
-                    type: 'pie',
-                    radius: '55%',
-                    center: ['50%', '60%'],
-                    data: [
-                        {value: {{ last_rds_disk }}, name: '已使用'},
-                        {value: 100 -{{ last_rds_disk }}, name: '未使用'},
-                    ],
-                    itemStyle: {
-                        emphasis: {
-                            shadowBlur: 10,
-                            shadowOffsetX: 0,
-                            shadowColor: 'rgba(0, 0, 0, 0.5)'
-                        }
-                    }
-                }
-            ]
-        };
+        var myChart_RDS_disk_pie = echarts.init(document.getElementById('rds_disk_pie'));
+        jQuery('#rds_disk_pie').showLoading();
         {#显示RDS-磁盘使用率饼图#}
-        myChart_RDS_disk_pie.setOption(option);
+        $.ajax({
+            type: "post",
+            async: true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+            url: "{% url 'configmanager:index_rds_disk_pie' %}",    //请求发送到TestServlet处
+            dataType: "json",        //返回数据形式为json
+            success: function (result) {
+                var last_rds_disk = result['last_rds_disk']
+                var option = {
+                    title: {
+                        text: '磁盘使用率',
+                        subtext: '最近5分钟',
+                        x: 'center'
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{b}:\n{c}%'
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 'left',
+                        data: ['已使用', '未使用']
+                    },
+                    series: [
+                        {
+                            name: '',
+                            type: 'pie',
+                            radius: '55%',
+                            center: ['50%', '60%'],
+                            data: [
+                                {value: last_rds_disk, name: '已使用'},
+                                {value: 100 - last_rds_disk, name: '未使用'},
+                            ],
+                            itemStyle: {
+                                emphasis: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+                myChart_RDS_disk_pie.setOption(option);
+                jQuery('#rds_disk_pie').hideLoading();
+            },
+            error: function (errorMsg) {
+                //请求失败时执行该函
+                jQuery('#rds_disk_pie').hideLoading();
+            }
+        });
 
 
         {#     RDS_CPU-line图#}
-        var myChart_RDS_CPU_line = echarts.init(document.getElementById('line_rds_cpu'));
-        var option = {
-            title: {
-                text: 'CPU使用率(单位:%)'
-            },
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'cross',
-                    label: {
-                        backgroundColor: '#6a7985'
-                    }
-                },
-                formatter: '{b}\nCPU使用率:{c}%'
-            },
-            legend: {
-                data: ['CPU使用率(单位:%)']
-            },
-            toolbox: {
-                feature: {
-                    saveAsImage: {}
-                }
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
-            xAxis: [
-                {
-                    type: 'category',
-                    boundaryGap: false,
-                    data: {{ add_time|safe }},
-                    axisLabel: {
-                        interval: 'auto',
+        var myChart_RDS_CPU_line = echarts.init(document.getElementById('rds_cpu_line'));
+        jQuery('#rds_cpu_line').showLoading();
 
-                        // 使用函数模板，函数参数分别为刻度数值（类目），刻度的索引
-                        formatter: function (value, index) {
-                            // 格式化成时:分
-                            var date = new Date(value);
-                            var texts = [date.getHours(), date.getMinutes()];
-                            return texts.join(':');
-                        }
-                    }
-                }
-            ],
-            yAxis: [
-                {
-                    type: 'value',
-                    axisLabel: {
-                        show: true,
-                        interval: 'auto',
-                        formatter: '{value}% '
-                    },
-                    show: true
-                }
-            ],
-            series: [{
-                data: {{ recently_rds_cpu|safe }},
-                type: 'line',
-                itemStyle: {
-                    normal: {
-                        color: '#0099cc',  //圈圈的颜色
-                        lineStyle: {
-                            color: '#0099cc'  //线的颜色
-                        }
-                    }
-                },
-                areaStyle: {}
-            }]
-        };
         {#    显示RDS-CPU-line图。#}
-        myChart_RDS_CPU_line.setOption(option);
+        $.ajax({
+            type: "post",
+            async: true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+            url: "{% url 'configmanager:' %}",    //请求发送到TestServlet处
+            dataType: "json",        //返回数据形式为json
+            success: function (result) {
+                var option = {
+                    title: {
+                        text: 'CPU使用率(单位:%)'
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'cross',
+                            label: {
+                                backgroundColor: '#6a7985'
+                            }
+                        },
+                        formatter: '{b}\nCPU使用率:{c}%'
+                    },
+                    legend: {
+                        data: ['CPU使用率(单位:%)']
+                    },
+                    toolbox: {
+                        feature: {
+                            saveAsImage: {}
+                        }
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: [
+                        {
+                            type: 'category',
+                            boundaryGap: false,
+                            data: {{ add_time|safe }},
+                            axisLabel: {
+                                interval: 'auto',
+
+                                // 使用函数模板，函数参数分别为刻度数值（类目），刻度的索引
+                                formatter: function (value, index) {
+                                    // 格式化成时:分
+                                    var date = new Date(value);
+                                    var texts = [date.getHours(), date.getMinutes()];
+                                    return texts.join(':');
+                                }
+                            }
+                        }
+                    ],
+                    yAxis: [
+                        {
+                            type: 'value',
+                            axisLabel: {
+                                show: true,
+                                interval: 'auto',
+                                formatter: '{value}% '
+                            },
+                            show: true
+                        }
+                    ],
+                    series: [{
+                        data: {{ recently_rds_cpu|safe }},
+                        type: 'line',
+                        itemStyle: {
+                            normal: {
+                                color: '#0099cc',  //圈圈的颜色
+                                lineStyle: {
+                                    color: '#0099cc'  //线的颜色
+                                }
+                            }
+                        },
+                        areaStyle: {}
+                    }]
+                };
+                myChart_RDS_CPU_line.setOption(option);
+                jQuery('#rds_cpu_line').hideLoading();
+            },
+            error: function (errorMsg) {
+                //请求失败时执行该函
+                jQuery('#rds_cpu_line').hideLoading();
+            }
+        });
 
 
         {#     RDS_IO-line图#}
@@ -705,12 +765,10 @@
                 jQuery('#alarm_line').hideLoading();
             },
             error: function (errorMsg) {
-                //请求失败时执行该函数
-                alert("图表请求数据失败!");
+                //请求失败时执行该函
                 jQuery('#body').hideLoading();
             }
         });
-
 
 
         //表单提交

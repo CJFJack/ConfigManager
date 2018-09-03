@@ -82,25 +82,9 @@ def index(request):
     recently_rds_disk.reverse()
     context['recently_rds_disk'] = recently_rds_disk
 
-    # 获取最后一次rds资源
-    last_rds_resource = RDS_Usage_Record.objects.order_by('-add_time')[:1]
-    # 获取最后一次rds资源使用率list
-    try:
-        context['last_rds_cpu'] = [q.cpu_usage for q in last_rds_resource][0]
-        context['last_rds_io'] = [q.io_usage for q in last_rds_resource][0]
-        context['last_rds_disk'] = [q.disk_usage for q in last_rds_resource][0]
-    except Exception, e:
-        print e
-
-    # 获取rds实例id
-    try:
-        context['rds_instance_id'] = [q.rds for q in last_rds_resource][0]
-    except Exception, e:
-        print e
-
+    # 按alarm产品类型统计（默认为最近30天）
     now = datetime.datetime.now()
     ever = now - datetime.timedelta(days=30)
-    # 按alarm产品类型统计（默认为最近30天）
     alarm = Alarm_History.objects.filter(alarm_time__gt=ever).values('namespace').annotate(Count("id"))
     product_type_list = []
     for i in alarm:
@@ -141,35 +125,51 @@ def index(request):
         instance_dict = json.dumps(instance_dict)
         instance_alarm_list.append(instance_dict)
     context['instance_alarm_list'] = instance_alarm_list
-    # 按月份统计(默认为本年)
-    # start = str(datetime.datetime.now())[:4]+'-01-01'
-    # end = str(datetime.datetime.now())[:4]+'-12-31'
-    # alarm = Alarm_History.objects.filter(alarm_time__gt=start).filter(alarm_time__lt=end).\
-    #     extra(select={'month': 'month(alarm_time)'}).values('month').annotate(number=Count('id'))
-    # alarm_num_x = []
-    # alarm_num_y = []
-    # this_year = str(datetime.datetime.now())[:4]
-    # for m in xrange(1, 13):
-    #     this_date = this_year + '-' + str(m)
-    #     alarm_num_x.append(this_date)
-    # alarm_num_x = json.dumps(alarm_num_x)
-    # for m in xrange(1, 13):
-    #     try:
-    #         dict_index = [int(a['month']) for a in alarm].index(m)
-    #     except Exception, e:
-    #         alarm_num_y.append(0)
-    #         print e
-    #     else:
-    #         alarm_num_y.append([a for a in alarm][dict_index]['number'])
-    # context['alarm_num_x'] = alarm_num_x
-    # context['alarm_num_y'] = alarm_num_y
 
     return render(request, 'configmanager/index.html', context)
 
 
 @login_required(login_url='/login/')
+def index_rds_cpu_pie(request):
+    # 获取最近一次rds资源
+    last_rds_resource = RDS_Usage_Record.objects.order_by('-add_time')[:1]
+    # 获取最近一次rds资源cpu使用率
+    try:
+        last_rds_cpu = [q.cpu_usage for q in last_rds_resource][0]
+    except Exception, e:
+        print e
+
+    return HttpResponse(json.dumps({'success': True, 'last_rds_cpu': last_rds_cpu}), content_type="application/json")
+
+
+@login_required(login_url='/login/')
+def index_rds_io_pie(request):
+    # 获取最近一次rds资源
+    last_rds_resource = RDS_Usage_Record.objects.order_by('-add_time')[:1]
+    # 获取最近一次rds资源IO使用率
+    try:
+        last_rds_io = [q.io_usage for q in last_rds_resource][0]
+    except Exception, e:
+        print e
+
+    return HttpResponse(json.dumps({'success': True, 'last_rds_io': last_rds_io}), content_type="application/json")
+
+
+@login_required(login_url='/login/')
+def index_rds_disk_pie(request):
+    # 获取最近一次rds资源
+    last_rds_resource = RDS_Usage_Record.objects.order_by('-add_time')[:1]
+    # 获取最近一次rds资源IO使用率
+    try:
+        last_rds_disk = [q.disk_usage for q in last_rds_resource][0]
+    except Exception, e:
+        print e
+
+    return HttpResponse(json.dumps({'success': True, 'last_rds_disk': last_rds_disk}), content_type="application/json")
+
+
+@login_required(login_url='/login/')
 def index_alarm_line(request):
-    context = {}
     start = str(datetime.datetime.now())[:4] + '-01-01'
     end = str(datetime.datetime.now())[:4] + '-12-31'
     alarm = Alarm_History.objects.filter(alarm_time__gt=start).filter(alarm_time__lt=end). \

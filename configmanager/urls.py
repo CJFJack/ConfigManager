@@ -2,7 +2,6 @@
 from django.conf.urls import url
 from . import views
 
-
 app_name = 'configmanager'
 
 urlpatterns = [
@@ -11,6 +10,9 @@ urlpatterns = [
     url(r'^index/$', views.index, name='index'),
     # dashboard页面
     url(r'^index/alarm/line/$', views.index_alarm_line, name='index_alarm_line'),
+    url(r'^index/rds/cpu_pie/$', views.index_rds_cpu_pie, name='index_rds_cpu_pie'),
+    url(r'^index/rds/io_pie/$', views.index_rds_io_pie, name='index_rds_io_pie'),
+    url(r'^index/rds/disk_pie/$', views.index_rds_disk_pie, name='index_rds_disk_pie'),
     # ECS页面
     url(r'^ecs/$', views.ECSListView.as_view(), name='ecslist'),
     url(r'^ecs/(?P<pk>[0-9]+)/change/$', views.ECSChangeView.as_view(), name='ecschange'),
@@ -40,7 +42,8 @@ urlpatterns = [
     url(r'^race/(?P<race_id>[0-9]+)/delete/$', views.race_delete, name='racedelete'),
     url(r'^race/(?P<pk>[0-9]+)/change/$', views.RaceEditView.as_view(), name='raceedit'),
     url(r'^race/(?P<race_id>[0-9]+)/siterelations/$', views.race_site_relation, name='racesiterelation'),
-    url(r'^race/wholerefresh/(?P<pagenumber>[0-9]+)/(?P<type>[a-zA-Z]+)/$', views.race_wholerefresh, name='racewholerefresh'),
+    url(r'^race/wholerefresh/(?P<pagenumber>[0-9]+)/(?P<type>[a-zA-Z]+)/$', views.race_wholerefresh,
+        name='racewholerefresh'),
     # Config页面
     url(r'^config/$', views.ConfigListView.as_view(), name='configlist'),
     url(r'^undeployconfig/$', views.UndeployConfigListView.as_view(), name='undeployconfiglist'),
@@ -50,7 +53,8 @@ urlpatterns = [
     url(r'^config/(?P<configfile_id>[0-9]+)/history/$', views.config_history, name='confighistory'),
     url(r'^config/(?P<pk>[0-9]+)/historydetail/$', views.ConfigHistoryDetailView.as_view(), name='confighistorydetail'),
     url(r'^config/(?P<confighistorydetail_id>[0-9]+)/rollback/$', views.config_rollback, name='configrollback'),
-    url(r'^config/(?P<deployecs_id>[0-9]+)/deploy/(?P<release_id>[0-9]+)/$', views.apply_config_deploy, name='applyconfigdeploy'),
+    url(r'^config/(?P<deployecs_id>[0-9]+)/deploy/(?P<release_id>[0-9]+)/$', views.apply_config_deploy,
+        name='applyconfigdeploy'),
     url(r'^config/(?P<site_id>[0-9]+)/slbpartrefresh/$', views.config_slb_part_refresh, name='configslbrefresh'),
     url(r'^config/(?P<site_id>[0-9]+)/ecspartrefresh/$', views.config_ecs_part_refresh, name='configecsrefresh'),
     # Apply页面
@@ -70,10 +74,14 @@ urlpatterns = [
     url(r'^slb/(?P<slb_id>[0-9]+)/slbhealthupdate/$', views.slb_health_update, name='slbhealthupdate'),
     url(r'^slb/(?P<site_id>[0-9]+)/moreslbhealthupdate/$', views.more_slb_health_update, name='moreslbhealthupdate'),
     url(r'^slb/allslbhealthupdate/$', views.all_slb_health_update, name='allslbhealthupdate'),
-    url(r'^slb/(?P<slb_id>[0-9]+)/removebackendserver/(?P<server_id>[0-9]+)/$', views.remove_backend_server, name='removebackendserver'),
-    url(r'^slb/(?P<slb_id>[0-9]+)/addbackendserver/(?P<server_id>[0-9]+)/$', views.add_backend_server, name='addbackendserver'),
-    url(r'^slb/(?P<site_id>[0-9]+)/siteremovebackendserver/(?P<server_id>[0-9]+)/$', views.site_remove_backend_server, name='siteremovebackendserver'),
-    url(r'^slb/(?P<site_id>[0-9]+)/siteaddbackendserver/(?P<server_id>[0-9]+)/$', views.site_add_backend_server, name='siteaddbackendserver'),
+    url(r'^slb/(?P<slb_id>[0-9]+)/removebackendserver/(?P<server_id>[0-9]+)/$', views.remove_backend_server,
+        name='removebackendserver'),
+    url(r'^slb/(?P<slb_id>[0-9]+)/addbackendserver/(?P<server_id>[0-9]+)/$', views.add_backend_server,
+        name='addbackendserver'),
+    url(r'^slb/(?P<site_id>[0-9]+)/siteremovebackendserver/(?P<server_id>[0-9]+)/$', views.site_remove_backend_server,
+        name='siteremovebackendserver'),
+    url(r'^slb/(?P<site_id>[0-9]+)/siteaddbackendserver/(?P<server_id>[0-9]+)/$', views.site_add_backend_server,
+        name='siteaddbackendserver'),
     url(r'^slb/(?P<slb_id>[0-9]+)/partrefresh/$', views.slb_part_refresh, name='slbpartrefresh'),
     url(r'^slb/wholerefresh/(?P<pagenumber>[0-9]+)/$', views.slb_whole_refresh, name='slbwholerefresh'),
 ]

@@ -3,10 +3,12 @@
 
 from aliyunsdkcore.client import AcsClient
 from aliyunsdkcore.request import CommonRequest
-import  json
+import json
+from django.conf import settings
 
-
-client = AcsClient('ZAL5Z3Ee8KhyZ2U1', 'afp7C6u1osEpCZSwVHcHkfcpJqoeEe', 'cn-hangzhou')
+AccessKeyId = settings.ACCESS_KEY_ID
+AccessKeySecret = settings.ACCESS_KEY_SECRET
+client = AcsClient(AccessKeyId, AccessKeySecret, 'cn-hangzhou')
 
 def acs_alarm_history(starttime, endtime):
     request = CommonRequest()

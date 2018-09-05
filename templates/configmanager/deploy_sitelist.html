@@ -138,10 +138,7 @@
         function MoreHealthRefresh(siteid, sitename, deploysiteid) {
             var postUrl = "/slb/" + siteid + "/moreslbhealthupdate/";
 
-            target = $("#myspin").get(0);
-            var bgDiv = document.getElementById("bgDiv");
-            bgDiv.style.display = "block";
-            spinner.spin(target);
+            jQuery('#body').showLoading();
 
             $.post(postUrl, function (data) {
                 if (data.success) {
@@ -156,8 +153,7 @@
                     alert("操作失败！" + data.message);
                 }
                 setTimeout(function () {
-                    spinner.spin();
-                    bgDiv.style.display = "none";
+                    jQuery('#body').hideLoading();
                 }, 800);
             });
         }
@@ -167,10 +163,7 @@
         function SiteRemoveBackendServer(siteid, sitename, deploysiteid, serverid, servername) {
             var postUrl = "/slb/" + siteid + "/siteremovebackendserver/" + serverid + "/";
 
-            target = $("#myspin").get(0);
-            var bgDiv = document.getElementById("bgDiv");
-            bgDiv.style.display = "block";
-            spinner.spin(target);
+            jQuery('#body').showLoading();
 
             $.post(postUrl, function (data) {
                 if (data.success) {
@@ -185,8 +178,7 @@
                     alert("操作失败！" + data.message);
                 }
                 setTimeout(function () {
-                    spinner.spin();
-                    bgDiv.style.display = "none";
+                    jQuery('#body').hideLoading();
                 }, 300);
             });
         }
@@ -196,10 +188,7 @@
         function SiteAddBackendServer(siteid, sitename, deploysiteid, serverid, servername) {
             var postUrl = "/slb/" + siteid + "/siteaddbackendserver/" + serverid + "/";
 
-            target = $("#myspin").get(0);
-            var bgDiv = document.getElementById("bgDiv");
-            bgDiv.style.display = "block";
-            spinner.spin(target);
+            jQuery('#body').showLoading();
 
             $.post(postUrl, function (data) {
                 if (data.success) {
@@ -214,8 +203,7 @@
                     alert("操作失败！" + data.message);
                 }
                 setTimeout(function () {
-                    spinner.spin();
-                    bgDiv.style.display = "none";
+                    jQuery('#body').hideLoading();
                 }, 300);
             });
         }

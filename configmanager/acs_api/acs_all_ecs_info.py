@@ -4,18 +4,11 @@
 from aliyunsdkcore import client
 from aliyunsdkecs.request.v20140526 import DescribeInstancesRequest
 import json, os
-import ConfigParser
+from django.conf import settings
 
-# config = ConfigParser.RawConfigParser()
-# currentdir = os.path.abspath('.')
-# configFilePath = os.path.join(currentdir, 'configmanager', 'acs_config', 'acs_config.ini')
-# config.read(configFilePath)
-# AccessKeyId = config.get('acs', 'AccessKeyId')
-# AccessKeySecret = config.get('acs', 'AccessKeySecret')
-# RegionId = config.get('acs', 'RegionId')
-#
-# clt = client.AcsClient(AccessKeyId, AccessKeySecret, RegionId)
-clt = client.AcsClient('ZAL5Z3Ee8KhyZ2U1', 'afp7C6u1osEpCZSwVHcHkfcpJqoeEe', 'cn-hangzhou')
+AccessKeyId = settings.ACCESS_KEY_ID
+AccessKeySecret = settings.ACCESS_KEY_SECRET
+clt = client.AcsClient(AccessKeyId, AccessKeySecret, 'cn-hangzhou')
 
 
 def query_all_ecs(RegionId):

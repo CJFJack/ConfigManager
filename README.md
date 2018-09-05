@@ -20,6 +20,9 @@ CMS(Config Manager Platform: 运维管理平台)
 pip install -i https://pypi.douban.com/simple/  -r requirements.txt
 ```
 
+### 安装并创建数据库cms
+
+
 ### 修改配置
 
 
@@ -40,16 +43,20 @@ DATABASES = {
 
 ```
 
-配置同步Zabbix 故障数据settings.py:
+阿里云接口认证配置settings.py:
 ```
-ZABBIX_AUTO_RECORD = True
-ZABBIX_DB_HOST = '192.168.104.152'
-ZABBIX_DB_PORT = '3306'
-ZABBIX_DB_USER = 'test'
-ZABBIX_DB_PASSWORD = 'geekwolf'
-ZABBIX_DB_NAME = 'zabbix'
-ZABBIX_SYNC_INTERVAL = 600  # 10分钟
+ACCESS_KEY_ID = 'ZAL5Z3Ee8KhyZ2U1'
+ACCESS_KEY_SECRET = 'afp7C6u1osEpCZSwVHcHkfcpJqoeEe'
+
 ```
+
+
+发布文件生成路径配置settings.py:
+```
+DEPLOY_DIR_PATH = r'D:\release'
+
+```
+
 
 ### 初始化数据
 ```
@@ -60,25 +67,16 @@ python manage.py loaddata default_user
 
 ```
 
-### 启动同步进程
-```
-screen python manage.py zbxsync
-注释：若ZABBIX_AUTO_RECORD = False 可以忽略此步骤
-```
 
-### 登录
+### 创建管理员
 
 ```
-python manage.py runserver
-http://127.0.0.1:8000
-admin admin
+python manage.py createsuperuser
 ```
 
 ### 交流
-![赞赏](https://raw.githubusercontent.com/geekwolf/fms/master/doc/images/wxzf.png)
 ![微信](https://raw.githubusercontent.com/geekwolf/fms/master/doc/images/wx.jpg)
 
-QQ群1: 541071512
 
 ![fms](https://raw.githubusercontent.com/geekwolf/fms/master/doc/images/dashboard.jpg)
 ![fms](https://raw.githubusercontent.com/geekwolf/fms/master/doc/images/fms.jpg)

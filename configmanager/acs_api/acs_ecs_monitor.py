@@ -5,19 +5,11 @@ from aliyunsdkcore import client
 from aliyunsdkcms.request.v20180308 import QueryMetricLastRequest
 from datetime import datetime, timedelta
 import json, os
-import ConfigParser
+from django.conf import settings
 
-# config = ConfigParser.RawConfigParser()
-# currentdir = os.path.abspath('.')
-# print currentdir
-# configFilePath = os.path.join(currentdir, 'configmanager', 'acs_config', 'acs_config.ini')
-# print configFilePath
-# config.read(configFilePath)
-# AccessKeyId = config.get('acs', 'AccessKeyId')
-# AccessKeySecret = config.get('acs', 'AccessKeySecret')
-# RegionId = config.get('acs', 'RegionId')
-
-clt = client.AcsClient('ZAL5Z3Ee8KhyZ2U1', 'afp7C6u1osEpCZSwVHcHkfcpJqoeEe', 'cn-hangzhou')
+AccessKeyId = settings.ACCESS_KEY_ID
+AccessKeySecret = settings.ACCESS_KEY_SECRET
+clt = client.AcsClient(AccessKeyId, AccessKeySecret, 'cn-hangzhou')
 
 now=datetime.now()
 starttime=str(now+timedelta(minutes = -5))

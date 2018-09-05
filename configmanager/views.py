@@ -2,36 +2,37 @@
 from __future__ import unicode_literals
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
-from time import time
 from datetime import datetime
 from django.core.files import File
-import os, json, ConfigParser, time, datetime
 from django.contrib import messages
 from django.db.models import Q, Count, Avg
-from django.db import connection
-
-# Create your views here.
-
+from django.utils import timezone
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
-from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem, SLB, \
-    SLBhealthstatus, DeployECS, RDS_Usage_Record, Alarm_History
-from .forms import ApplyForm, DeployitemFormSet, SLBForm, SLBsiteFormSet
 from django.http import HttpResponse
 from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import UpdateView
 from django.views.generic.edit import CreateView
+
+
+# Create your views here.
+import os, json, time, datetime
+from time import time
+from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem, SLB, \
+    SLBhealthstatus, DeployECS, RDS_Usage_Record, Alarm_History
+from .forms import ApplyForm, DeployitemFormSet, SLBForm, SLBsiteFormSet
 from configmanager.acs_api.acs_ecs_monitor import query_ecs_api
-from configmanager.acs_api.acs_ecs_info import query_ecs_info
+from acs_api.acs_ecs_info import query_ecs_info
 from configmanager.acs_api.acs_slb_info import query_slb_info
 from configmanager.acs_api.acs_slb_health import query_slb_health
 from configmanager.acs_api.acs_slb_backendserver_remove import remove_backendserver
 from configmanager.acs_api.acs_slb_backendserver_add import add_backendserver
 from configmanager.acs_api.acs_all_ecs_info import query_all_ecs
-from django.utils import timezone
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 
 app_name = 'configmanager'
 
@@ -793,14 +794,10 @@ def config_deploy(request, release_id):
     r.modified_user = request.user.username
     r.save()
     '''获取发布配置文件存放目录'''
-    config = ConfigParser.RawConfigParser()
-    currentdir = os.path.abspath('.')
-    configFilePath = os.path.join(currentdir, 'configmanager', 'acs_config', 'deploy_filepath.ini')
-    config.read(configFilePath)
-    deploydirpath = config.get('deploydirpath', 'dirpath')
+    deploy_dir_path = settings.DEPLOY_DIR_PATH
     '''生成配置文件'''
     ecs = r.ECS.name
-    config_path = os.path.join(deploydirpath, r.site.fullname, ecs, 'releaseconfig')
+    config_path = os.path.join(deploy_dir_path, r.site.fullname, ecs, 'releaseconfig')
     if not os.path.exists(config_path):
         os.makedirs(config_path)
     for c in r.site.configfile_set.all():

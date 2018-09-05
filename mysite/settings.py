@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Django settings for mysite project.
 
@@ -25,7 +26,7 @@ SECRET_KEY = '7hjt%ske7c8m@l%83ccq(jk@(5#6tz^kfvofcgh_q2)jxvm0f&'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.88.104', 'localhost']
+ALLOWED_HOSTS = ['192.168.88.104', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -147,8 +148,10 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
 
+# 默认登录后跳转页面
 LOGIN_REDIRECT_URL = '/configmanager/index/'
 
+# 会话超时时间
 SESSION_COOKIE_AGE = 60 * 30
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True 
@@ -183,6 +186,15 @@ CORS_ALLOW_HEADERS = (
     'Pragma',
 )
 
+# 定时任务
 CRONJOBS = [
     ('*/1 * * * *', 'configmanager.cron.my_scheduled_job')
 ]
+
+# 生成配置文件路径
+DEPLOY_DIR_PATH = r'D:\release'
+
+
+# 阿里云API配置
+ACCESS_KEY_ID = 'ZAL5Z3Ee8KhyZ2U1'
+ACCESS_KEY_SECRET = 'afp7C6u1osEpCZSwVHcHkfcpJqoeEe'

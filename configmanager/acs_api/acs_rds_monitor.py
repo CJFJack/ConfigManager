@@ -4,9 +4,11 @@
 from aliyunsdkcore import client
 from aliyunsdkcms.request.v20180308 import QueryMetricLastRequest
 import json
+from django.conf import settings
 
-
-clt = client.AcsClient('ZAL5Z3Ee8KhyZ2U1', 'afp7C6u1osEpCZSwVHcHkfcpJqoeEe', 'cn-hangzhou')
+AccessKeyId = settings.ACCESS_KEY_ID
+AccessKeySecret = settings.ACCESS_KEY_SECRET
+clt = client.AcsClient(AccessKeyId, AccessKeySecret, 'cn-hangzhou')
 
 def query_rds_monitor(instanceId, metric):
     # 设置参数

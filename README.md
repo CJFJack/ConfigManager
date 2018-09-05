@@ -77,6 +77,7 @@ python manage.py createsuperuser
 ### 交流
 ![赞赏](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/wxzs.png)
 ![微信](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/wx.png)
+
 QQ: 398741302
 
 ![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/acs_alarm_report.png)

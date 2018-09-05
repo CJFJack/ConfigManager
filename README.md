@@ -1,4 +1,4 @@
-CMS(Config Manager Platform: 运维管理平台)
+CMS(Config Manager System: 运维管理平台)
 ==============================================
 
 [![Build Status](https://img.shields.io/travis/rust-lang/rust.svg)](https://img.shields.io/travis/rust-lang/rust.svg)
@@ -78,8 +78,8 @@ python manage.py createsuperuser
 ![微信](https://raw.githubusercontent.com/geekwolf/fms/master/doc/images/wx.jpg)
 
 
-![fms](https://raw.githubusercontent.com/geekwolf/fms/master/doc/images/dashboard.jpg)
-![fms](https://raw.githubusercontent.com/geekwolf/fms/master/doc/images/fms.jpg)
-![fms](https://raw.githubusercontent.com/geekwolf/fms/master/doc/images/add_fms.jpg)
-![fms](https://raw.githubusercontent.com/geekwolf/fms/master/doc/images/add_user.jpg)
-![fms](https://raw.githubusercontent.com/geekwolf/fms/master/doc/images/group_perm.jpg)
+![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/acs_alarm_report.png)
+![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/acs_rds_report.png)
+![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/cms_config_manager.png)
+![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/cms_ecs_manager.png)
+![cms](https://raw.githubusercontent.com/geekwolf/fms/master/doc/images/group_perm.jpg)

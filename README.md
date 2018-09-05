@@ -82,4 +82,4 @@ python manage.py createsuperuser
 ![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/acs_rds_report.png)
 ![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/cms_config_manager.png)
 ![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/cms_ecs_manager.png)
-![cms](https://raw.githubusercontent.com/geekwolf/fms/master/doc/images/group_perm.jpg)
+![cms]https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/cms_deploy_apply.png)

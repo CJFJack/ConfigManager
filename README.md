@@ -45,8 +45,8 @@ DATABASES = {
 
 阿里云接口认证配置settings.py:
 ```
-ACCESS_KEY_ID = 'ZAL5Z3Ee8KhyZ2U1'
-ACCESS_KEY_SECRET = 'afp7C6u1osEpCZSwVHcHkfcpJqoeEe'
+ACCESS_KEY_ID = 'XXXXXXXXXX'
+ACCESS_KEY_SECRET = 'XXXXXXXXXXXXXX'
 
 ```
 
@@ -83,4 +83,4 @@ python manage.py createsuperuser
 ![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/acs_rds_report.png)
 ![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/cms_config_manager.png)
 ![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/cms_ecs_manager.png)
-![cms]https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/cms_deploy_apply.png)
+![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/cms_deploy_apply.png)

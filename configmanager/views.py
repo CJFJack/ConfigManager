@@ -7,7 +7,7 @@ from datetime import datetime
 from django.core.files import File
 import os, json, ConfigParser, time, datetime
 from django.contrib import messages
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Avg
 from django.db import connection
 
 # Create your views here.
@@ -32,7 +32,6 @@ from configmanager.acs_api.acs_slb_backendserver_add import add_backendserver
 from configmanager.acs_api.acs_all_ecs_info import query_all_ecs
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
 
 app_name = 'configmanager'
 
@@ -62,49 +61,6 @@ def index(request):
             select_count = 4032
         context['rds_range_default'] = range
 
-    # 按alarm产品类型统计（默认为最近30天）
-    now = datetime.datetime.now()
-    ever = now - datetime.timedelta(days=30)
-    alarm = Alarm_History.objects.filter(alarm_time__gt=ever).values('namespace').annotate(Count("id"))
-    product_type_list = []
-    for i in alarm:
-        product_type_list.append(str(i['namespace']))
-    context['product_type_list'] = product_type_list
-    product_type_alarm_list= []
-    for i in alarm:
-        product_type_dict = {}
-        product_type_dict[str('value')] = i['id__count']
-        product_type_dict[str('name')] = str(i['namespace'])
-        product_type_alarm_list.append(product_type_dict)
-    context['product_type_alarm_list'] = product_type_alarm_list
-    # 按alarm监控项类型统计（默认为最近30天）
-    alarm = Alarm_History.objects.filter(alarm_time__gt=ever).values('metric_name').annotate(Count("id"))
-    metric_type_list = []
-    for i in alarm:
-        metric_type_list.append(str(i['metric_name']))
-    context['metric_type_list'] = metric_type_list
-    metric_type_alarm_list= []
-    for i in alarm:
-        metric_type_dict = {}
-        metric_type_dict[str('value')] = i['id__count']
-        metric_type_dict[str('name')] = str(i['metric_name'])
-        metric_type_alarm_list.append(metric_type_dict)
-    context['metric_type_alarm_list'] = metric_type_alarm_list
-    # 按alarm实例比例统计（默认为最近30天）
-    alarm = Alarm_History.objects.filter(alarm_time__gt=ever).values('instance_name').annotate(Count("id"))
-    instance_list = []
-    for i in alarm:
-        instance_list.append(i['instance_name'])
-    instance_list = json.dumps(instance_list)
-    context['instance_list'] = instance_list
-    instance_alarm_list = []
-    for i in alarm:
-        instance_dict = {}
-        instance_dict['value'] = i['id__count']
-        instance_dict['name'] = i['instance_name']
-        instance_dict = json.dumps(instance_dict)
-        instance_alarm_list.append(instance_dict)
-    context['instance_alarm_list'] = instance_alarm_list
     return render(request, "configmanager/index.html", context)
 
 
@@ -184,8 +140,68 @@ def index_rds_line(request):
     recently_rds_disk.reverse()
 
     return HttpResponse(json.dumps({'success': True, 'add_time': add_time,
-                                    'recently_rds_cpu':recently_rds_cpu, 'recently_rds_io':recently_rds_io,
-                                    'recently_rds_disk':recently_rds_disk}), content_type="application/json")
+                                    'recently_rds_cpu': recently_rds_cpu, 'recently_rds_io': recently_rds_io,
+                                    'recently_rds_disk': recently_rds_disk}), content_type="application/json")
+
+
+@login_required(login_url='/login/')
+def index_alarm_product_type_pie(request):
+    # 按alarm产品类型统计（默认为最近30天）
+    now = datetime.datetime.now()
+    ever = now - datetime.timedelta(days=30)
+    alarm = Alarm_History.objects.filter(alarm_time__gt=ever).values('namespace').annotate(Count("id"))
+    product_type_list = []
+    for i in alarm:
+        product_type_list.append(str(i['namespace']))
+    product_type_alarm_list = []
+    for i in alarm:
+        product_type_dict = {}
+        product_type_dict[str('value')] = i['id__count']
+        product_type_dict[str('name')] = str(i['namespace'])
+        product_type_alarm_list.append(product_type_dict)
+    return HttpResponse(json.dumps({'success': True, 'product_type_list': product_type_list,
+                                    'product_type_alarm_list': product_type_alarm_list}),
+                        content_type="application/json")
+
+
+@login_required(login_url='/login/')
+def index_alarm_metric_type_pie(request):
+    # 按alarm监控项类型统计（默认为最近30天）
+    now = datetime.datetime.now()
+    ever = now - datetime.timedelta(days=30)
+    alarm = Alarm_History.objects.filter(alarm_time__gt=ever).values('metric_name').annotate(Count("id"))
+    metric_type_list = []
+    for i in alarm:
+        metric_type_list.append(str(i['metric_name']))
+    metric_type_alarm_list = []
+    for i in alarm:
+        metric_type_dict = {}
+        metric_type_dict[str('value')] = i['id__count']
+        metric_type_dict[str('name')] = str(i['metric_name'])
+        metric_type_alarm_list.append(metric_type_dict)
+    return HttpResponse(json.dumps({'success': True, 'metric_type_list': metric_type_list,
+                                    'metric_type_alarm_list': metric_type_alarm_list}),
+                        content_type="application/json")
+
+
+@login_required(login_url='/login/')
+def index_alarm_instance_pie(request):
+    # 按alarm实例比例统计（默认为最近30天）
+    now = datetime.datetime.now()
+    ever = now - datetime.timedelta(days=30)
+    alarm = Alarm_History.objects.filter(alarm_time__gt=ever).values('instance_name').annotate(Count("id"))
+    instance_list = []
+    for i in alarm:
+        instance_list.append(i['instance_name'])
+    instance_alarm_list = []
+    for i in alarm:
+        instance_dict = {}
+        instance_dict['value'] = i['id__count']
+        instance_dict['name'] = i['instance_name']
+        instance_alarm_list.append(instance_dict)
+    return HttpResponse(json.dumps({'success': True, 'instance_list': instance_list,
+                                    'instance_alarm_list': instance_alarm_list}),
+                        content_type="application/json")
 
 
 @login_required(login_url='/login/')
@@ -209,7 +225,35 @@ def index_alarm_line(request):
         else:
             alarm_num_y.append([a for a in alarm][dict_index]['number'])
 
-    return HttpResponse(json.dumps({'success': True, 'alarm_num_x': alarm_num_x, 'alarm_num_y': alarm_num_y}), content_type="application/json")
+    return HttpResponse(json.dumps({'success': True, 'alarm_num_x': alarm_num_x, 'alarm_num_y': alarm_num_y}),
+                        content_type="application/json")
+
+
+@login_required(login_url='/login/')
+def index_ecs_cpu_pie(request):
+    ecs_cpu_average = ECS.objects.aggregate(Avg('recently_cpu'))
+    ecs_cpu_average = ecs_cpu_average['recently_cpu__avg']
+    ecs_cpu_average = '%.2f' % ecs_cpu_average
+    return HttpResponse(json.dumps({'success': True, 'ecs_cpu_average': ecs_cpu_average}),
+                        content_type="application/json")
+
+
+@login_required(login_url='/login/')
+def index_ecs_memory_pie(request):
+    ecs_memory_average = ECS.objects.aggregate(Avg('recently_memory'))
+    ecs_memory_average = ecs_memory_average['recently_memory__avg']
+    ecs_memory_average = '%.2f' % ecs_memory_average
+    return HttpResponse(json.dumps({'success': True, 'ecs_memory_average': ecs_memory_average}),
+                        content_type="application/json")
+
+
+@login_required(login_url='/login/')
+def index_ecs_disk_pie(request):
+    ecs_disk_average = ECS.objects.aggregate(Avg('recently_diskusage'))
+    ecs_disk_average = ecs_disk_average['recently_diskusage__avg']
+    ecs_disk_average = '%.2f' % ecs_disk_average
+    return HttpResponse(json.dumps({'success': True, 'ecs_disk_average': ecs_disk_average}),
+                        content_type="application/json")
 
 
 class SafePaginator(Paginator):
@@ -293,7 +337,7 @@ def ecs_disable(request, ecs_id):
 def ecs_delete(request, ecs_id):
     ecs = get_object_or_404(ECS, pk=ecs_id)
     ecs.delete()
-    messages.success(request, '成功！删除ECS '+ecs.name)
+    messages.success(request, '成功！删除ECS ' + ecs.name)
     return HttpResponseRedirect(reverse('configmanager:ecslist'))
 
 
@@ -388,6 +432,7 @@ def update_allecs_info(request):
 class SiteListView(generic.ListView):
     template_name = 'configmanager/site_list.html'
     context_object_name = 'Site_list'
+    paginator_class = SafePaginator
     paginate_by = 10
 
     def get_queryset(self):
@@ -431,19 +476,20 @@ class SiteChangeView(generic.DetailView):
         context['ECSs'] = ECSs
         context['Sites'] = Sites
         context['Siteraces'] = Siteraces
-        print context
         return context
 
 
 @login_required(login_url='/login/')
 def add_relation_ecs(request, site):
     for key in request.POST:
-        try:
-            e = ECS.objects.get(name=key)
-        except:
-            pass
-        else:
-            site.ECSlists.add(e)
+        value_list = request.POST.getlist(key)
+        for v in value_list:
+            try:
+                    e = ECS.objects.get(name=v)
+            except:
+                pass
+            else:
+                site.ECSlists.add(e)
 
 
 @login_required(login_url='/login/')
@@ -459,14 +505,15 @@ def site_save(request, site_id):
         s.devcharge = request.POST['devcharge']
         s.deployattention = request.POST['deployattention']
         s.modified_user = request.user.username
+
+        '''修改所属站点族'''
         try:
-            s.siterace_id = request.POST['optionsRadios']
+            s.siterace_id = request.POST['select_race']
         except:
             s.siterace_id = '99999'
         s.save()
 
         '''新增或删除关联配置文件'''
-        post_filenames_list = []
         post_filenames = request.POST['configfiles']
         post_filenames_list = post_filenames.split(';')
         s.update_configfiles(post_filenames_list=post_filenames_list)
@@ -475,8 +522,11 @@ def site_save(request, site_id):
         add_relation_ecs(request=request, site=s)
 
         '''减少所属ECS'''
+        for key in request.POST:
+            if key == 'select_ecs[]':
+                value_list = request.POST.getlist(key)
         for es in s.ECSlists.all():
-            if not request.POST.has_key(es.name):
+            if es.name not in value_list:
                 s.ECSlists.remove(es)
 
         messages.success(request, "成功！修改站点 <a href=\'/site/" + str(site_id) + "/change/\'>" + s.fullname + "</a>")
@@ -537,7 +587,7 @@ def site_add(request):
             Siteraces = Siterace.objects.all()
             return render(request, 'configmanager/site_add.html', {'ECSs': ECSs, 'Siteraces': Siteraces})
         if request.POST.has_key('site-add'):
-            messages.success(request, "成功！添加站点 "+fullname)
+            messages.success(request, "成功！添加站点 " + fullname)
             return HttpResponseRedirect(reverse('configmanager:sitelist'))
     else:
         return HttpResponseRedirect(reverse('configmanager:sitelist'))
@@ -674,8 +724,8 @@ class UndeployConfigListView(generic.ListView):
             q = ''
         if (q != ''):
             for site in Site.objects.filter(Q(fullname__icontains=q) |
-                                                Q(shortname__icontains=q) |
-                                                Q(port__icontains=q)).order_by('fullname'):
+                                            Q(shortname__icontains=q) |
+                                            Q(port__icontains=q)).order_by('fullname'):
                 if site.have_undeploy_config_or_not():
                     L.append(site)
         else:
@@ -846,7 +896,8 @@ class UndeployApplyListView(generic.ListView):
         except:
             q = ''
         if (q != ''):
-            apply_list = Apply.objects.filter(Q(applyproject__icontains=q)).filter(status='WD').order_by('-wishdeploy_time').order_by('-apply_time')
+            apply_list = Apply.objects.filter(Q(applyproject__icontains=q)).filter(status='WD').order_by(
+                '-wishdeploy_time').order_by('-apply_time')
         else:
             apply_list = Apply.objects.filter(status='WD').order_by('-wishdeploy_time').order_by('-apply_time')
         return apply_list
@@ -1365,7 +1416,8 @@ def site_whole_refresh(request, pagenumber):
         Site_list = paginator.page(1)
         return render(request, template, {'Site_list': Site_list, 'pagenumber': pagenumber})
     except EmptyPage:
-        return HttpResponse(json.dumps({'empty': True, 'pagenumber': paginator.num_pages}), content_type="application/json")
+        return HttpResponse(json.dumps({'empty': True, 'pagenumber': paginator.num_pages}),
+                            content_type="application/json")
     else:
         return render(request, template, {'success': True, 'Site_list': Site_list, 'pagenumber': pagenumber})
 
@@ -1383,10 +1435,40 @@ def race_wholerefresh(request, pagenumber, type):
             return render(request, template, {'Race_list': Race_list, 'pagenumber': pagenumber})
         except EmptyPage:
             print paginator.num_pages
-            return HttpResponse(json.dumps({'empty': True, 'pagenumber': paginator.num_pages}), content_type="application/json")
+            return HttpResponse(json.dumps({'empty': True, 'pagenumber': paginator.num_pages}),
+                                content_type="application/json")
         else:
             return render(request, template, {'Race_list': Race_list, 'pagenumber': pagenumber})
     else:
         return HttpResponse(json.dumps({'add': True, 'pagenumber': pagenumber}), content_type="application/json")
 
 
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class AlarmHistoryListView(generic.ListView):
+    model = Alarm_History
+    template_name = 'configmanager/alarm_list.html'
+    context_object_name = 'alarm_list'
+    paginator_class = SafePaginator
+    paginate_by = 10
+
+    def get_queryset(self):
+        try:
+            q = self.request.GET['q']
+        except:
+            q = ''
+        if (q != ''):
+            alarm_list = Alarm_History.objects.filter(Q(instance_name__icontains=q)).order_by('-alarm_time')
+        else:
+            alarm_list = Alarm_History.objects.order_by('-alarm_time')
+        return alarm_list
+
+    def get_context_data(self, **kwargs):
+        context = super(AlarmHistoryListView, self).get_context_data(**kwargs)
+        q = self.request.GET.get('q')
+        if q is None:
+            return context
+        context['q'] = q
+        return context
+
+    def get_paginate_by(self, queryset):
+        return self.request.GET.get('paginate_by', self.paginate_by)

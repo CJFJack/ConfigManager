@@ -8,12 +8,20 @@ urlpatterns = [
     # 主体页面
     url(r'^$', views.index, name='index'),
     url(r'^index/$', views.index, name='index'),
+
     # dashboard页面
-    url(r'^index/alarm/line/$', views.index_alarm_line, name='index_alarm_line'),
-    url(r'^index/rds/cpu/pie/$', views.index_rds_cpu_pie, name='index_rds_cpu_pie'),
-    url(r'^index/rds/io/pie/$', views.index_rds_io_pie, name='index_rds_io_pie'),
-    url(r'^index/rds/disk/pie/$', views.index_rds_disk_pie, name='index_rds_disk_pie'),
-    url(r'^index/rds/line/$', views.index_rds_line, name='index_rds_line'),
+    url(r'^index/alarm_line/$', views.index_alarm_line, name='index_alarm_line'),
+    url(r'^index/alarm_product_type_pie/$', views.index_alarm_product_type_pie, name='index_alarm_product_type_pie'),
+    url(r'^index/alarm_metric_type_pie/$', views.index_alarm_metric_type_pie, name='index_alarm_metric_type_pie'),
+    url(r'^index/alarm_instance_pie/$', views.index_alarm_instance_pie, name='index_alarm_instance_pie'),
+    url(r'^index/rds_cpu_pie/$', views.index_rds_cpu_pie, name='index_rds_cpu_pie'),
+    url(r'^index/rds_io_pie/$', views.index_rds_io_pie, name='index_rds_io_pie'),
+    url(r'^index/rds_disk_pie/$', views.index_rds_disk_pie, name='index_rds_disk_pie'),
+    url(r'^index/rds_line/$', views.index_rds_line, name='index_rds_line'),
+    url(r'^index/ecs_cpu_pie/$', views.index_ecs_cpu_pie, name='index_ecs_cpu_pie'),
+    url(r'^index/ecs_memory_pie/$', views.index_ecs_memory_pie, name='index_ecs_memory_pie'),
+    url(r'^index/ecs_disk_pie/$', views.index_ecs_disk_pie, name='index_ecs_disk_pie'),
+
     # ECS页面
     url(r'^ecs/$', views.ECSListView.as_view(), name='ecslist'),
     url(r'^ecs/(?P<pk>[0-9]+)/change/$', views.ECSChangeView.as_view(), name='ecschange'),
@@ -29,6 +37,7 @@ urlpatterns = [
     url(r'^ecs/addmethod/$', views.ecs_add, name='ecsaddmethod'),
     url(r'^ecs/(?P<ecs_id>[0-9]+)/partrefresh/(?P<pagenumber>[0-9]+)/$', views.ecs_part_refresh, name='ecspartrefresh'),
     url(r'^ecs/wholerefresh/(?P<pagenumber>[0-9]+)/$', views.ecs_whole_refresh, name='ecswholerefresh'),
+
     # Site页面
     url(r'^site/$', views.SiteListView.as_view(), name='sitelist'),
     url(r'^site/(?P<pk>[0-9]+)/change/$', views.SiteChangeView.as_view(), name='sitechange'),
@@ -37,6 +46,7 @@ urlpatterns = [
     url(r'^site/addmethod/$', views.site_add, name='siteaddmethod'),
     url(r'^site/(?P<site_id>[0-9]+)/delete/$', views.site_delete, name='sitedelete'),
     url(r'^site/wholerefresh/(?P<pagenumber>[0-9]+)/$', views.site_whole_refresh, name='sitewholerefresh'),
+
     # Race站点族页面
     url(r'^race/$', views.RaceListView.as_view(), name='racelist'),
     url(r'^race/add/$', views.race_add, name='raceadd'),
@@ -45,6 +55,7 @@ urlpatterns = [
     url(r'^race/(?P<race_id>[0-9]+)/siterelations/$', views.race_site_relation, name='racesiterelation'),
     url(r'^race/wholerefresh/(?P<pagenumber>[0-9]+)/(?P<type>[a-zA-Z]+)/$', views.race_wholerefresh,
         name='racewholerefresh'),
+
     # Config页面
     url(r'^config/$', views.ConfigListView.as_view(), name='configlist'),
     url(r'^undeployconfig/$', views.UndeployConfigListView.as_view(), name='undeployconfiglist'),
@@ -58,6 +69,7 @@ urlpatterns = [
         name='applyconfigdeploy'),
     url(r'^config/(?P<site_id>[0-9]+)/slbpartrefresh/$', views.config_slb_part_refresh, name='configslbrefresh'),
     url(r'^config/(?P<site_id>[0-9]+)/ecspartrefresh/$', views.config_ecs_part_refresh, name='configecsrefresh'),
+
     # Apply页面
     url(r'^apply/$', views.ApplyListView.as_view(), name='applylist'),
     url(r'^undeployapply/$', views.UndeployApplyListView.as_view(), name='undeployapplylist'),
@@ -67,6 +79,7 @@ urlpatterns = [
     url(r'^apply/(?P<apply_id>[0-9]+)/delete/$', views.apply_delete, name='applydelete'),
     url(r'^apply/(?P<pk>[0-9]+)/deploysitelist/$', views.DeploySiteView.as_view(), name='deploysitelist'),
     url(r'^apply/(?P<site_id>[0-9]+)/partrefresh/$', views.apply_part_refresh, name='applypartrefresh'),
+
     # SLB页面
     url(r'^slb/$', views.SLBListView.as_view(), name='slblist'),
     url(r'^slb/allinfoupdate/$', views.all_slb_info_update, name='allslbinfoupdate'),
@@ -85,4 +98,7 @@ urlpatterns = [
         name='siteaddbackendserver'),
     url(r'^slb/(?P<slb_id>[0-9]+)/partrefresh/$', views.slb_part_refresh, name='slbpartrefresh'),
     url(r'^slb/wholerefresh/(?P<pagenumber>[0-9]+)/$', views.slb_whole_refresh, name='slbwholerefresh'),
+
+    # 报警管理页面
+    url(r'^alarm/$', views.AlarmHistoryListView.as_view(), name='alarm_history_list')
 ]

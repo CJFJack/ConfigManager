@@ -26,7 +26,7 @@ SECRET_KEY = '7hjt%ske7c8m@l%83ccq(jk@(5#6tz^kfvofcgh_q2)jxvm0f&'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.88.104', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -79,20 +79,6 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'django',
-#         'USER': 'root',
-#         'PASSWORD': 'Python@123',
-#         'HOST': '127.0.0.1',
-#         'PORT': '3306',
-#        # 'OPTIONS': {
-#        #     'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-#        # }
-#    }
-# }
 
 
 DATABASES = {
@@ -196,5 +182,5 @@ DEPLOY_DIR_PATH = r'D:\release'
 
 
 # 阿里云API配置
-ACCESS_KEY_ID = 'ZAL5Z3Ee8KhyZ2U1'
-ACCESS_KEY_SECRET = 'afp7C6u1osEpCZSwVHcHkfcpJqoeEe'
+ACCESS_KEY_ID = 'xxx'
+ACCESS_KEY_SECRET = 'xxx'

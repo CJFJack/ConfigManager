@@ -182,5 +182,5 @@ DEPLOY_DIR_PATH = r'D:\release'
 
 
 # 阿里云API配置
-ACCESS_KEY_ID = 'xxx'
-ACCESS_KEY_SECRET = 'xxx'
+ACCESS_KEY_ID = 'ZAL5Z3Ee8KhyZ2U1'
+ACCESS_KEY_SECRET = 'afp7C6u1osEpCZSwVHcHkfcpJqoeEe'

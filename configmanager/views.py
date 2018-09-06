@@ -18,9 +18,8 @@ from django.utils.decorators import method_decorator
 from django.views.generic.edit import UpdateView
 from django.views.generic.edit import CreateView
 
-
 # Create your views here.
-import os, json, time, datetime
+
 from time import time
 from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem, SLB, \
     SLBhealthstatus, DeployECS, RDS_Usage_Record, Alarm_History
@@ -32,7 +31,7 @@ from configmanager.acs_api.acs_slb_health import query_slb_health
 from configmanager.acs_api.acs_slb_backendserver_remove import remove_backendserver
 from configmanager.acs_api.acs_slb_backendserver_add import add_backendserver
 from configmanager.acs_api.acs_all_ecs_info import query_all_ecs
-
+import os, json, time, datetime
 
 app_name = 'configmanager'
 
@@ -486,7 +485,7 @@ def add_relation_ecs(request, site):
         value_list = request.POST.getlist(key)
         for v in value_list:
             try:
-                    e = ECS.objects.get(name=v)
+                e = ECS.objects.get(name=v)
             except:
                 pass
             else:
@@ -780,8 +779,8 @@ def config_save(request, configfile_id):
                 for p_c in s.configfile_set.all():
                     if p_c.filename == c.filename:
                         relation_config_save(request, configfileid=p_c.id)
-
         return HttpResponseRedirect(reverse('configmanager:configlist'))
+
     if request.POST.has_key('config-goback'):
         return HttpResponseRedirect(reverse('configmanager:configlist'))
 
@@ -840,12 +839,18 @@ def config_rollback(request, confighistorydetail_id):
     ch = ConfigmanagerHistoricalconfigfile.objects.get(pk=confighistorydetail_id)
     configfileid = ch.id
     if request.POST.has_key('config-rollback'):
+        # 回滚配置文件
         rollbackcontent = ch.content
         c = Configfile.objects.get(pk=configfileid)
         c.content = rollbackcontent
         c.save()
-        messages.success(request,
-                         "成功！回滚站点 " + ch.get_site_fullname() + " 配置文件 " + ch.filename + " 修改编号：" + confighistorydetail_id)
+        # 更新配置发布状态为未发布
+        for r in c.site.release_set.all():
+            r.status = 'N'
+            r.save()
+        # 返回页面提示信息
+        messages.success(request, "成功！回滚站点 " + ch.get_site_fullname() + " 配置文件 " + ch.filename + " 修改编号："
+                         + confighistorydetail_id)
         return HttpResponseRedirect(reverse('configmanager:configlist'))
     if request.POST.has_key('config-goback'):
         return HttpResponseRedirect(reverse('configmanager:confighistory', args=(configfileid,)))

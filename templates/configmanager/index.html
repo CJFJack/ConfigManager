@@ -4,12 +4,14 @@
 
 {% block content %}
 
+    {#    HTML部分#}
+
     <!-- 每30s刷新一次页面 -->
     <meta http-equiv="refresh" content="60">
 
 
     <ul id="myTab" class="nav nav-tabs">
-        <li class="active">
+        <li>
             <a href="#RDS" data-toggle="tab">RDS-统计报表</a>
         </li>
         <li>
@@ -103,7 +105,7 @@
         </div>
 
         {#        报警统计报表#}
-        <div class="tab-pane fade in active" id="ALARM">
+        <div class="tab-pane fade active" id="ALARM">
             <div class="panel panel-default">
                 <div class="panel-body">
                     {#报警统计饼图#}
@@ -133,7 +135,7 @@
 
 
         {#        ECS统计报表#}
-        <div class="tab-pane fade in active" id="ECS">
+        <div class="tab-pane fade active" id="ECS">
             <div class="panel panel-default">
                 <div class="panel-body">
 
@@ -154,6 +156,9 @@
             </div>
         </div>
     </div>
+
+
+
 
     {#     JS部分#}
 

@@ -57,6 +57,12 @@ DEPLOY_DIR_PATH = r'D:\release'
 
 ```
 
+修改允许访问IPsettings.py:
+```
+ALLOWED_HOSTS = []
+
+```
+
 
 ### 初始化数据
 ```

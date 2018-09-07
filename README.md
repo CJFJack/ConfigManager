@@ -17,7 +17,7 @@ CMS(Config Manager System: 运维管理平台)
 ### 安装依赖
 
 ```
-pip install -i https://pypi.douban.com/simple/  -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ### 安装并创建数据库cms

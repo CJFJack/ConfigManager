@@ -14,7 +14,7 @@ billiard==3.3.0.23
 colorama==0.3.3
 django-cors-headers==2.4.0
 django-simple-history==2.3.0
-funcsigs==1.0.2=
+funcsigs==1.0.2
 futures==3.2.0
 jmespath==0.7.1
 kombu==3.0.37

@@ -80,6 +80,7 @@ python manage.py createsuperuser
 
 QQ: 398741302
 
+![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/login.png)
 ![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/acs_alarm_report.png)
 ![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/acs_rds_report.png)
 ![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/cms_config_manager.png)

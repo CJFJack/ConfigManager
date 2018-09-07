@@ -75,14 +75,14 @@ python manage.py createsuperuser
 ```
 
 ### 交流
-![赞赏](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/wxzs.png)
-![微信](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/wx.png)
+![赞赏](https://raw.githubusercontent.com/CJFJack/ConfigManager/master/doc/images/wxzs.png)
+![微信](https://raw.githubusercontent.com/CJFJack/ConfigManager/master/doc/images/wx.png)
 
 QQ: 398741302
 
-![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/login.png)
-![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/acs_alarm_report.png)
-![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/acs_rds_report.png)
-![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/cms_config_manager.png)
-![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/cms_ecs_manager.png)
-![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/bootstrap/doc/images/cms_deploy_apply.png)
+![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/master/doc/images/login.png)
+![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/master/doc/images/acs_alarm_report.png)
+![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/master/doc/images/acs_rds_report.png)
+![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/master/doc/images/cms_config_manager.png)
+![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/master/doc/images/cms_ecs_manager.png)
+![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/master/doc/images/cms_deploy_apply.png)

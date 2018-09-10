@@ -59,7 +59,7 @@ DEPLOY_DIR_PATH = r'D:\release'
 
 修改允许访问IPsettings.py:
 ```
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 ```
 
@@ -68,16 +68,24 @@ ALLOWED_HOSTS = []
 ```
 python manage.py makemigrations
 python manage.py migrate
-python manage.py loaddata default_types
 python manage.py loaddata default_user
 
 ```
 
 
-### 创建管理员
+### 运行服务器
 
 ```
-python manage.py createsuperuser
+python manage.py runserver 0:8888
+```
+
+
+### 管理员登录
+
+```
+访问 http://localhost:8888
+默认管理员账号：admin
+默认管理员密码：Python@123
 ```
 
 ### 交流

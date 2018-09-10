@@ -23,7 +23,12 @@ def query_rds_monitor(instanceId, metric):
     # 发起请求
     response = clt.do_action(request)
     json_response = json.loads(response)
-    return json.loads(json_response['Datapoints'])[0]['Average']
+    try:
+        average = json.loads(json_response['Datapoints'])[0]['Average']
+    except:
+        return 0
+    else:
+        return average
 
 
 # 调用函数

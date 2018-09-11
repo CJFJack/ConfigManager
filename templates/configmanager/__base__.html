@@ -35,33 +35,6 @@
 </head>
 <body id="body">
 
-<!--loading样式-->
-{#<script src="https://cdn.bootcss.com/spin.js/2.3.2/spin.min.js"></script>#}
-{#<script>#}
-{#    var opts = {#}
-{#        lines: 13, // 花瓣数目#}
-{#        length: 20, // 花瓣长度#}
-{#        width: 10, // 花瓣宽度#}
-{#        radius: 30, // 花瓣距中心半径#}
-{#        corners: 1, // 花瓣圆滑度 (0-1)#}
-{#        rotate: 0, // 花瓣旋转角度#}
-{#        direction: 1, // 花瓣旋转方向 1: 顺时针, -1: 逆时针#}
-{#        color: '#5882FA', // 花瓣颜色#}
-{#        speed: 2, // 花瓣旋转速度#}
-{#        trail: 60, // 花瓣旋转时的拖影(百分比)#}
-{#        shadow: false, // 花瓣是否显示阴影#}
-{#        hwaccel: false, //spinner 是否启用硬件加速及高速旋转#}
-{#        className: 'spinner', // spinner css 样式名称#}
-{#        zIndex: 2e9, // spinner的z轴 (默认是2000000000)#}
-{#        top: '50%', // spinner 相对父容器Top定位 单位 px#}
-{#        left: '50%', // spinner 相对父容器Left定位 单位 px#}
-{#        position: 'fixed',#}
-{#    };#}
-{#    var spinner = new Spinner(opts);#}
-{##}
-{##}
-{#</script>#}
-
 {% load systemmanager %}
 <!--页面导航-->
 <div class="container-fluid">
@@ -90,7 +63,7 @@
 
 
 
-                            {% if request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}">
+                            {% if request.user.is_superuser or request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}">
                         <a href="#"
                            class="dropdown-toggle
 
@@ -102,7 +75,7 @@
 
 
 
-                                   {% if request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}"
+                                   {% if request.user.is_superuser or request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}"
                            data-toggle="dropdown">
                             系统管理 <b class="caret"></b>
                         </a>
@@ -134,7 +107,7 @@
 
 
 
-                                    {% if request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}">
+                                    {% if request.user.is_superuser or request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}">
                                 <a href="{% url 'configmanager:configlist' %}">配置修改</a></li>
                             <li class="
 
@@ -143,7 +116,7 @@
 
 
 
-                                    {% if request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}">
+                                    {% if request.user.is_superuser or request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}">
                                 <a href="{% url 'configmanager:undeployconfiglist' %}">待生效配置</a></li>
                             <li role="presentation" class="divider"></li>
                             <li role="presentation" class="dropdown-header">发布申请</li>
@@ -154,7 +127,7 @@
                     </li>
                     <li class="dropdown"><a href="{% url 'configmanager:alarm_history_list' %}">报警管理</a></li>
                     <li class="dropdown"><a
-                            style="{% if request.user|has_group:'admin' %}disploy:;{% else %}display:none;{% endif %}"
+                            style="{% if request.user.is_staff or request.user|has_group:'admin' %}disploy:;{% else %}display:none;{% endif %}"
                             href="/admin/">后台管理</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">

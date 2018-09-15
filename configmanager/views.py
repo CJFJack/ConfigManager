@@ -17,13 +17,15 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import UpdateView
 from django.views.generic.edit import CreateView
+from django.views.generic.base import View
+from django.contrib.auth import authenticate, login
 
 # Create your views here.
 
 from time import time
 from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem, SLB, \
     SLBhealthstatus, DeployECS, RDS_Usage_Record, Alarm_History
-from .forms import ApplyForm, DeployitemFormSet, SLBForm, SLBsiteFormSet
+from .forms import ApplyForm, DeployitemFormSet, SLBForm, SLBsiteFormSet, LoginForm
 from configmanager.acs_api.acs_ecs_monitor import query_ecs_api
 from acs_api.acs_ecs_info import query_ecs_info
 from configmanager.acs_api.acs_slb_info import query_slb_info
@@ -34,6 +36,27 @@ from configmanager.acs_api.acs_all_ecs_info import query_all_ecs
 import os, json, time, datetime
 
 app_name = 'configmanager'
+
+
+class LoginView(View):
+
+    def get(self, request):
+        login_form = LoginForm()
+        return render(request, "configmanager/login.html", {'login_form': login_form})
+
+    def post(self, request):
+        login_form = LoginForm(request.POST)
+        if login_form.is_valid():
+            username = request.POST['username']
+            password = request.POST['password']
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return HttpResponseRedirect(request.POST.get('next', '/') or '/')
+            else:
+                return render(request, "configmanager/login.html", {'messages': u'用户名或密码错误！', 'login_form': login_form})
+        else:
+            return render(request, "configmanager/login.html", {'login_form': login_form})
 
 
 @login_required(login_url='/login/')
@@ -692,9 +715,9 @@ class ConfigListView(generic.ListView):
         if (q != ''):
             Site_list = Site.objects.filter(Q(fullname__icontains=q) |
                                             Q(shortname__icontains=q) |
-                                            Q(port__icontains=q)).order_by('fullname')
+                                            Q(port__icontains=q)).filter(status='Y').order_by('fullname')
         else:
-            Site_list = Site.objects.order_by('fullname')
+            Site_list = Site.objects.filter(status='Y').order_by('fullname')
         return Site_list
 
     def get_context_data(self, **kwargs):

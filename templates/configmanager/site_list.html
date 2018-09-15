@@ -4,77 +4,78 @@
 {% block content %}
 
 
-<div id="whole" class="container-fluid table-responsive">
-    {% if Site_list %}
-    <table class="table table-striped table-hover table-condensed">
-        <thead>
-        <th>站点名称</th>
-        <th>站点简称</th>
-        <th>配置文件夹名称</th>
-        <th>配置文件名称</th>
-        <th>所属ECS</th>
-        <th>所属站点族</th>
-        <th>操作</th>
-        </thead>
-        <tbody>
-        {% for site in Site_list %}
-        <tr>
-            <td><a href="{% url 'configmanager:sitechange' site.id %}">{{ site.fullname }}</a></td>
-            <td>{{ site.shortname }}</td>
-            <td>{{ site.configdirname }}</td>
-            <td>
-                {% for configfile in site.configfile_set.all %}
-                <span>{{ configfile.filename }}</span><br/>
+    <div id="whole" class="container-fluid table-responsive">
+        {% if Site_list %}
+            <table class="table table-striped table-hover table-condensed">
+                <thead>
+                <th>站点名称</th>
+                <th>站点简称</th>
+                <th>配置文件夹名称</th>
+                <th>配置文件名称</th>
+                <th>所属ECS</th>
+                <th>所属站点族</th>
+                <th>操作</th>
+                <th>状态</th>
+                </thead>
+                <tbody>
+                {% for site in Site_list %}
+                    <tr>
+                        <td><a href="{% url 'configmanager:sitechange' site.id %}">{{ site.fullname }}</a></td>
+                        <td>{{ site.shortname }}</td>
+                        <td>{{ site.configdirname }}</td>
+                        <td>
+                            {% for configfile in site.configfile_set.all %}
+                                <span>{{ configfile.filename }}</span><br/>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for ecs in site.ECSlists.all %}
+                                <span>{{ ecs }}</span><br/>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {{ site.siterace }}
+                        </td>
+                        <td>
+                            &nbsp;<a class="btn btn-primary" href="{% url 'configmanager:sitechange' site.id %}">修改</a>&nbsp;
+                            &nbsp;<a class="btn btn-danger" href="{% url 'configmanager:sitedelete' site.id %}"
+                                     onclick="return confirm('Are you sure you want to delete this?')">删除</a>&nbsp;
+                        </td>
+                        <td>
+                            {% if site.status == 'N' %}<span class="text-danger">禁用</span>{% else %}启用{% endif %}
+                        </td>
+                    </tr>
                 {% endfor %}
-            </td>
-            <td>
-                {% for ecs in site.ECSlists.all %}
-                <span>{{ ecs }}</span><br/>
-                {% endfor %}
-            </td>
-            <td>
-                {{ site.siterace }}
-            </td>
-            <td>
-                &nbsp;<a class="btn btn-primary" href="{% url 'configmanager:sitechange' site.id %}">修改</a>&nbsp;
-                &nbsp;<a class="btn btn-danger" href="{% url 'configmanager:sitedelete' site.id %}"
-                         onclick="return confirm('Are you sure you want to delete this?')">删除</a>&nbsp;
-            </td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>No Sites are available.</p>
-    {% endif %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No Sites are available.</p>
+        {% endif %}
 
-</div>
+    </div>
 
 
-<script>
-$.ajaxSetup({
-    data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
-});
+    <script>
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+        });
 
-//主体刷新
-function WholePartialRefresh(pagenumber) {
-    var postUrl = "/site/wholerefresh/"+pagenumber+"/";
+        //主体刷新
+        function WholePartialRefresh(pagenumber) {
+            var postUrl = "/site/wholerefresh/" + pagenumber + "/";
 
-    $.post(postUrl, function(data) {
-        if (data.empty) {
-            window.location.replace("/site/?q=&page="+data.pagenumber);
+            $.post(postUrl, function (data) {
+                if (data.empty) {
+                    window.location.replace("/site/?q=&page=" + data.pagenumber);
+                }
+                else {
+                    $('#whole').html(data);
+                }
+            });
         }
-        else {
-            $('#whole').html(data);
-        }
-    });
-}
 
 
-
-
-
-</script>
+    </script>
 
 
 {% endblock %}

@@ -18,18 +18,20 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from apscheduler.schedulers.background import BackgroundScheduler
 from configmanager import cron
+from configmanager.views import LoginView
 import logging
-logging.basicConfig()
 
+logging.basicConfig()
 
 urlpatterns = [
     url(r'^', include('configmanager.urls')),
     url(r'^configmanager/', include('configmanager.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'^login/$', auth_views.login, name='login'),
+    # url(r'^login/$', auth_views.login, name='login'),
+    url(r'^login/$', LoginView.as_view(), name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
+    url(r'^captcha/', include('captcha.urls')),
 ]
-
 
 scheduler = BackgroundScheduler()
 

@@ -63,9 +63,11 @@
 
 
 
+
                             {% if request.user.is_superuser or request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}">
                         <a href="#"
                            class="dropdown-toggle
+
 
 
 
@@ -107,9 +109,11 @@
 
 
 
+
                                     {% if request.user.is_superuser or request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}">
                                 <a href="{% url 'configmanager:configlist' %}">配置修改</a></li>
                             <li class="
+
 
 
 
@@ -131,9 +135,13 @@
                             href="/admin/">后台管理</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#"><span class="glyphicon glyphicon-user"></span> 欢迎！ {{ request.user.first_name }}</a>
+                    <li>
+                        <a href="#"><span class="glyphicon glyphicon-user"></span> 欢迎！
+                            {% if not request.user.first_name %}{{ request.user.username }}{% else %}
+                                {{ request.user.first_name }}{% endif %}</a>
                     </li>
-                    <li><a href="{% url 'logout' %}" target="_top"><span class="glyphicon glyphicon-log-out"></span> 注销</a>
+                    <li>
+                        <a href="{% url 'logout' %}" target="_top"><span class="glyphicon glyphicon-log-out"></span> 注销</a>
                     </li>
                 </ul>
             </div>

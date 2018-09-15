@@ -3,7 +3,7 @@
 from configmanager.acs_api import acs_rds_info
 from configmanager.acs_api import acs_rds_monitor
 from configmanager.acs_api import acs_alarm_history
-from .models import RDS, RDS_Usage_Record, Alarm_History
+from .models import RDS, RDS_Usage_Record, Alarm_History, ECS
 import datetime, time
 
 
@@ -52,4 +52,21 @@ def get_alram_history_list():
                 alarm = Alarm_History(name=name, namespace=namespace, alarm_time=alarm_time, value=value,
                                       instance_name=instance_name, metric_name=metric_name, dimension=dimension)
                 alarm.save()
+
+
+def get_ecs_resource():
+    for ecs in ECS.objects.all():
+        instanceid = ecs.instanceid.encode('utf-8')
+        try:
+            recently_cpu = query_ecs_api(instanceid=instanceid, metric="cpu_total")
+            recently_mem = query_ecs_api(instanceid=instanceid, metric="memory_usedutilization")
+            recently_diskusage = query_ecs_api(instanceid=instanceid, metric="diskusage_utilization")
+        except:
+            pass
+        else:
+            ecs.recently_memory = recently_mem['Average']
+            ecs.recently_cpu = recently_cpu['Average']
+            ecs.recently_diskusage = recently_diskusage['Average']
+            ecs.save()
+
 

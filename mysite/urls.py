@@ -21,6 +21,7 @@ from configmanager import cron
 from configmanager.views import LoginView
 import logging
 
+
 logging.basicConfig()
 
 urlpatterns = [
@@ -52,6 +53,12 @@ def get_rds_monitor():
 def get_alram_history():
     cron.get_alram_history_list()
     print 'get_alarm_history'
+
+
+@scheduler.scheduled_job("interval", seconds=400, id="get_ecs_resource")
+def get_ecs_resource():
+    cron.get_ecs_resource()
+    print 'get_ecs_resource'
 
 
 scheduler.start()

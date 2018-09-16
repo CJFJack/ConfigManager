@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load staticfiles %}
 
     <!--默认标题-->
     <title>{% block title %}{% endblock %}运维管理平台</title>
@@ -8,16 +9,25 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" type="text/css" href="/static/configmanager/css/td.css"/>
+    <!--引用自定义css-->
+    <link rel="stylesheet" type="text/css" href="{% static 'configmanager/css/td.css' %}"/>
     <link rel="stylesheet" type="text/css" href="/static/configmanager/css/bgDiv.css"/>
 
-    <!--引用jquery cdn和bootstratp css、js-->
+
+    <!--引用jquery cdn-->
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+    <!--引用bootstratp css、js-->
     <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
             crossorigin="anonymous"></script>
+
+    <!--应用font-awesome css-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+          integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/static/configmanager/css/loginstyle.css">
 
     {#    引用echarts#}
     <script src="https://cdn.bootcss.com/echarts/4.1.0/echarts.min.js"></script>
@@ -64,9 +74,15 @@
 
 
 
+
+
+
                             {% if request.user.is_superuser or request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}">
                         <a href="#"
                            class="dropdown-toggle
+
+
+
 
 
 
@@ -110,9 +126,15 @@
 
 
 
+
+
+
                                     {% if request.user.is_superuser or request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}">
                                 <a href="{% url 'configmanager:configlist' %}">配置修改</a></li>
                             <li class="
+
+
+
 
 
 

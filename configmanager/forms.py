@@ -29,5 +29,5 @@ SLBsiteFormSet = inlineformset_factory(SLB, SLBsite, fields=('site',), extra=1, 
 
 class LoginForm(Form):
     username = CharField(required=True, max_length=20)
-    password = CharField(required=True, max_length=10)
+    password = CharField(required=True, max_length=20)
     captcha = CaptchaField(error_messages={'invalid': u'验证码错误！'})

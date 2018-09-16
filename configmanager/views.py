@@ -19,8 +19,9 @@ from django.views.generic.edit import UpdateView
 from django.views.generic.edit import CreateView
 from django.views.generic.base import View
 from django.contrib.auth import authenticate, login
+from captcha.models import CaptchaStore
+from captcha.helpers import captcha_image_url
 
-# Create your views here.
 
 from time import time
 from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem, SLB, \
@@ -33,7 +34,10 @@ from configmanager.acs_api.acs_slb_health import query_slb_health
 from configmanager.acs_api.acs_slb_backendserver_remove import remove_backendserver
 from configmanager.acs_api.acs_slb_backendserver_add import add_backendserver
 from configmanager.acs_api.acs_all_ecs_info import query_all_ecs
-import os, json, time, datetime
+import os
+import json
+import time
+import datetime
 
 app_name = 'configmanager'
 
@@ -42,10 +46,15 @@ class LoginView(View):
 
     def get(self, request):
         login_form = LoginForm()
-        return render(request, "configmanager/login.html", {'login_form': login_form})
+        hash_key = CaptchaStore.generate_key()
+        image_url = captcha_image_url(hash_key)
+        return render(request, "configmanager/login.html", {'login_form': login_form, 'hash_key': hash_key,
+                                                            'image_url': image_url})
 
     def post(self, request):
         login_form = LoginForm(request.POST)
+        hash_key = CaptchaStore.generate_key()
+        image_url = captcha_image_url(hash_key)
         if login_form.is_valid():
             username = request.POST['username']
             password = request.POST['password']
@@ -54,9 +63,11 @@ class LoginView(View):
                 login(request, user)
                 return HttpResponseRedirect(request.POST.get('next', '/') or '/')
             else:
-                return render(request, "configmanager/login.html", {'messages': u'用户名或密码错误！', 'login_form': login_form})
+                return render(request, "configmanager/login.html", {'messages': u'用户名或密码错误！', 'login_form': login_form,
+                                                                    'hash_key': hash_key, 'image_url': image_url})
         else:
-            return render(request, "configmanager/login.html", {'login_form': login_form})
+            return render(request, "configmanager/login.html", {'login_form': login_form, 'hash_key': hash_key,
+                                                                'image_url': image_url})
 
 
 @login_required(login_url='/login/')

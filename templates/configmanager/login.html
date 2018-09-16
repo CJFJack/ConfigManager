@@ -1,51 +1,79 @@
-{% extends 'configmanager/__base__.html' %}
-{% block nav %}none{% endblock %}
-{% block title %}登录 | {% endblock %}
-{% block search_display %}none{% endblock %}
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>运维管理平台</title>
 
-    <form class="form-horizontal" role="form" action="{% url 'login' %}" method="post">
-        {% csrf_token %}
-        {{ login_form.management_form }}
-        <div class="form-group">
-            <label for="username" class="col-sm-5 control-label">用户名</label>
-            <div class="col-sm-2">
-                <input type="text" class="form-control" name="username" id="id_username" placeholder="请输入用户名">
+    <!--引用jquery cdn-->
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+    <!--引用bootstratp css、js-->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+
+    <!--应用font-awesome css-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+          integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/static/configmanager/css/loginstyle.css">
+
+</head>
+<body id="login">
+
+<form class="form-horizontal" role="form" action="{% url 'login' %}" method="post">
+    {% csrf_token %}
+    {{ login_form.management_form }}
+    <div class="container">
+        <div class="form row">
+            <div class="form-horizontal col-md-offset-3" id="login_form">
+                <h3 class="form-title">登录</h3>
+                <div class="col-md-9">
+                    <div class="form-group">
+                        <i class="fa fa-user fa-lg"></i>
+                        <input class="form-control required" type="text" placeholder="请输入用户名" id="username"
+                               name="username" autofocus="autofocus" maxlength="20"/>
+                    </div>
+                    <div class="form-group">
+                        <i class="fa fa-lock fa-lg"></i>
+                        <input class="form-control required" type="password" placeholder="请输入密码" id="password"
+                               name="password" maxlength="20"/>
+                    </div>
+                    <div class="form-group">
+                        <i class="fa fa-lg"></i>
+                        <input type="text" id="id_reg_captcha_1" name="captcha_1"
+                               class="form-control form-control-captcha fl required" placeholder="请输入验证码"><br/>
+                        <span class="">
+                            <img src="{{ image_url }}" class="captcha" alt="captcha">
+                        </span><input id="id_reg_captcha_0" name="captcha_0" type="hidden" value="{{ hash_key }}">
+                    </div>
+                    <div class="form-group col-md-offset-9">
+                        <button type="submit" class="btn btn-success pull-right" name="submit">登录</button>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="form-group">
-            <label for="password" class="col-sm-5 control-label">密码</label>
-            <div class="col-sm-2">
-                <input type="password" class="form-control" name="password" id="id_password" placeholder="请输入密码">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="captcha" class="col-sm-5 control-label">验证码</label>
-            <div class="col-sm-4">
-                {{ login_form.captcha }}
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-sm-offset-5 col-sm-10">
-                <button type="submit" class="btn btn-primary">登录</button>
-            </div>
-        </div>
-        <input type="hidden" name="next" value="{{ request.GET.next }}">
-        {{ login_form.errors }}
-    </form>
+    </div>
 
-    <script>
+    <input type="hidden" name="next" value="{{ request.GET.next }}">
+    {{ login_form.errors }}
 
-        $('.captcha').click(function () {
-            $.getJSON("/captcha/refresh/", function (result) {
-                $('.captcha').attr('src', result['image_url']);
-                $('#id_captcha_0').val(result['key'])
-            });
+</form>
 
+<script>
 
+    $('.captcha').click(function () {
+        $.getJSON("/captcha/refresh/", function (result) {
+            $('.captcha').attr('src', result['image_url']);
+            $('#id_captcha_0').val(result['key'])
         });
+    });
 
-    </script>
+</script>
 
-{% endblock %}
+</body>
+</html>
+
+
 

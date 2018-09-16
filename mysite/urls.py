@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """mysite URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -28,9 +29,9 @@ urlpatterns = [
     url(r'^', include('configmanager.urls')),
     url(r'^configmanager/', include('configmanager.urls')),
     url(r'^admin/', admin.site.urls),
-    # url(r'^login/$', auth_views.login, name='login'),
     url(r'^login/$', LoginView.as_view(), name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
+    # 验证码
     url(r'^captcha/', include('captcha.urls')),
 ]
 

@@ -25,3 +25,4 @@ six==1.11.0
 tzlocal==1.5.1
 wheel==0.31.1
 xlwt==1.3.0
+captcha

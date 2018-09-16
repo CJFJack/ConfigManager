@@ -63,7 +63,7 @@ class LoginView(View):
                 login(request, user)
                 return HttpResponseRedirect(request.POST.get('next', '/') or '/')
             else:
-                return render(request, "configmanager/login.html", {'messages': u'用户名或密码错误！', 'login_form': login_form,
+                return render(request, "configmanager/login.html", {'msg': u'用户名或密码错误！', 'login_form': login_form,
                                                                     'hash_key': hash_key, 'image_url': image_url})
         else:
             return render(request, "configmanager/login.html", {'login_form': login_form, 'hash_key': hash_key,

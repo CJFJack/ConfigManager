@@ -1,5 +1,5 @@
 #login{
-    background: url("/static/configmanager/img/login_lunbo1.png");
+    background: url("/static/configmanager/img/login_background.jpg");
     animation-name:myfirst;
     animation-duration:12s;
     /*变换时间*/
@@ -12,10 +12,10 @@
 }
 @keyframes myfirst
 {
-    0%   {background:url("/static/configmanager/img/login_lunbo1.png");}
-    34%  {background:url("/static/configmanager/img/login_lunbo2.png");}
-    67%  {background:url("/static/configmanager/img/login_lunbo3.png");}
-    100% {background:url("/static/configmanager/img/login_lunbo4.png");}
+    0%   {background:url("/static/configmanager/img/login_background.jpg");}
+    34%  {background:url("/static/configmanager/img/login_background.jpg");}
+    67%  {background:url("/static/configmanager/img/login_background.jpg");}
+    100% {background:url("/static/configmanager/img/login_background.jpg");}
 }
 .form{background: rgba(255,255,255,0.2);width:400px;margin:120px auto;}
 /*阴影*/

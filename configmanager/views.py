@@ -66,7 +66,8 @@ class LoginView(View):
                 return render(request, "configmanager/login.html", {'msg': u'用户名或密码错误！', 'login_form': login_form,
                                                                     'hash_key': hash_key, 'image_url': image_url})
         else:
-            return render(request, "configmanager/login.html", {'login_form': login_form, 'hash_key': hash_key,
+            return render(request, "configmanager/login.html", {'msg': u'验证码错误！',
+                                                                'login_form': login_form, 'hash_key': hash_key,
                                                                 'image_url': image_url})
 
 

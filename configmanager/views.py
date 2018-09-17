@@ -42,7 +42,6 @@ app_name = 'configmanager'
 
 
 class LoginView(View):
-
     def get(self, request):
         login_form = LoginForm()
         hash_key = CaptchaStore.generate_key()

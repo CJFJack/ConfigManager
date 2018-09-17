@@ -1,5 +1,6 @@
 #login{
-    background: url("/static/configmanager/img/login_background.jpg");
+    /*background: url("/static/configmanager/img/login_background.jpg");*/
+    background: #1488c6;
     animation-name:myfirst;
     animation-duration:12s;
     /*变换时间*/
@@ -12,10 +13,10 @@
 }
 @keyframes myfirst
 {
-    0%   {background:url("/static/configmanager/img/login_background.jpg");}
-    34%  {background:url("/static/configmanager/img/login_background.jpg");}
-    67%  {background:url("/static/configmanager/img/login_background.jpg");}
-    100% {background:url("/static/configmanager/img/login_background.jpg");}
+    /*0%   {background:url("/static/configmanager/img/login_background.jpg");}*/
+    /*34%  {background:url("/static/configmanager/img/login_background.jpg");}*/
+    /*67%  {background:url("/static/configmanager/img/login_background.jpg");}*/
+    /*100% {background:url("/static/configmanager/img/login_background.jpg");}*/
 }
 .form{background: rgba(255,255,255,0.2);width:400px;margin:120px auto;}
 /*阴影*/

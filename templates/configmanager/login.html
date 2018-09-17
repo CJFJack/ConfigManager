@@ -22,6 +22,22 @@
 </head>
 <body id="login">
 
+<!--登录提示信息-->
+<div {% if msg %}style="display:;" {% else %}style="display:none;" {% endif %} id="alert-div"
+     class="alert alert-info">
+    <button type="button" class="close" data-dismiss="alert"
+            aria-hidden="true">
+        &times;
+    </button>
+    {% if msg %}
+        {% for message in msg %}
+            {% autoescape off %}
+                {{ message }}
+            {% endautoescape %}
+        {% endfor %}
+    {% endif %}
+</div>
+
 <form class="form-horizontal" role="form" action="{% url 'login' %}" method="post">
     {% csrf_token %}
     {{ login_form.management_form }}

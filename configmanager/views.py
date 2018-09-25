@@ -22,10 +22,9 @@ from django.contrib.auth import authenticate, login
 from captcha.models import CaptchaStore
 from captcha.helpers import captcha_image_url
 
-
 from time import time
 from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem, SLB, \
-    SLBhealthstatus, DeployECS, RDS_Usage_Record, Alarm_History
+    SLBhealthstatus, DeployECS, RDS_Usage_Record, Alarm_History, Jenkins_Job_List
 from .forms import ApplyForm, DeployitemFormSet, SLBForm, SLBsiteFormSet, LoginForm
 from configmanager.acs_api.acs_ecs_monitor import query_ecs_api
 from acs_api.acs_ecs_info import query_ecs_info
@@ -34,6 +33,7 @@ from configmanager.acs_api.acs_slb_health import query_slb_health
 from configmanager.acs_api.acs_slb_backendserver_remove import remove_backendserver
 from configmanager.acs_api.acs_slb_backendserver_add import add_backendserver
 from configmanager.acs_api.acs_all_ecs_info import query_all_ecs
+from configmanager.jenkins_api.jenkins_job import get_Jenkins_Job_List, getSCMInfroFromLatestGoodBuild
 import os
 import json
 import time
@@ -1509,3 +1509,67 @@ class AlarmHistoryListView(generic.ListView):
 
     def get_paginate_by(self, queryset):
         return self.request.GET.get('paginate_by', self.paginate_by)
+
+
+class JenkinsJobListView(generic.ListView):
+    model = Jenkins_Job_List
+    template_name = 'configmanager/jenkins_job_list.html'
+    context_object_name = 'jenkins_job_list'
+    paginator_class = SafePaginator
+    paginate_by = 10
+
+    def get_queryset(self):
+        try:
+            q = self.request.GET['q']
+        except:
+            q = ''
+        if (q != ''):
+            jenkins_job_list = Jenkins_Job_List.objects.filter(
+                Q(name__icontains=q)).order_by('name')
+        else:
+            jenkins_job_list = Jenkins_Job_List.objects.order_by('name')
+        return jenkins_job_list
+
+    def get_context_data(self, **kwargs):
+        context = super(JenkinsJobListView, self).get_context_data(**kwargs)
+        q = self.request.GET.get('q')
+        if q is None:
+            return context
+        context['q'] = q
+        return context
+
+    def get_paginate_by(self, queryset):
+        return self.request.GET.get('paginate_by', self.paginate_by)
+
+
+@login_required(login_url='/login/')
+def jenkins_sync_job(request):
+    job_list = get_Jenkins_Job_List('http://jenkins.dev.com', 'jack', 'cjf123')
+    for job in job_list:
+        if not Jenkins_Job_List.objects.filter(name=job):
+            jenkins_job_list = Jenkins_Job_List(name=job)
+            jenkins_job_list.save()
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+
+@login_required(login_url='/login/')
+def sync_job_last_success_build_num(request):
+    for job in Jenkins_Job_List.objects.all():
+        num = getSCMInfroFromLatestGoodBuild('http://jenkins.dev.com', job.name, 'jack', 'cjf123')
+        job.last_success_num = num
+        job.save()
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+
+@login_required(login_url='/login/')
+def jenkins_job_list_whole_refresh(request, pagenumber):
+    jenkins_job_list = Jenkins_Job_List.objects.order_by('name')
+    template = 'configmanager/jenkins_job_list_template.html'
+    paginator = Paginator(jenkins_job_list, 10)
+    try:
+        jenkins_job_list = paginator.page(pagenumber)
+    except PageNotAnInteger:
+        jenkins_job_list = paginator.page(1)
+    except EmptyPage:
+        jenkins_job_list = paginator.page(paginator.num_pages)
+    return render(request, template, {'jenkins_job_list': jenkins_job_list, 'pagenumber': pagenumber})

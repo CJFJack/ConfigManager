@@ -3,6 +3,7 @@
 from configmanager.acs_api import acs_rds_info
 from configmanager.acs_api import acs_rds_monitor
 from configmanager.acs_api import acs_alarm_history
+from configmanager.acs_api import acs_ecs_monitor
 from .models import RDS, RDS_Usage_Record, Alarm_History, ECS
 import datetime, time
 
@@ -58,9 +59,9 @@ def get_ecs_resource():
     for ecs in ECS.objects.all():
         instanceid = ecs.instanceid.encode('utf-8')
         try:
-            recently_cpu = query_ecs_api(instanceid=instanceid, metric="cpu_total")
-            recently_mem = query_ecs_api(instanceid=instanceid, metric="memory_usedutilization")
-            recently_diskusage = query_ecs_api(instanceid=instanceid, metric="diskusage_utilization")
+            recently_cpu = acs_ecs_monitor.query_ecs_api(instanceid=instanceid, metric="cpu_total")
+            recently_mem = acs_ecs_monitor.query_ecs_api(instanceid=instanceid, metric="memory_usedutilization")
+            recently_diskusage = acs_ecs_monitor.query_ecs_api(instanceid=instanceid, metric="diskusage_utilization")
         except:
             pass
         else:

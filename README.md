@@ -8,6 +8,9 @@ CMS(Config Manager System: 运维管理平台)
 > CMS现有功能:
 
 - 统计Dashboard
+    - 报警统计
+    - RDS资源统计
+    - ECS资源统计
 - 系统管理
     - ECS管理
     - 应用管理

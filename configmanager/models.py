@@ -462,7 +462,7 @@ class Alarm_History(models.Model):
 
 class Jenkins_Job_List(models.Model):
     name = models.CharField(max_length=50, verbose_name=u'Jenkins任务名称')
-    last_success_num = models.IntegerField(null=True, blank=True, verbose_name=u'最后一次成功构建版本号')
+    last_success_num = models.IntegerField(default=0, verbose_name=u'最后一次成功构建版本号')
 
     class Meta:
         verbose_name = u'Jenkins任务列表'

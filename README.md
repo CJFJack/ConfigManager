@@ -30,13 +30,13 @@ CMS(Config Manager System: 运维管理平台)
 pip install -r requirements.txt
 ```
 
-### 安装并创建数据库cms
+### 安装 MySQL 并创建数据库 cms
 
 
 ### 修改配置
 
 
-MySQL配置修改settings.py:
+MySQL 配置修改 settings.py:
 
 ```
 DATABASES = {
@@ -53,7 +53,7 @@ DATABASES = {
 
 ```
 
-阿里云接口认证配置settings.py:
+阿里云接口认证配置 settings.py:
 ```
 ACCESS_KEY_ID = 'XXXXXXXXXX'
 ACCESS_KEY_SECRET = 'XXXXXXXXXXXXXX'
@@ -61,7 +61,7 @@ ACCESS_KEY_SECRET = 'XXXXXXXXXXXXXX'
 ```
 
 
-Jenkins配置settings.py:
+Jenkins 配置 settings.py:
 ```
 JENKINS_URL = 'http://jenkins.dev.com'
 JENKINS_USER = 'xxxx'
@@ -70,13 +70,13 @@ JENKINS_PASS = 'xxxxxx'
 ```
 
 
-发布文件生成路径配置settings.py:
+发布文件生成路径配置 settings.py:
 ```
 DEPLOY_DIR_PATH = r'D:\release'
 
 ```
 
-修改允许访问IPsettings.py:
+修改允许访问IP settings.py:
 ```
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 

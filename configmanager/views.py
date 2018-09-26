@@ -43,7 +43,6 @@ app_name = 'configmanager'
 
 
 class LoginView(View):
-
     def get(self, request):
         login_form = LoginForm()
         hash_key = CaptchaStore.generate_key()
@@ -60,8 +59,13 @@ class LoginView(View):
             password = request.POST['password']
             user = authenticate(username=username, password=password)
             if user is not None:
-                login(request, user)
-                return HttpResponseRedirect(request.POST.get('next', '/') or '/')
+                if user.is_active:
+                    login(request, user)
+                    return HttpResponseRedirect(request.POST.get('next', '/') or '/')
+                else:
+                    return render(request, 'configmanager/login.html', {'msg': u'用户未激活，请联系系统管理员！',
+                                                                        'login_form': login_form, 'hash_key': hash_key,
+                                                                        'image_url': image_url})
             else:
                 return render(request, "configmanager/login.html", {'msg': u'用户名或密码错误！', 'login_form': login_form,
                                                                     'hash_key': hash_key, 'image_url': image_url})

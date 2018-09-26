@@ -1,0 +1,13 @@
+<td>
+    {{ job.name }}
+</td>
+<td>
+    {{ job.last_success_num }}
+</td>
+<td>
+    <a href="javascript:void(0);"
+       onclick="UpdateLastSuccessBuildNum('{{ job.id }}', '{{ job.name }}')"
+       type="button" class="btn btn-info">更新最后一次成功构建版本号</a>
+    <a href="javascript:void(0);" onclick="Build('{{ job.id }}', '{{ job.name }}')"
+       type="button" class="btn btn-success">构建</a>
+</td>

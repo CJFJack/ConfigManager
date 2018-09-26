@@ -33,7 +33,7 @@ from configmanager.acs_api.acs_slb_health import query_slb_health
 from configmanager.acs_api.acs_slb_backendserver_remove import remove_backendserver
 from configmanager.acs_api.acs_slb_backendserver_add import add_backendserver
 from configmanager.acs_api.acs_all_ecs_info import query_all_ecs
-from configmanager.jenkins_api.jenkins_job import get_Jenkins_Job_List, getSCMInfroFromLatestGoodBuild
+from configmanager.jenkins_api.jenkins_job import get_Jenkins_Job_List, getSCMInfroFromLatestGoodBuild, build_job
 import os
 import json
 import time
@@ -1542,9 +1542,14 @@ class JenkinsJobListView(generic.ListView):
         return self.request.GET.get('paginate_by', self.paginate_by)
 
 
+jenkins_url = settings.JENKINS_URL
+jenkins_user = settings.JENKINS_USER
+jenkins_pass = settings.JENKINS_PASS
+
+
 @login_required(login_url='/login/')
-def jenkins_sync_job(request):
-    job_list = get_Jenkins_Job_List('http://jenkins.dev.com', 'jack', 'cjf123')
+def jenkins_sync_jobs(request):
+    job_list = get_Jenkins_Job_List(jenkins_url, jenkins_user, jenkins_pass)
     for job in job_list:
         if not Jenkins_Job_List.objects.filter(name=job):
             jenkins_job_list = Jenkins_Job_List(name=job)
@@ -1555,7 +1560,7 @@ def jenkins_sync_job(request):
 @login_required(login_url='/login/')
 def sync_job_last_success_build_num(request):
     for job in Jenkins_Job_List.objects.all():
-        num = getSCMInfroFromLatestGoodBuild('http://jenkins.dev.com', job.name, 'jack', 'cjf123')
+        num = getSCMInfroFromLatestGoodBuild(jenkins_url, job.name, jenkins_user, jenkins_pass)
         job.last_success_num = num
         job.save()
     return HttpResponse(json.dumps({'success': True}), content_type="application/json")
@@ -1564,7 +1569,7 @@ def sync_job_last_success_build_num(request):
 @login_required(login_url='/login/')
 def jenkins_job_list_whole_refresh(request, pagenumber):
     jenkins_job_list = Jenkins_Job_List.objects.order_by('name')
-    template = 'configmanager/jenkins_job_list_template.html'
+    template = 'configmanager/job_whole_fresh_template.html'
     paginator = Paginator(jenkins_job_list, 10)
     try:
         jenkins_job_list = paginator.page(pagenumber)
@@ -1573,3 +1578,36 @@ def jenkins_job_list_whole_refresh(request, pagenumber):
     except EmptyPage:
         jenkins_job_list = paginator.page(paginator.num_pages)
     return render(request, template, {'jenkins_job_list': jenkins_job_list, 'pagenumber': pagenumber})
+
+
+@login_required(login_url='/login/')
+def jenkins_update_job(request, jobid):
+    try:
+        job = Jenkins_Job_List.objects.get(id=jobid)
+    except:
+        pass
+    else:
+        job_name = job.name
+    last_success_build = getSCMInfroFromLatestGoodBuild(jenkins_url, job_name, jenkins_user, jenkins_pass)
+    job.last_success_num = last_success_build
+    job.save()
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")
+
+
+@login_required(login_url='/login/')
+def job_part_refresh(request, jobid):
+    job = Jenkins_Job_List.objects.get(pk=jobid)
+    template = 'configmanager/job_part_fresh_template.html'
+    return render(request, template, {"job": job})
+
+
+@login_required(login_url='/login/')
+def jenkins_build_job(request, jobid):
+    try:
+        job = Jenkins_Job_List.objects.get(id=jobid)
+    except:
+        pass
+    else:
+        job_name = job.name
+    build_job(jenkins_url, job_name, jenkins_user, jenkins_pass)
+    return HttpResponse(json.dumps({'success': True}), content_type="application/json")

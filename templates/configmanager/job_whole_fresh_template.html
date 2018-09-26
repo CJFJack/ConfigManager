@@ -3,15 +3,23 @@
         <thead>
         <th>Jenkins 任务名称</th>
         <th>最后一次成功构建版本号</th>
+        <th>操作</th>
         </thead>
         <tbody>
         {% for job in jenkins_job_list %}
-            <tr>
+            <tr id="tr_{{ job.id }}">
                 <td>
                     {{ job.name }}
                 </td>
                 <td>
                     {{ job.last_success_num }}
+                </td>
+                <td>
+                    <a href="javascript:void(0);"
+                       onclick="UpdateLastSuccessBuildNum('{{ job.id }}', '{{ job.name }}')"
+                       type="button" class="btn btn-info">更新最后一次成功构建版本号</a>
+                    <a href="javascript:void(0);" onclick="Build('{{ job.id }}', '{{ job.name }}')"
+                       type="button" class="btn btn-success">构建</a>
                 </td>
             </tr>
         {% endfor %}

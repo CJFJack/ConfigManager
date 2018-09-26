@@ -104,9 +104,12 @@ urlpatterns = [
 
     # Jenkins管理页面
     url(r'^jenkins_job_list/$', views.JenkinsJobListView.as_view(), name='jenkins_job_list'),
-    url(r'^jenkins/sync_job/$', views.jenkins_sync_job, name='jenkins_sync_job'),
+    url(r'^jenkins/sync_job/$', views.jenkins_sync_jobs, name='jenkins_sync_jobs'),
     url(r'^jenkins_job_list/wholerefresh/(?P<pagenumber>[0-9]+)/$', views.jenkins_job_list_whole_refresh,
         name='jenkins_job_list_whole_refresh'),
     url(r'^jenkins/sync_job_last_success_build_num/$', views.sync_job_last_success_build_num,
         name='sync_job_last_success_build_num'),
+    url(r'^jenkins/(?P<jobid>[0-9]+)/update/$', views.jenkins_update_job, name='jenkins_update_job'),
+    url(r'^jenkins/(?P<jobid>[0-9]+)/partrefresh/$', views.job_part_refresh, name='job_part_refresh'),
+    url(r'^jenkins/(?P<jobid>[0-9]+)/build/$', views.jenkins_build_job, name='jenkins_build_job'),
 ]

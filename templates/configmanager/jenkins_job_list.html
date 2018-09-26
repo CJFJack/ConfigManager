@@ -8,7 +8,7 @@
         <div class="btn-group">
             <a href="javascript:void(0);" onclick="SyncAllJenkinsJob('{{ page_obj.number }}')" type="button"
                class="btn btn-success">同步所有 Jenkins 任务</a>
-            <a href="javascript:void(0);" onclick="SyncAllJenkinsJobNumber('{{ page_obj.number }}')" type="button"
+            <a href="javascript:void(0);" onclick="SyncAllJenkinsLastJobNumber('{{ page_obj.number }}')" type="button"
                class="btn btn-info">同步所有 Jenkins 任务的 LastSuccessBuildNum</a>
         </div>
     </div><br>
@@ -24,7 +24,7 @@
                 </thead>
                 <tbody>
                 {% for job in jenkins_job_list %}
-                    <tr>
+                    <tr id="tr_{{ job.id }}">
                         <td>
                             {{ job.name }}
                         </td>
@@ -33,9 +33,9 @@
                         </td>
                         <td>
                             <a href="javascript:void(0);"
-                               onclick="UpdateLastSuccessBuildNum('{{ job.id }}', '{{ pagenumber }}')"
-                               type="button" class="btn btn-success">更新最后一次成功构建版本号</a>
-                            <a href="javascript:void(0);" onclick="Build('{{ job.id }}', '{{ pagenumber }}')"
+                               onclick="UpdateLastSuccessBuildNum('{{ job.id }}', '{{ job.name }}')"
+                               type="button" class="btn btn-info">更新最后一次成功构建版本号</a>
+                            <a href="javascript:void(0);" onclick="Build('{{ job.id }}', '{{ job.name }}')"
                                type="button" class="btn btn-success">构建</a>
                         </td>
                     </tr>
@@ -57,10 +57,10 @@
         });
 
         //局部刷新
-        function PartialRefresh(ecsid, pagenumber) {
-            var postUrl = "/ecs/" + ecsid + "/partrefresh/" + pagenumber + "/";
+        function PartialRefresh(jobid) {
+            var postUrl = "/jenkins/" + jobid + "/partrefresh/";
             $.post(postUrl, function (data) {
-                $('#tr_' + ecsid).html(data)
+                $('#tr_' + jobid).html(data)
             });
         }
 
@@ -99,7 +99,7 @@
 
 
         //更新所有 Jenkins 任务的最后一次成功构建版本号
-        function SyncAllJenkinsJobNumber(pagenumber) {
+        function SyncAllJenkinsLastJobNumber(pagenumber) {
             var postUrl = "/jenkins/sync_job_last_success_build_num/";
             var pagenumber = pagenumber;
 
@@ -124,44 +124,18 @@
         }
 
 
-        // 更新jenkins 最好一次成功构建版本号
-        function UpdateLastSuccessBuildNum(jobid, pagenumber) {
-            var postUrl = "/ecs/" + ecsid + "/disable/";
-            var ecsname = ecsname
+        // 更新jenkins 最后一次成功构建版本号
+        function UpdateLastSuccessBuildNum(jobid, jobname) {
+            var postUrl = "/jenkins/" + jobid + "/update/";
 
             jQuery('#body').showLoading();
 
             $.post(postUrl, function (data) {
                 if (data.success) {
-                    PartialRefresh(ecsid, pagenumber);
-                    $("#alert-div").css("display", "");
-                    $("#alert-div").attr("class", "alert alert-warning");
-                    $("#alert-div").text("成功！禁用ECS " + ecsname);
-                    setTimeout(function () {
-                        $("#alert-div").fadeOut();
-                    }, 20000);
-                } else {
-                    alert("操作失败！" + data.message);
-                }
-                setTimeout(function () {
-                    jQuery('#body').hideLoading();
-                }, 300);
-            });
-        }
-
-        //启用ECS
-        function ECSenable(ecsid, ecsname, pagenumber) {
-            var postUrl = "/ecs/" + ecsid + "/enable/";
-            var ecsname = ecsname
-
-            jQuery('#body').showLoading();
-
-            $.post(postUrl, function (data) {
-                if (data.success) {
-                    PartialRefresh(ecsid, pagenumber);
+                    PartialRefresh(jobid);
                     $("#alert-div").css("display", "");
                     $("#alert-div").attr("class", "alert alert-success");
-                    $("#alert-div").text("成功！启用ECS " + ecsname);
+                    $("#alert-div").text("成功！更新 Job " + jobname);
                     setTimeout(function () {
                         $("#alert-div").fadeOut();
                     }, 20000);
@@ -175,19 +149,18 @@
         }
 
 
-        //刷新ECS监控数据
-        function UpdateECSMonitor(ecsid, ecsname, pagenumber) {
-            var postUrl = "/ecs/" + ecsid + "/updatemonitor/";
-            var ecsname = ecsname
+        // 构建 Jenkins 任务
+        function Build(jobid, jobname) {
+            var postUrl = "/jenkins/" + jobid + "/build/";
 
             jQuery('#body').showLoading();
 
             $.post(postUrl, function (data) {
                 if (data.success) {
-                    PartialRefresh(ecsid, pagenumber);
+                    PartialRefresh(jobid);
                     $("#alert-div").css("display", "");
                     $("#alert-div").attr("class", "alert alert-success");
-                    $("#alert-div").text("成功！刷新监控数据 " + ecsname);
+                    $("#alert-div").text("成功！触发构建 Job " + jobname);
                     setTimeout(function () {
                         $("#alert-div").fadeOut();
                     }, 20000);
@@ -199,32 +172,6 @@
                 }, 300);
             });
         }
-
-        //刷新ECS基础数据
-        function UpdateECSInfo(ecsid, ecsname, pagenumber) {
-            var postUrl = "/ecs/" + ecsid + "/updateinfo/";
-            var ecsname = ecsname
-
-            jQuery('#body').showLoading();
-
-            $.post(postUrl, function (data) {
-                if (data.success) {
-                    PartialRefresh(ecsid, pagenumber);
-                    $("#alert-div").css("display", "");
-                    $("#alert-div").attr("class", "alert alert-success");
-                    $("#alert-div").text("成功！刷新基础数据 " + ecsname);
-                    setTimeout(function () {
-                        $("#alert-div").fadeOut();
-                    }, 20000);
-                } else {
-                    alert("操作失败！" + data.message);
-                }
-                setTimeout(function () {
-                    jQuery('#body').hideLoading();
-                }, 300);
-            });
-        }
-
 
     </script>
 

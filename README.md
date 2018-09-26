@@ -9,7 +9,14 @@ CMS(Config Manager System: 运维管理平台)
 
 - 统计Dashboard
 - 系统管理
+    - ECS管理
+    - 应用管理
+    - 应用族管理
+    - SLB管理
 - 发布管理
+    - 配置管理
+    - Jenkins管理
+    - 发布申请
 - 报警管理
 
 ## 部署
@@ -47,6 +54,15 @@ DATABASES = {
 ```
 ACCESS_KEY_ID = 'XXXXXXXXXX'
 ACCESS_KEY_SECRET = 'XXXXXXXXXXXXXX'
+
+```
+
+
+Jenkins配置settings.py:
+```
+JENKINS_URL = 'http://jenkins.dev.com'
+JENKINS_USER = 'xxxx'
+JENKINS_PASS = 'xxxxxx'
 
 ```
 
@@ -100,3 +116,4 @@ QQ: 398741302
 ![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/master/doc/images/cms_config_manager.png)
 ![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/master/doc/images/cms_ecs_manager.png)
 ![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/master/doc/images/cms_deploy_apply.png)
+![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/master/doc/images/cms_jenkins_job_manage.png)

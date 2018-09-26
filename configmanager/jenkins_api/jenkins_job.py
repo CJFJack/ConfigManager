@@ -21,8 +21,6 @@ def getSCMInfroFromLatestGoodBuild(url, jobName, username=None, password=None):
 def build_job(url, job, username=None, password=None):
     J = Jenkins(url, username, password)
     result = J.build_job(job)
-    queue_info = J.get_queue_info()
-    print queue_info
     return result
 
 

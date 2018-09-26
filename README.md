@@ -116,4 +116,4 @@ QQ: 398741302
 ![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/master/doc/images/cms_config_manager.png)
 ![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/master/doc/images/cms_ecs_manager.png)
 ![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/master/doc/images/cms_deploy_apply.png)
-![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/master/doc/images/cms_jenkins_job_manage.png)
+![cms](https://raw.githubusercontent.com/CJFJack/ConfigManager/New_Template/doc/images/cms_jenkins_job_manage.png)

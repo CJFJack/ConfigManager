@@ -21,6 +21,7 @@ from django.views.generic.base import View
 from django.contrib.auth import authenticate, login
 from captcha.models import CaptchaStore
 from captcha.helpers import captcha_image_url
+from pure_pagination.mixins import PaginationMixin
 
 from time import time
 from .models import ECS, Site, Configfile, Siterace, Release, ConfigmanagerHistoricalconfigfile, Apply, Deployitem, SLB, \
@@ -1511,11 +1512,11 @@ class AlarmHistoryListView(generic.ListView):
         return self.request.GET.get('paginate_by', self.paginate_by)
 
 
-class JenkinsJobListView(generic.ListView):
+@method_decorator(login_required(login_url='/login/'), name='dispatch')
+class JenkinsJobListView(PaginationMixin, generic.ListView):
     model = Jenkins_Job_List
     template_name = 'configmanager/jenkins_job_list.html'
     context_object_name = 'jenkins_job_list'
-    paginator_class = SafePaginator
     paginate_by = 10
 
     def get_queryset(self):
@@ -1530,16 +1531,16 @@ class JenkinsJobListView(generic.ListView):
             jenkins_job_list = Jenkins_Job_List.objects.order_by('name')
         return jenkins_job_list
 
-    def get_context_data(self, **kwargs):
-        context = super(JenkinsJobListView, self).get_context_data(**kwargs)
-        q = self.request.GET.get('q')
-        if q is None:
-            return context
-        context['q'] = q
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super(JenkinsJobListView, self).get_context_data(**kwargs)
+    #     q = self.request.GET.get('q')
+    #     if q is None:
+    #         return context
+    #     context['q'] = q
+    #     return context
 
-    def get_paginate_by(self, queryset):
-        return self.request.GET.get('paginate_by', self.paginate_by)
+    # def get_paginate_by(self, queryset):
+    #     return self.request.GET.get('paginate_by', self.paginate_by)
 
 
 jenkins_url = settings.JENKINS_URL

@@ -47,6 +47,42 @@
         {% endif %}
     </div>
 
+    {% block page %}{% endblock %}
+
+    {% load i18n %}
+    <div class="container-fluid table-responsive pagination page">
+        {% if is_paginated %}
+            <ul class="pagination page">
+                <li>
+                    <span>共有 {{ page_obj.paginator.count }} 条记录</span>&nbsp;&nbsp;
+                    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                </li>
+                {% if page_obj.has_previous %}
+                    <li><a href="?{{ page_obj.previous_page_number.querystring }}"
+                           class="prev">&lsaquo;&lsaquo; {% trans "previous" %}</a></li>
+                {% else %}
+                    <li><span class="disabled prev">&lsaquo;&lsaquo; {% trans "previous" %}</span>
+                {% endif %}
+                {% for page in page_obj.pages %}
+                    {% if page %}
+                        {% ifequal page page_obj.number %}
+                            <li class="active"><span>{{ page }}</span></li>
+                        {% else %}
+                            <li><a href="?{{ page.querystring }}" class="page">{{ page }}</a></li>
+                        {% endifequal %}
+                    {% else %}
+                        <li><a href="javascript:void(0)">...</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <li><a href="?{{ page_obj.next_page_number.querystring }}" class="next">{% trans "next" %}
+                        &rsaquo;&rsaquo;</a></li>
+                {% else %}
+                    <li><span class="disabled">{% trans "next" %} &rsaquo;&rsaquo;</span></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
 
 
     <script>

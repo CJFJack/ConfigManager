@@ -80,9 +80,15 @@
 
 
 
+
+
+
                             {% if request.user.is_superuser or request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}">
                         <a href="#"
                            class="dropdown-toggle
+
+
+
 
 
 
@@ -126,9 +132,15 @@
                             <li role="presentation" class="dropdown-header">配置管理</li>
                             <li class="
 
+
+
+
                                     {% if request.user.is_superuser or request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}">
                                 <a href="{% url 'configmanager:configlist' %}">配置修改</a></li>
                             <li class="
+
+
+
 
                                     {% if request.user.is_superuser or request.user|has_group:'admin' or request.user|has_group:'运维工程师' or request.user|has_group:'运维经理' %}{% else %}disabled{% endif %}">
                                 <a href="{% url 'configmanager:undeployconfiglist' %}">待生效配置</a></li>
@@ -202,33 +214,38 @@
     <!-- // content -->
 
     <!--分页栏-->
-    <div class="container-fluid table-responsive">
-        {% if is_paginated %}
-            <ul class="pagination">
-                <li>
-                    <span>共有 {{ page_obj.paginator.count }} 条记录</span>&nbsp;&nbsp;
-                    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-                </li>
-                {% if page_obj.has_previous %}
-                    <li><a href="?q={{ q }}&page={{ page_obj.previous_page_number }}">上一页</a></li>
-                {% else %}
-                    <li class="disabled"><span>上一页</span></li>
-                {% endif %}
-                {% for i in paginator.page_range %}
-                    {% if page_obj.number == i %}
-                        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+    {% block page %}
+
+        <div class="container-fluid table-responsive">
+            {% if is_paginated %}
+                <ul class="pagination">
+                    <li>
+                        <span>共有 {{ page_obj.paginator.count }} 条记录</span>&nbsp;&nbsp;
+                        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+                    {% if page_obj.has_previous %}
+                        <li><a href="?q={{ q }}&page={{ page_obj.previous_page_number }}">上一页</a></li>
                     {% else %}
-                        <li><a href="?q={{ q }}&page={{ i }}">{{ i }}</a></li>
+                        <li class="disabled"><span>上一页</span></li>
                     {% endif %}
-                {% endfor %}
-                {% if page_obj.has_next %}
-                    <li><a href="?q={{ q }}&page={{ page_obj.next_page_number }}">下一页</a></li>
-                {% else %}
-                    <li class="disabled"><span>下一页</span></li>
-                {% endif %}
-            </ul>
-        {% endif %}
-    </div>
+                    {% for i in paginator.page_range %}
+                        {% if page_obj.number == i %}
+                            <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                        {% else %}
+                            <li><a href="?q={{ q }}&page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <li><a href="?q={{ q }}&page={{ page_obj.next_page_number }}">下一页</a></li>
+                    {% else %}
+                        <li class="disabled"><span>下一页</span></li>
+                    {% endif %}
+                </ul>
+            {% endif %}
+        </div>
+
+
+    {% endblock %}
 
 </div>
 

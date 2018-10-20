@@ -8,6 +8,7 @@ from captcha.fields import CaptchaField
 
 class ApplyForm(ModelForm):
     wishdeploy_time = DateField(widget=widgets.AdminDateWidget(), label=u'期望发布日期')
+
     class Meta:
         model = Apply
         fields = '__all__'

@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from django.db import models
 from simple_history.models import HistoricalRecords
-from django.utils.html import format_html
 
 # Create your models here.
 
@@ -339,12 +338,14 @@ class Person(models.Model):
     def __unicode__(self):              # __unicode__ on Python 2
         return self.name
 
+
 class Group(models.Model):
     name = models.CharField(max_length=128)
     members = models.ManyToManyField(Person, through='Membership')
 
     def __unicode__(self):              # __unicode__ on Python 2
         return self.name
+
 
 class Membership(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
@@ -371,9 +372,9 @@ class ConfigmanagerHistoricalconfigfile(models.Model):
     class Meta:
         managed = False
         db_table = 'configmanager_historicalconfigfile'
-    
+
     def get_site_fullname(self):
-        s= Site.objects.get(pk=self.site_id)
+        s = Site.objects.get(pk=self.site_id)
         return s.fullname
     
     def __unicode__(self):

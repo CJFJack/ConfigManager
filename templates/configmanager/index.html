@@ -343,7 +343,7 @@
         var myChart_ALARM_line = echarts.init(document.getElementById('alarm_line'));
         {#显示loading加载样式#}
         jQuery('#alarm_line').showLoading();
-        {#    显示RDS-CPU-line图。#}
+        {#    显示ALARM-CPU-line图。#}
         $.ajax({
             type: "post",
             async: true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
